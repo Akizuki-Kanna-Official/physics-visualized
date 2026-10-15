@@ -24,10 +24,12 @@ if(M.events)M.events(s,EV,P);if(f||s.t-last>=dtr){H.push({t:s.t,...M.rec(s,P)});
 if(inF)FIV.push([a,s.t]);TG=M.tg(EV,P);}
 function reset(){readParams();X=M.exact(PX,P);$("ans").innerHTML=tagsNote()+M.sol(X,P);st=M.init(P);prerun();cam={x:0,v:0};TSc=null;MAG={z:1,on:false};run=false;PIE.d=null;chipLast="";if(M.onReset)M.onReset(P);updBtns();if(typeof draw==="function"&&VIEW)draw();}
 // 播放倍率：子弹时间开时，在极短过程前后放慢（提前量按当前倍率估算），全部按真实时间连续缓动
-function tsTarget(){const b=M.tsBase(P);if(!slow)return b;const s=M.tsSlow(P),lead=(TSc||b)*1.6,hold=s*0.6;for(const[a,e]of FIV){if(st.t>=a-lead&&st.t<=e+hold)return s;}return b;}
+// 接近极短过程时，目标倍率 = 剩余物理时间/1.2 s（即约 1.2 s 真实时间后到达），夹在 [慢放, 正常] 之间——连续变小、无跳变；过程中用慢放倍率，结束后保持 hold 再恢复
+function tsTarget(){const b=M.tsBase(P);if(!slow)return b;const s=M.tsSlow(P),lead=(TSc||b)*1.6,hold=s*0.6;st._iv=st._iv||{};
+for(let i=0;i<FIV.length;i++){const[a,e]=FIV[i];if(st.t>e+hold)continue;if(st.t<a){const ap=Math.min(b,Math.max(s,(a-st.t)/1.2));if(ap<b||st._iv[i]){st._iv[i]=1;return ap;}continue;}st._iv[i]=1;return s;}return b;}
 function advance(dS){let rem=dS,n=0;while(rem>1e-15&&n<2e5){const h=Math.min(M.h(st,P),rem);M.step(st,h,P);rem-=h;n++;}}
 function frame(t){if(lastT==null)lastT=t;const dt=Math.min((t-lastT)/1000,.05);lastT=t;
-if(run){const tg=tsTarget();TSc=slow?tsEase2(TSc,tg,dt,0.35):tg;advance(dt*TSc);
+if(run){if(TSc==null)TSc=tsTarget();const tg=tsTarget();TSc=slow?tsEase2(TSc,tg,dt,0.35):tg;advance(dt*TSc);
 const f=M.camFocus?M.camFocus(st,P):null;if(f!=null){const tgt=Math.max(M.camMin==null?0:M.camMin,(f*K+VIEW.ox)-(M.camAnchor||CW/2));const T1=M.camNeg?tgt:Math.max(0,tgt);cam.tv=cam.lt==null?0:(T1-cam.lt)/Math.max(dt,1e-6);cam.lt=T1;camStep(cam,T1,dt,M.camW||2.2,cam.tv);}
 const mg=M.mag?M.mag(st,P):null;if(mg){MAG.on=true;MAG.z+=(mg.z-MAG.z)*(1-Math.exp(-dt/0.6));}}
 draw();chipUpd();requestAnimationFrame(frame);}
