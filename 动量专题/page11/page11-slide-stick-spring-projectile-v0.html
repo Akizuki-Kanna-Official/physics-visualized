@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,600&display=swap">
+<title>第 11 页 · 下滑粘合 + 弹簧 + 平抛</title>
+<link rel="stylesheet" href="../../common/cw.css">
+</head><body><div id="app">
+<header class="top"><span class="tag">模型三 · 簧类（第 11 页）</span><h1>第 3 题　A 滑下粘 B，弹簧推 C 平抛</h1>
+<div class="tools"><label class="sw"><input type="checkbox" id="clawdOn" checked><i></i>显示小人</label>
+<div class="fzc"><span>字号</span><button id="fzm" aria-label="减小字号">A−</button><input type="range" id="fz" min="50" max="400" step="10" value="100"><button id="fzp" aria-label="增大字号">A＋</button><b id="fzv">100%</b></div></div></header>
+<main class="main">
+<section class="left"><div class="stage" id="scene"><canvas id="c"></canvas><div id="clawd" class="clawd"></div></div><div class="hint chip" id="hint">动画按时间缩放播放</div></section>
+<section class="right"><nav class="tabs" id="tabs"><i class="ind" id="ind"></i><button data-t="sol" class="on">解题过程</button><button data-t="gr">运动图像</button><button data-t="en">能量饼图</button></nav>
+<div class="tabbody">
+<div class="tab on" id="t-sol"><div class="pager" id="pg-sol"><p class="q">一轻质弹簧的一端固定在滑块 B 上，另一端与滑块 C 接触但未连接，该整体静止放在离地面高为 <span class="f">H</span> = 5 m 的光滑水平桌面上。现有一滑块 A 从光滑曲面上离桌面 <span class="f">h</span> = 1.8 m 高处由静止开始滑下，与滑块 B 发生碰撞并粘在一起压缩弹簧推动滑块 C 向前运动，经一段时间，滑块 C 脱离弹簧，继续在水平桌面上匀速运动一段后从桌面边缘飞出。已知 <span class="f">m</span><sub>A</sub> = 1 kg，<span class="f">m</span><sub>B</sub> = 2 kg，<span class="f">m</span><sub>C</sub> = 3 kg，取 <span class="f">g</span> = 10 m/s²。求：(1) 滑块 A 与滑块 B 碰撞结束瞬间的速度大小；(2) 被压缩弹簧的最大弹性势能；(3) 滑块 C 落地点与桌面边缘的水平距离。</p>
+<p class="fnote">质量、高度为<b>题目给的</b>；劲度系数、C 到桌边距离、曲面形状为<b>动画补设</b>。</p><h3>解答</h3><div id="ans"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-gr"><div class="seg" id="seg"><button data-g="gv" class="on">v–t</button><button data-g="gx">x–t</button><button data-g="ge">E–t</button></div>
+<div class="pager" id="pg-gr"><div id="gb"><h4 id="gtitle"></h4><canvas id="gv" class="on"></canvas><canvas id="gx"></canvas><canvas id="ge"></canvas></div><div class="gleg" id="gleg"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-en"><div class="pager" id="pg-en"><h3>A 初始重力势能 <i class=f>m</i><sub>A</sub><i class=f>gh</i> 的去向</h3><canvas id="pie"></canvas><div id="pieLeg" class="pleg"></div><h3>实时数据</h3><div id="live" class="live"></div></div><div class="pgnav"></div></div>
+</div></section></main>
+<footer class="bot"><div class="ctl"><div class="btns"><button class="primary" id="play">▶ 开始播放</button><button id="pause">⏸ 暂停</button><button id="rst">↺ 重置</button></div><label class="sw bt"><input type="checkbox" id="bt" checked><i></i>子弹时间</label></div><div class="params" id="params"></div></footer>
+</div>
+<script src="../../common/exact.js"></script><script src="../../common/canvas.js"></script><script src="../../common/graph.js"></script><script src="../../common/pie.js"></script><script src="../../common/clawd.js"></script><script src="../../common/scene.js"></script><script src="../../common/ui.js"></script><script src="../../common/draw.js"></script>
+<script>
+const KEY="p11";
+const defs=[["mA","A 的质量 mA","kg",0.2,5,0.1,1,"g"],["mB","B 的质量 mB","kg",0.2,5,0.1,2,"g"],["mC","C 的质量 mC","kg",0.2,6,0.1,3,"g"],["h","A 释放高度 h","m",0.2,3,0.1,1.8,"g"],["H","桌面高 H","m",1,8,0.5,5,"g"],["k","劲度系数 k","N/m",20,400,1,96,"a"],["d","C 到桌边的距离","m",0.5,4,0.1,2,"a"]];
+const g=10,W=0.4,L0=0.4,XB=1.0,KC=1e5;
+const M={title:"第 11 页 · 下滑粘合 + 弹簧弹开 + 平抛",
+exact(Q){const half=R(1,2),G=R(g),vA=qroot(qm(R(2),qm(G,Q.h))),mAB=qa(Q.mA,Q.mB),r1=qd(Q.mA,mAB),v1=smq(vA,r1),mt=qa(mAB,Q.mC),v1s=qm(qsq(r1),qm(R(2),qm(G,Q.h))),
+v2s=qm(v1s,qsq(qd(mAB,mt))),Ep=qs(qm(half,qm(mAB,v1s)),qm(half,qm(mt,v2s))),vC=smq(v1,qd(qm(R(2),mAB),mt)),vAB=smq(v1,qd(qs(mAB,Q.mC),mt)),t=qroot(qd(qm(R(2),Q.H),G)),
+E0=qm(Q.mA,qm(G,Q.h)),E1=qm(half,qm(mAB,v1s)),Qc=qs(E0,E1),EC=qm(half,qm(Q.mC,qsq(qd(qm(R(2),mAB),mt)))),xs=qm(qsq(qd(qm(R(2),mAB),mt)),qm(v1s,qd(qm(R(2),Q.H),G)));
+return{vA,v1,Ep,vC,vAB,t,x:qroot(xs),E0,Qc,E1,rQ:qd(Qc,E0),rC:qm(EC,R(1)),rCf:qd(qm(EC,R(1)),E0),rAB:qd(qm(half,qm(mAB,qm(qsq(qd(qs(mAB,Q.mC),mt)),v1s))),E0),abNeg:qv(qs(mAB,Q.mC))};},
+init(P){return{t:0,ph:0,phi:Math.PI/2,om:0,xA:-P.h,yA:P.h,vA:0,xB:XB,vB:0,xC:XB+W+L0,vC:0,yC:0,vy:0};},
+edge(P){return XB+2*W+L0+P.d;},
+h(s){if(s.ph===1)return Math.max(2e-6,Math.min(2e-3,(s.xB-s.xA-W)/s.vA/4));return s.ph===2?2e-6:s.ph===0?5e-4:2e-4;},fast(s){return s.ph===2;},
+step(s,h,P){const{mA,mB,mC,k}=P;s.t+=h;
+if(s.ph===0){// 光滑曲面（1/4 圆弧，形状为动画补设）：φ'' = −(g/h) sin φ
+const Rr=P.h,f=(p,o)=>[o,-g/Rr*Math.sin(p)],[a1,b1]=f(s.phi,s.om),[a2,b2]=f(s.phi+a1*h/2,s.om+b1*h/2),[a3,b3]=f(s.phi+a2*h/2,s.om+b2*h/2),[a4,b4]=f(s.phi+a3*h,s.om+b3*h);
+s.phi+=h/6*(a1+2*a2+2*a3+a4);s.om+=h/6*(b1+2*b2+2*b3+b4);if(s.phi<=0){s.ph=1;s.phi=0;s.vA=sval(X.vA);s.xA=0;s.yA=0;s.tb=s.t;}else{s.xA=-Rr*Math.sin(s.phi);s.yA=Rr-Rr*Math.cos(s.phi);s.vA=-Rr*s.om*Math.cos(s.phi);}return;}
+const Fs=()=>k*Math.max(0,L0-(s.xC-s.xB-W));
+if(s.ph<=2){const d=s.xA+W-s.xB;if(s.ph===1&&d>=0)s.ph=2;const Fc=s.ph===2?KC*Math.max(0,d):0,F=Fs();
+s.vA-=Fc/mA*h;s.vB+=(Fc-F)/mB*h;s.vC+=F/mC*h;s.xA+=s.vA*h;s.xB+=s.vB*h;s.xC+=s.vC*h;
+if(s.ph===2&&s.vA<=s.vB){const v=(mA*s.vA+mB*s.vB)/(mA+mB);s.vA=s.vB=v;s.ph=3;s.tc=s.t;s.dc=s.xB-s.xA;}return;}
+if(s.ph===3){const mAB=mA+mB,a=()=>{const F=Fs();return[-F/mAB,F/mC,F];};let[a1,c1]=a();s.xB+=s.vB*h+.5*a1*h*h;s.xC+=s.vC*h+.5*c1*h*h;let[a2,c2,F]=a();s.vB+=.5*(a1+a2)*h;s.vC+=.5*(c1+c2)*h;s.xA=s.xB-s.dc;s.vA=s.vB;
+const c=L0-(s.xC-s.xB-W);if(c>(s.cmax||0))s.cmax=c;
+if(c<=0&&s.vC>s.vB){s.ph=4;s.ts=s.t;// C 脱离弹簧：取精确速度
+const vc=sval(X.vC),vab=sval(X.vAB);if(Math.abs(s.vC-vc)<5e-3){s.vC=vc;s.vB=s.vA=vab;}}return;}
+if(s.ph===4){s.xA+=s.vA*h;s.xB+=s.vB*h;s.xC+=s.vC*h;if(s.xC+W/2>=M.edge(P)){s.ph=5;s.tf=s.t;s.x0=M.edge(P);s.xC=s.x0-W/2;}return;}
+if(s.ph===5){s.xA+=s.vA*h;s.xB+=s.vB*h;const tt=s.t-s.tf;s.xC=s.x0-W/2+s.vC*tt;s.yC=-.5*g*tt*tt;s.vy=-g*tt;if(s.yC<=-P.H){s.yC=-P.H;s.ph=6;s.tl=s.t;s.land=s.vC*Math.sqrt(2*P.H/g);s.xC=s.x0-W/2+s.land;s.vC=0;s.vy=0;}return;}
+s.xA+=s.vA*h;s.xB+=s.vB*h;},
+check(s){return{cmax:s.cmax,Ep:.5*96*(s.cmax||0)**2,vAB:s.vB,tland:s.tl,land:s.land};},
+tsBase(){return 0.5;},tsSlow(){return 0.002;},tPre(P){return 8;},
+events(s,E){["tb","tc","ts","tf","tl"].forEach(k=>{if(s[k]&&!E[k])E[k]=s[k];});},tg(E){return E.tl?E.tl+0.4:6;},
+rec(s,P){const c=Math.max(0,L0-(s.xC-s.xB-W));return{v:{A:s.vA,B:s.vB,C:s.vC},x:{c:c*10,y:s.yC},E:{A:s.ph<3?.5*P.mA*(s.ph===0?(P.h*s.om)**2:s.vA**2):0,AB:s.ph>=3?.5*(P.mA+P.mB)*s.vB**2:.5*P.mB*s.vB**2,C:.5*P.mC*s.vC**2,p:.5*P.k*c*c,Q:s.ph>=3?qv(X.Qc):0}};},
+G:{gv:{title:"水平速度—时间图像",note:"A 滑到底 6 m/s → 与 B 粘合 2 m/s → 弹簧把 C 推开：C 得 2 m/s，AB 恰好停下；C 落地后静止",f:"v",ylab:[["速度 ",0],["v",1],[" / (m·s⁻¹)",0]],s:[{k:"A",c:"#8A6440",t:[["A（水平分速度）",0]]},{k:"B",c:C.slate,dash:[6,3],t:[["B（粘合后即 AB）",0]]},{k:"C",c:C.brass,t:[["C",0]]}],mark:E=>E.tf},
+gx:{title:"弹簧压缩量与 C 的高度",note:"实线：弹簧压缩量（×10，单位 dm）；虚线：C 相对桌面的高度（平抛下落 H = 5 m）",f:"x",ylab:[["",0],["x",1],[" / dm,  ",0],["y",1],[" / m",0]],s:[{k:"c",c:C.clay,t:[["弹簧压缩量（dm）",0]]},{k:"y",c:C.brass,dash:[5,4],t:[["C 的高度（m）",0]]}],mark:E=>E.tf},
+ge:{title:"能量—时间图像（C 离开桌面前）",note:"粘合损失 12 J；弹簧把 AB 的 6 J 动能全部转给 C",f:"E",ylab:[["能量 ",0],["E",1],[" / J",0]],s:[{k:"A",c:"#8A6440",t:[["A 动能",0]]},{k:"AB",c:C.slate,t:[["B（AB）动能",0]]},{k:"C",c:C.brass,t:[["C 动能",0]]},{k:"p",c:C.plum,t:[["弹性势能",0]]},{k:"Q",c:C.clay,t:[["碰撞内能",0]]}],mark:E=>E.tc}},
+view(P){const wd=P.h+M.edge(P)+P.d+1.0,ht=P.h+P.H+0.5,K=Math.min(400/wd,290/ht);return{K,ox:50+K*P.h,gy:150+K*(P.h+0.3)};},ground:false,
+world(v,s,P){const E=M.edge(P);
+// 曲面与桌面
+ctx.fillStyle="#E4DFD2";ctx.beginPath();ctx.moveTo(v.X(-P.h-0.15),v.Y(P.h));for(let a=Math.PI/2;a>=0;a-=0.03)ctx.lineTo(v.X(-P.h*Math.sin(a)),v.Y(P.h-P.h*Math.cos(a)));ctx.lineTo(v.X(E),v.Y(0));ctx.lineTo(v.X(E),v.Y(-P.H));ctx.lineTo(v.X(-P.h-0.15),v.Y(-P.H));ctx.closePath();ctx.fill();
+ctx.strokeStyle=C.ink;ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(v.X(-P.h-0.15),v.Y(P.h));for(let a=Math.PI/2;a>=0;a-=0.02)ctx.lineTo(v.X(-P.h*Math.sin(a)),v.Y(P.h-P.h*Math.cos(a)));ctx.lineTo(v.X(E),v.Y(0));ctx.lineTo(v.X(E),v.Y(-P.H));ctx.stroke();
+ctx.beginPath();ctx.moveTo(v.X(E-0.2),v.Y(-P.H));ctx.lineTo(v.X(E+P.d+2),v.Y(-P.H));ctx.stroke();
+// 平抛轨迹
+if(s.ph>=5){ctx.strokeStyle="rgba(201,100,66,.6)";ctx.setLineDash([4,4]);ctx.beginPath();const vc=sval(X.vC),T=Math.min(s.t-s.tf,Math.sqrt(2*P.H/g));for(let t=0;t<=T+1e-9;t+=T/40){const X0=v.X(E+vc*t),Y0=v.Y(-.5*g*t*t);t?ctx.lineTo(X0,Y0):ctx.moveTo(X0,Y0);}ctx.stroke();ctx.setLineDash([]);}
+wSpring(v,s.xB+W,s.xC,W/2,8,0.06);wBlock(v,s.xB,0,W,W,"B",STEEL);wBlock(v,s.xC,s.yC,W,W,"C");
+ctx.save();ctx.translate(v.X(s.xA+W/2),v.Y(s.yA));ctx.rotate(s.ph===0?s.phi:0);wBlock({K:v.K,X:x=>(x-W/2)*v.K,Y:y=>-y*v.K},0,0,W,W,"A",WOOD);ctx.restore();
+if(v.main){ctx.fillStyle=C.ink;ctx.font="12px "+GF;ctx.fillText("h = "+P.h+" m",v.X(-P.h)-34,v.Y(P.h/2));ctx.fillText("H = "+P.H+" m",v.X(E)+8,v.Y(-P.H/2));
+if(s.ph===6){ctx.fillStyle=C.clay;ctx.fillText("落地点距桌边 "+fx(s.land,4)+" m",v.X(E)+8,v.Y(-P.H)-30);}}},
+mag(s,P){return{x:s.ph>=5?s.xC+W/2:(s.xB+s.xC+W)/2,y:s.ph>=5?s.yC+W/2:W/2,z:4,r:[500,170,470,270],title:"放大镜 · A、B、C 与弹簧"};},
+status(s,P){return["A 沿光滑曲面下滑，机械能守恒","A 在光滑桌面上匀速滑向 B","A 与 B 碰撞粘合（时间极短，弹簧几乎未形变）","AB 压缩弹簧推动 C：动量守恒、机械能守恒","C 脱离弹簧匀速运动，AB 恰好静止","C 离开桌边做平抛运动","C 落地后静止（地面吸收竖直速度，假设不反弹不滑行）"][s.ph];},
+bars(s,P){const m=sval(X.vA);return[["A",s.vA,"#8A6440",m],["B",s.vB,C.slate,m],["C",s.vC,C.brass,m]];},
+pie(s,P,X){const E=qv(X.E0),r=M.rec(s,P).E;return{tgt:[r.A/E,s.ph>=3?r.AB/E:0,(s.ph>=5?qv(X.rC):r.C)/E,r.p/E,r.Q/E],cols:["#8A6440",C.slate,C.brass,C.plum,C.clay],names:["A 动能","AB 动能","C 动能（水平部分）","弹性势能","碰撞内能"],done:s.ph>=4,fr:[R(0),X.rAB,X.rCf,R(0),X.rQ]};},
+live(s,P){const c=Math.max(0,L0-(s.xC-s.xB-W));return[["桌面上水平总动量",fx(P.mA*s.vA+P.mB*s.vB+(s.ph>=5?P.mC*sval(X.vC):P.mC*s.vC),4)+" kg·m/s"],["弹性势能",fx(.5*P.k*c*c,4)+" J"],["已出现的最大弹性势能",fx(.5*P.k*(s.cmax||0)**2,4)+" J"],["C 落地点距桌边",s.land?fx(s.land,4)+" m":"—"]];},
+sol(X,P){const i=t=>`<span class="f">${t}</span>`,V=(q,u)=>`<span class="v">${surdH(q,u)}</span>`,VE=(q,u)=>`<span class="v">${exH(q,u)}</span>`,st=(n,h)=>`<div class="step"><span class="n">${n}</span><div>${h}</div></div>`,m=k=>i("m")+"<sub>"+k+"</sub>";
+return st(1,`<b>A 下滑</b>：曲面光滑，机械能守恒 ${m("A")}${i("gh")} = ½${m("A")}${i("v")}<sub>A</sub>² ⇒ ${i("v")}<sub>A</sub> = ${V(X.vA,"m/s")}`)+
+st(2,`<b>(1)</b> A 与 B 碰撞时间极短，弹簧来不及形变，C 不参与；A、B 动量守恒：${m("A")}${i("v")}<sub>A</sub> = (${m("A")}+${m("B")})${i("v")}₁ ⇒ ${i("v")}₁ = ${V(X.v1,"m/s")}（损失 ${exH(X.Qc,"J")} 变为内能）`)+
+st(3,`<b>(2)</b> AB 压缩弹簧推 C，三者共速时弹簧最短、弹性势能最大：(${m("A")}+${m("B")})${i("v")}₁ = (${m("A")}+${m("B")}+${m("C")})${i("v")}₂；<br>${i("E")}<sub>p</sub> = ½(${m("A")}+${m("B")})${i("v")}₁² − ½(${m("A")}+${m("B")}+${m("C")})${i("v")}₂² = ${VE(X.Ep,"J")}`)+
+st(4,`<b>(3)</b> 弹簧恢复原长时 C 脱离（相当于弹性碰撞）：${i("v")}<sub>C</sub> = 2(${m("A")}+${m("B")})${i("v")}₁/(${m("A")}+${m("B")}+${m("C")}) = ${V(X.vC,"m/s")}，AB 速度 ${surdH(X.vAB,"m/s")}${X.abNeg===0?"（恰好静止）":""}。<br>平抛：${i("H")} = ½${i("gt")}² ⇒ ${i("t")} = ${surdH(X.t,"s")}，${i("x")} = ${i("v")}<sub>C</sub>${i("t")} = ${V(X.x,"m")}`)+
+`<div class="ansbox">答案：(1) ${surdH(X.v1,"m/s")}；(2) ${exH(X.Ep,"J")}；(3) ${surdH(X.x,"m")}（与课件一致）</div>`+
+`<div class="fnote">动画补设：曲面画成半径为 ${i("h")} 的 1/4 圆弧（只有高度影响答案）；劲度系数 ${i("k")}、弹簧原长、C 到桌边距离、物块尺寸不影响答案。AB 与 C 分开后，AB 速度为 0，<b>就此静止</b>；C 落地时地面吸收其竖直速度，动画假设它<b>落地即停</b>（题目只问落地点）。</div>`+(X.abNeg<0?`<div class="warn">当前 ${m("A")}+${m("B")} &lt; ${m("C")}，AB 被弹回向左运动，会滑上曲面——超出本题设定，动画只演示到 C 落地。</div>`:"");}};
+
+</script>
+<script src="../../common/engine.js"></script>
+<script>engineStart();</script>
+</body></html>
