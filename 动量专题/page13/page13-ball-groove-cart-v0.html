@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,600&display=swap">
+<title>第 13 页 · 小球滑入等质量弧形槽小车</title>
+<link rel="stylesheet" href="../../common/cw.css">
+</head><body><div id="app">
+<header class="top"><span class="tag">模型四 · 滑块—曲面（第 13 页）</span><h1>第 2 题　等质量弧形槽小车（多选）</h1>
+<div class="tools"><label class="sw"><input type="checkbox" id="clawdOn" checked><i></i>显示小人</label>
+<div class="fzc"><span>字号</span><button id="fzm" aria-label="减小字号">A−</button><input type="range" id="fz" min="50" max="400" step="10" value="100"><button id="fzp" aria-label="增大字号">A＋</button><b id="fzv">100%</b></div></div></header>
+<main class="main">
+<section class="left"><div class="stage" id="scene"><canvas id="c"></canvas><div id="clawd" class="clawd"></div></div><div class="hint chip" id="hint">动画按时间缩放播放</div></section>
+<section class="right"><nav class="tabs" id="tabs"><i class="ind" id="ind"></i><button data-t="sol" class="on">解题过程</button><button data-t="gr">运动图像</button><button data-t="en">能量饼图</button></nav>
+<div class="tabbody">
+<div class="tab on" id="t-sol"><div class="pager" id="pg-sol"><p class="q">（多选）如图所示，在光滑水平面上停放质量为 <span class="f">m</span> 的装有弧形槽的小车。现有一质量也为 <span class="f">m</span> 的小球以（<span class="f">v</span>₀）的水平速度沿切线水平的槽口向小车滑去（不计摩擦），到达某一高度后，小球又返回小车右端，则（　　）<br>A. 小球在小车上到达最高点时的速度大小为 <span class="f">v</span>₀/2<br>B. 小球离车后，对地将向右做平抛运动<br>C. 小球离车后，对地将做自由落体运动<br>D. 此过程中小球对车做的功为 <span class="f">mv</span>₀²/2</p>
+<p class="fnote">等质量为<b>题目给的</b>；<span class="f">m</span>、<span class="f">v</span>₀ 为<b>示例数值</b>；槽的尺寸为<b>动画补设</b>。</p><h3>解答</h3><div id="ans"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-gr"><div class="seg" id="seg"><button data-g="gv" class="on">v–t</button><button data-g="gx">h–t</button><button data-g="ge">E–t</button></div>
+<div class="pager" id="pg-gr"><div id="gb"><h4 id="gtitle"></h4><canvas id="gv" class="on"></canvas><canvas id="gx"></canvas><canvas id="ge"></canvas></div><div class="gleg" id="gleg"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-en"><div class="pager" id="pg-en"><h3>小球初动能 ½<i class=f>mv</i>₀² 的去向</h3><canvas id="pie"></canvas><div id="pieLeg" class="pleg"></div><h3>实时数据</h3><div id="live" class="live"></div></div><div class="pgnav"></div></div>
+</div></section></main>
+<footer class="bot"><div class="ctl"><div class="btns"><button class="primary" id="play">▶ 开始播放</button><button id="pause">⏸ 暂停</button><button id="rst">↺ 重置</button></div><label class="sw bt"><input type="checkbox" id="bt" checked><i></i>子弹时间</label></div><div class="params" id="params"></div></footer>
+</div>
+<script src="../../common/exact.js"></script><script src="../../common/canvas.js"></script><script src="../../common/graph.js"></script><script src="../../common/pie.js"></script><script src="../../common/clawd.js"></script><script src="../../common/scene.js"></script><script src="../../common/ui.js"></script><script src="../../common/draw.js"></script>
+<script>
+const KEY="p13";
+const defs=[["m","质量 m（小球与小车相同）","kg",0.2,5,0.1,1,"e"],["v0","初速度 v₀","m/s",1,8,0.5,4,"e"],["R","槽的圆弧半径 R","m",0.4,2,0.1,0.8,"a"]];
+const g=10,RB=0.08,D=0.3,LIP=0.4,WR=0.09;
+const M={title:"第 13 页 · 小球滑入等质量弧形槽小车",clawdX:960,clawdY:472,
+extraTags(){return{g:["小车与小球质量都为 <i class=f>m</i>；不计摩擦；水平面光滑","小球到达某一高度后返回小车右端"],a:["槽口（小车右端平台）离地高度 0.3 m、长 0.4 m"]};},
+exact(Q){const half=R(1,2),G=R(g),v=qd(Q.v0,R(2)),h=qd(qsq(Q.v0),qm(R(4),G)),W=qm(half,qm(Q.m,qsq(Q.v0))),E0=W;return{v,h,vball:R(0),vcar:qs(R(0),Q.v0),W,E0,rh:qd(qm(qm(Q.m,G),h),E0),out:qv(h)>=qv(Q.R)};},
+init(P){return{t:0,ph:0,X:0,V:0,phi:0,om:0,xb:LIP-0.02,vb:-P.v0,yb:D};},
+h(s){return s.ph===1?2e-4:1e-3;},fast(){return false;},
+step(s,h,P){const m=P.m,Mc=P.m,Rr=P.R;s.t+=h;
+if(s.ph===0){s.xb+=s.vb*h;if(s.xb<=s.X){s.ph=1;s.ti=s.t;s.om=(s.V-s.vb)/Rr;s.xb=s.X;}return;}
+if(s.ph===1){// 拉格朗日方程：(M+m)Ẍ − mR(cosφ·φ̈ − sinφ·φ̇²) = 0；Rφ̈ − cosφ·Ẍ + g sinφ = 0
+const acc=(p,o)=>{const c=Math.cos(p),sn=Math.sin(p),a11=Mc+m,a12=-m*Rr*c,b1=-m*Rr*sn*o*o,a21=-c,a22=Rr,b2=-g*sn,det=a11*a22-a12*a21;return[(b1*a22-a12*b2)/det,(a11*b2-a21*b1)/det];};
+const d=y=>{const[aX,aP]=acc(y[2],y[3]);return[y[1],aX,y[3],aP];},y=[s.X,s.V,s.phi,s.om],k1=d(y),k2=d(y.map((v,i)=>v+k1[i]*h/2)),k3=d(y.map((v,i)=>v+k2[i]*h/2)),k4=d(y.map((v,i)=>v+k3[i]*h));
+[s.X,s.V,s.phi,s.om]=y.map((v,i)=>v+h/6*(k1[i]+2*k2[i]+2*k3[i]+k4[i]));s.xb=s.X-Rr*Math.sin(s.phi);s.vb=s.V-Rr*Math.cos(s.phi)*s.om;s.yb=D+Rr-Rr*Math.cos(s.phi);
+if(s.yb-D>(s.hmax||0)){s.hmax=s.yb-D;s.vtop=s.vb;}
+if(s.phi<=0&&s.om<0){s.ph=2;s.tx=s.t;if(Math.abs(s.vb)<5e-3&&Math.abs(s.V+P.v0)<5e-3){s.vb=0;s.V=-P.v0;}s.phi=0;s.yb=D;}return;}
+s.X+=s.V*h;
+if(s.ph===2){s.xb+=s.vb*h;if(s.xb>s.X+LIP){s.ph=3;s.tf=s.t;}return;}
+if(s.ph===3){const tt=s.t-s.tf;s.yb=D-.5*g*tt*tt;s.vy=-g*tt;if(s.yb<=0){s.yb=0;s.vy=0;s.ph=4;s.tl=s.t;}return;}},
+check(s){return{hmax:s.hmax,vtop:s.vtop,vb:s.vb,V:s.V,tl:s.tl};},
+tsBase(){return 0.5;},tsSlow(){return 0.5;},tPre(P){return 12;},
+events(s,E){["ti","tx","tf","tl"].forEach(k=>{if(s[k]&&!E[k])E[k]=s[k];});},tg(E){return E.tl?E.tl+0.6:3;},
+rec(s,P){const vy=s.ph===1?P.R*Math.sin(s.phi)*s.om:s.ph===3?s.vy:0;return{v:{b:s.vb,X:s.V,vy},x:{y:s.yb},E:{b:.5*P.m*(s.vb**2+vy**2),X:.5*P.m*s.V**2,p:P.m*g*(s.yb-D)}};},
+G:{gv:{title:"速度—时间图像（向右为正）",note:"最高点二者共速 v₀/2；小球回到槽口时速度交换：小球水平速度变为 0，小车以 v₀ 向左；之后小球自由下落（竖直分速度见虚线）",f:"v",ylab:[["速度 ",0],["v",1],[" / (m·s⁻¹)",0]],s:[{k:"b",c:C.clay,t:[["小球水平分速度",0]]},{k:"X",c:C.slate,t:[["小车",0]]},{k:"vy",c:C.clay,dash:[4,4],w:1.4,t:[["小球竖直分速度",0]]}],mark:E=>E.tx},
+gx:{title:"小球高度—时间图像",note:"以槽底为参考：最高 v₀²/(4g)；离车后从槽口高度自由下落到地面（负值）",f:"x",ylab:[["相对槽底高度 ",0],["h",1],[" / m",0]],s:[{k:"y",c:C.clay,t:[["小球高度 − 槽底高度",0]]}],mark:E=>E.tx},
+ge:{title:"能量—时间图像（以槽底为重力势能零点）",note:"离车前机械能守恒：小球动能最终全部转给小车，小球对车做功 ½mv₀²",f:"E",ylab:[["能量 ",0],["E",1],[" / J",0]],s:[{k:"b",c:C.clay,t:[["小球动能",0]]},{k:"X",c:C.slate,t:[["小车动能",0]]},{k:"p",c:C.sage,t:[["小球重力势能",0]]}],mark:E=>E.tx}},
+view(P){const K=Math.min(240,300/(P.R+D+0.25));return{K,ox:560,gy:400};},
+camFocus(s,P){return s.X;},camNeg:true,onReset(P){const K=Math.min(240,300/(P.R+D+0.25));M.camAnchor=560;},track(s,P){return[s.X];},
+world(v,s,P){const Rr=P.R,X0=s.X,xl=X0-Rr-0.18,top=D+Rr+0.1;
+if(!offscreen(v,X0-Rr/2,D,"小车")){ctx.fillStyle="#C9CFDA";ctx.strokeStyle=C.ink;ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(v.X(xl),v.Y(WR*2));ctx.lineTo(v.X(xl),v.Y(top));ctx.lineTo(v.X(X0-Rr),v.Y(top));
+for(let a=Math.PI/2;a>=0;a-=0.03)ctx.lineTo(v.X(X0-Rr*Math.sin(a)),v.Y(D+Rr-Rr*Math.cos(a)));ctx.lineTo(v.X(X0+LIP),v.Y(D));ctx.lineTo(v.X(X0+LIP),v.Y(WR*2));ctx.closePath();ctx.fill();ctx.stroke();
+[xl+0.25,X0+LIP-0.25].forEach(x=>{ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(v.X(x),v.Y(WR),WR*v.K,0,7);ctx.fill();ctx.stroke();});
+ctx.fillStyle=C.ink;ctx.font="italic 600 15px 'Source Serif 4',serif";ctx.fillText("m",v.X(xl+0.1),v.Y(D+0.05));}
+const a=s.ph===1?s.phi:0,cx=s.ph===1?X0-(Rr-RB)*Math.sin(a):s.xb,cy=s.ph===1?D+Rr-(Rr-RB)*Math.cos(a):s.yb+RB;
+if(!offscreen(v,cx,cy,"小球"))wBall(v,cx,cy,RB,C.clay,"m");
+if(v.main){if(s.ph===0)wArrow(v,cx-0.1,cy+0.18,-1,36,C.clay,"v₀");if(s.ph>=3&&!offscreen(v,cx,cy,"")){ctx.strokeStyle="rgba(201,100,66,.5)";ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(v.X(cx),v.Y(D+RB));ctx.lineTo(v.X(cx),v.Y(cy));ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=C.clay;ctx.font="12px "+GF;ctx.fillText(s.ph===4?"自由落体落地，静止":"自由落体",v.X(cx)+10,v.Y(cy)-12);}
+if(s.hmax){ctx.fillStyle=C.clay;ctx.font="12px "+GF;ctx.fillText("最大高度（相对槽底）"+fx(s.hmax,3)+" m",v.X(X0-Rr),v.Y(top)-10);}}},
+status(s,P){return["小球以 v₀ 水平滑向槽内（小车静止）",s.om>0?"小球沿槽上升：小车被推向左加速，小球减速":"小球沿槽滑下：小车继续加速","小球回到槽口：水平速度为 0，小车以 v₀ 向左离开","小球离开小车，对地做自由落体运动","小球落地静止；小车以 v₀ 永远匀速向左"][s.ph];},
+bars(s,P){return[["小球（水平）",s.vb,C.clay,P.v0],["小车",s.V,C.slate,P.v0]];},
+pie(s,P,X){const E=qv(X.E0),r=M.rec(s,P).E;return{tgt:[s.ph>=3?0:r.b/E,r.X/E,s.ph>=3?0:r.p/E],cols:[C.clay,C.slate,C.sage],names:["小球动能","小车动能","小球重力势能（以槽底为零）"],done:s.ph>=2,fr:[R(0),R(1),R(0)]};},
+live(s,P){return[["水平总动量",fx(P.m*(s.ph>=3?0:s.vb)+P.m*s.V,4)+" kg·m/s"],["小车速度",fx(s.V,4)+" m/s"],["已达最大高度（相对槽底）",fx(s.hmax||0,4)+" m"]];},
+sol(X,P){const i=t=>`<span class="f">${t}</span>`,V=(q,u)=>`<span class="v">${exH(q,u)}</span>`,st=(n,h)=>`<div class="step"><span class="n">${n}</span><div>${h}</div></div>`,ok=t=>`<b style="color:#3f7f4f">${t}</b>`,no=t=>`<b style="color:#C96442">${t}</b>`;
+return `<div class="warn">题干“以的水平速度”中漏了速度符号，由选项可知为 ${i("v")}₀。题目用字母表示，动画取<b>示例数值</b> ${i("m")} = ${P.m} kg、${i("v")}₀ = ${P.v0} m/s。</div>`+
+st(1,`<b>守恒判断</b>：系统水平方向不受外力，<b>水平动量守恒</b>；不计摩擦，<b>机械能守恒</b>。`)+
+st(2,`<b>A</b>　最高点时小球与小车水平速度相同（小球竖直速度为零）：${i("mv")}₀ = 2${i("mv")} ⇒ ${i("v")} = ${i("v")}₀/2（${V(X.v,"m/s")}）。${ok("A 正确")}（最大高度 ${i("v")}₀²/(4${i("g")}) = ${exH(X.h,"m")}）`)+
+st(3,`<b>B、C</b>　小球回到槽口时：${i("mv")}₀ = ${i("mv")}₁ + ${i("mv")}₂，½${i("mv")}₀² = ½${i("mv")}₁² + ½${i("mv")}₂² ⇒ ${i("v")}₁ = 0，${i("v")}₂ = ${i("v")}₀（等质量弹性“碰撞”，速度交换）。小球离车时对地速度为零，做<b>自由落体运动</b>。${no("B 错误")}，${ok("C 正确")}`)+
+st(4,`<b>D</b>　对小车用动能定理：${i("W")} = ½${i("mv")}₀² − 0（${V(X.W,"J")}）。${ok("D 正确")}`)+
+`<div class="ansbox">答案：ACD（与课件一致）</div>`+
+`<div class="fnote">动画补设：槽的圆弧半径 ${i("R")} = ${P.R} m（须大于 ${i("v")}₀²/(4${i("g")})）、槽口离地高度与平台长度、车轮尺寸。小球离车后自由下落、落地即静止；小车以 ${i("v")}₀ <b>永远匀速向左</b>，镜头跟随小车，已静止的小球离开画面后用边缘箭头指示。</div>`+(X.out?`<div class="warn">当前 ${i("R")} 太小，小球会冲出槽，请增大 ${i("R")}。</div>`:"");}};
+
+</script>
+<script src="../../common/engine.js"></script>
+<script>engineStart();</script>
+</body></html>
