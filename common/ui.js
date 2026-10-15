@@ -9,7 +9,7 @@ function buildParams(){$("params").innerHTML=defs.map(d=>{const lab=d[7]?d[1].re
 if(!d[7])return `<div class="p"><div class="k">${lab}</div><div class="val"><span id="${d[0]}v"></span><small>${d[2]}</small></div><input id="${d[0]}" type="range" min="${d[3]}" max="${d[4]}" step="${d[5]}" value="${d[6]}"></div>`;
 const t=TAGS[d[7]];return `<div class="p"><div class="k">${lab}<span class="tg ${t[1]}">${t[0]}</span></div><div class="val"><input class="num" id="${d[0]}n" type="number" min="${d[3]}" max="${d[4]}" step="${d[5]}" value="${d[6]}"><small>${d[2]}</small></div><input id="${d[0]}" type="range" min="${d[3]}" max="${d[4]}" step="${d[5]}" value="${d[6]}"></div>`;}).join("");}
 // 读取参数：P 浮点，PX 精确分数（滑块字符串十进制精确转分数）
-function readParams(){P={};PX={};defs.forEach(d=>{const v=$(d[0]).value;PX[d[0]]=qparse(v);P[d[0]]=+v;const s=$(d[0]+"v");if(s)s.textContent=P[d[0]];const n=$(d[0]+"n");if(n&&document.activeElement!==n)n.value=v;});}
+function readParams(){P={};PX={};defs.forEach(d=>{const nn=$(d[0]+"n"),v=nn&&nn.value.trim()!==""?nn.value.trim():$(d[0]).value;PX[d[0]]=qparse(v);P[d[0]]=+v;const s=$(d[0]+"v");if(s)s.textContent=P[d[0]];const n=$(d[0]+"n");if(n&&document.activeElement!==n)n.value=v;});}
 function cwButtons(){document.querySelectorAll("button").forEach(b=>{let sc=1;
 b.addEventListener("pointerdown",()=>{b.animate([{transform:`scale(${sc})`},{transform:"scale(0.96)"}],{duration:120,easing:"cubic-bezier(.32,.72,0,1)",fill:"forwards"});sc=.96;});
 const up=()=>{if(sc===1)return;b.animate(springKF(...BOUNCY,.96,1,.3).map(v=>({transform:`scale(${v})`})),{duration:300,fill:"forwards"});sc=1;};
@@ -57,7 +57,9 @@ const c=$(GSEL);if(c.animate){const kf=springKF(...SNAPPY,0,1,.35);c.animate(kf.
 $("fz").oninput=e=>setFZ(e.target.value/100);$("fzm").onclick=()=>setFZ(FZ-.1);$("fzp").onclick=()=>setFZ(FZ+.1);
 const cOn=$("clawdOn");cOn.checked=!(LS&&LS.getItem(KEY+".clawd")==="0");const applyC=()=>{$("clawd").style.display=cOn.checked?"":"none";try{LS.setItem(KEY+".clawd",cOn.checked?"1":"0")}catch(e){}};cOn.onchange=applyC;applyC();
 const op=onParam||(()=>{reset();layoutTab();});
-defs.forEach(d=>{$(d[0]).oninput=op;const n=$(d[0]+"n");if(n)n.onchange=()=>{let v=+n.value;if(!isFinite(v))v=d[6];v=Math.max(d[3],Math.min(d[4],v));$(d[0]).value=String(n.value).trim()===""?d[6]:n.value;if(+$(d[0]).value!==+n.value){$(d[0]).value=v;}n.value=$(d[0]).value;op();};});
+defs.forEach(d=>{const n=$(d[0]+"n");$(d[0]).oninput=()=>{if(n)n.value=$(d[0]).value;op();};
+// 数值输入框：可输入任意小数（精确转分数），超出范围夹到端点；滑块同步到最近刻度
+if(n)n.onchange=()=>{let v=+n.value;if(n.value.trim()===""||!isFinite(v))n.value=String(d[6]);else if(v<d[3])n.value=String(d[3]);else if(v>d[4])n.value=String(d[4]);$(d[0]).value=n.value;op();};});
 window.addEventListener("resize",layout);
 (function watchDPR(){const mq=matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);const h=()=>{layout();watchDPR();};mq.addEventListener?mq.addEventListener("change",h,{once:true}):mq.addListener(h);})();
 if(document.fonts)document.fonts.ready.then(layout);

@@ -14,7 +14,8 @@ function tsEase(cur,tgt,dt,tau){if(!cur)return tgt;return cur*Math.pow(tgt/cur,1
 // V11 起新页面使用：在对数空间指数缓动，且每 1/60 s 变化不超过 ×1.10（保证相邻帧屏幕速度比 ≤ 1.10）
 function tsEase2(cur,tgt,dt,tau){if(!cur)return tgt;let d=Math.log(tgt/cur)*(1-Math.exp(-dt/(tau||0.35)));const lim=Math.log(1.10)*dt*60;d=Math.max(-lim,Math.min(lim,d));return cur*Math.exp(d);}
 // 镜头：临界阻尼弹簧追踪目标（px），按真实时间推进；返回新状态 {x,v}
-function camStep(c,target,dt,w){w=w||2.2;const a=w*w*(target-c.x)-2*w*c.v;c.v+=a*dt;c.x+=c.v*dt;return c;}
+// tv：目标速度（前馈），匀速跟随时无滞后
+function camStep(c,target,dt,w,tv){w=w||2.2;tv=tv||0;const a=w*w*(target-c.x)+2*w*(tv-c.v);c.v+=a*dt;c.x+=c.v*dt;return c;}
 // 子弹时间说明条
 let chipLast="";
 function chipSet(slow,N,extra){const Nr=N>=100?Math.round(N/10)*10:N>=10?Math.round(N):+N.toFixed(N<1?2:1);

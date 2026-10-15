@@ -123,3 +123,14 @@ input[type=range]::-webkit-slider-thumb{width:calc(28px*var(--fzc));height:calc(
 .left .hint.chip.off{background:#EEF1EA;color:#4E5E43;box-shadow:inset 0 0 0 1px rgba(78,94,67,.18)}.left .hint.chip b{font-family:var(--math);font-variant-numeric:tabular-nums}
 .ctl .sw.bt{font-size:calc(16px*var(--fzc));min-height:calc(48px*var(--fzc));padding:0 calc(10px*var(--fzc));border-radius:var(--r-panel);background:hsla(0,0%,8%,.06);justify-content:center;white-space:nowrap}
 .ctl .btns{display:flex;gap:8px}.ctl .btns button{flex:1 0 auto;white-space:nowrap;padding:0 calc(14px*var(--fzc))}button:disabled{opacity:.38;cursor:default;pointer-events:none}
+/* ===== V11 起新页面使用（第 2 页未用到这些类） ===== */
+.tg{display:inline-block;margin-left:.45em;font-size:.78em;line-height:1.5;padding:0 .5em;border-radius:999px;vertical-align:1px;white-space:nowrap}
+.tg-g{background:#EEF1EA;color:#4E5E43;box-shadow:inset 0 0 0 1px rgba(78,94,67,.2)}.tg-e{background:#FBF3EF;color:#9E4429;box-shadow:inset 0 0 0 1px rgba(201,100,66,.25)}.tg-a{background:#EEF0F6;color:#475070;box-shadow:inset 0 0 0 1px rgba(71,80,112,.2)}
+.bot .p .val input.num{font:inherit;font-weight:600;font-family:var(--math);font-variant-numeric:tabular-nums;width:5.2em;border:0;border-radius:6px;background:hsla(0,0%,8%,.05);padding:0 .25em;color:var(--ink);outline:none}
+.bot .p .val input.num:focus{box-shadow:var(--focus)}
+.bot .p .val input.num::-webkit-inner-spin-button{opacity:.4}
+.bot .params.np{grid-template-columns:repeat(var(--np,5),minmax(0,1fr))}
+.lbl{margin:.5em 0 .3em;font-size:.86em;color:var(--ink2);line-height:1.8;break-inside:avoid}.lbl .tg{margin:0 .3em 0 0}
+.opt{display:flex;gap:.6em;padding:.45em 0;border-top:1px solid var(--a1);break-inside:avoid;line-height:1.8;color:var(--ink2)}.opt b.ok{color:#4E5E43}.opt b.no{color:#9E4429}.opt>b{flex:none}
+.ansbox{margin:.6em 0;padding:.5em .8em;border-radius:var(--r-panel);background:#EEF1EA;color:#3E4C35;box-shadow:inset 0 0 0 1px rgba(78,94,67,.12);break-inside:avoid}
+.warn{margin:.6em 0;padding:.5em .8em;border-radius:var(--r-panel);background:#FFF6E5;color:#7A5A12;box-shadow:inset 0 0 0 1px rgba(160,120,20,.2);font-size:.9em;break-inside:avoid}

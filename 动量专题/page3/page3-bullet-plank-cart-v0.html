@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,600&display=swap">
+<title>第 3 页 · 子弹穿过 A，A 在平板车 B 上滑动</title>
+<link rel="stylesheet" href="../../common/cw.css">
+</head><body><div id="app">
+<header class="top"><span class="tag">模型一 · 子弹—木块（第 3 页）</span><h1>第 2 题　子弹穿过物块，物块在平板车上滑动</h1>
+<div class="tools"><label class="sw"><input type="checkbox" id="clawdOn" checked><i></i>显示小人</label>
+<div class="fzc"><span>字号</span><button id="fzm" aria-label="减小字号">A−</button><input type="range" id="fz" min="50" max="400" step="10" value="100"><button id="fzp" aria-label="增大字号">A＋</button><b id="fzv">100%</b></div></div></header>
+<main class="main">
+<section class="left"><div class="stage" id="scene"><canvas id="c"></canvas><div id="clawd" class="clawd"></div></div><div class="hint chip" id="hint">动画按时间缩放播放</div></section>
+<section class="right"><nav class="tabs" id="tabs"><i class="ind" id="ind"></i><button data-t="sol" class="on">解题过程</button><button data-t="gr">运动图像</button><button data-t="en">能量饼图</button></nav>
+<div class="tabbody">
+<div class="tab on" id="t-sol"><div class="pager" id="pg-sol"><p class="q">如图所示，质量为 <span class="f">m</span><sub>B</sub> 的平板车 B 上表面水平，开始时静止在光滑水平面上，在平板车左端静止着一质量为 <span class="f">m</span><sub>A</sub> 的物体 A，一颗质量为 <span class="f">m</span>₀ 的子弹以 <span class="f">v</span>₀ 的水平初速度射入物体 A，射穿 A 后速度变为 <span class="f">v</span>，子弹穿过物体 A 的时间极短。已知 A、B 之间的动摩擦因数不为零，且 A 与 B 最终达到相对静止。求：(1) 子弹射穿物体 A 的瞬间物体 A 的速度 <span class="f">v</span><sub>A</sub>；(2) 平板车 B 和物体 A 的最终速度 <span class="f">v</span><sub>共</sub>（设车身足够长）。拓展：若已知动摩擦因数为 μ，则要 A 不从 B 上滑落，B 至少多长？</p>
+<p class="fnote">题目只给字母，页面采用<b>示例数值</b>；地面光滑，A 在 B 上滑动时所受摩擦力 <span class="f">f</span> = μ<span class="f">m</span><sub>A</sub><span class="f">g</span>，<span class="f">g</span> = 10 m/s²。</p><h3>解答</h3><div id="ans"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-gr"><div class="seg" id="seg"><button data-g="gv" class="on">v–t</button><button data-g="gx">x–t</button><button data-g="ge">E–t</button></div>
+<div class="pager" id="pg-gr"><div id="gb"><h4 id="gtitle"></h4><canvas id="gv" class="on"></canvas><canvas id="gx"></canvas><canvas id="ge"></canvas></div><div class="gleg" id="gleg"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-en"><div class="pager" id="pg-en"><h3>A 获得的动能去向</h3><canvas id="pie"></canvas><div id="pieLeg" class="pleg"></div><h3>实时数据</h3><div id="live" class="live"></div></div><div class="pgnav"></div></div>
+</div></section></main>
+<footer class="bot"><div class="ctl"><div class="btns"><button class="primary" id="play">▶ 开始播放</button><button id="pause">⏸ 暂停</button><button id="rst">↺ 重置</button></div><label class="sw bt"><input type="checkbox" id="bt" checked><i></i>子弹时间</label></div><div class="params" id="params"></div></footer>
+</div>
+<script src="../../common/exact.js"></script><script src="../../common/canvas.js"></script><script src="../../common/graph.js"></script><script src="../../common/pie.js"></script><script src="../../common/clawd.js"></script><script src="../../common/scene.js"></script><script src="../../common/ui.js"></script><script src="../../common/draw.js"></script>
+<script>
+const KEY="p3";
+// [id,标签,单位,min,max,step,默认,标注]
+const defs=[["m0","子弹质量 m₀","kg",0.005,0.1,0.005,0.02,"e"],["v0","初速度 v₀","m/s",100,1000,10,600,"e"],["v","射穿后速度 v","m/s",0,900,10,100,"e"],
+["mA","物体 A 质量 mA","kg",0.5,5,0.1,2,"e"],["mB","平板车 B 质量 mB","kg",0.5,10,0.1,3,"e"],["mu","动摩擦因数 μ","",0.1,1,0.05,0.5,"e"],
+["w","A 的宽度","m",0.05,0.4,0.01,0.2,"a"],["L","车长","m",0.5,5,0.1,2,"a"]];
+const g=10,HA=0.2,WR=0.07,TH=0.1,DECK=0.24;
+const M={title:"第 3 页 · 子弹穿过物块 A 后 A 在平板车 B 上滑动",
+exact(Q,P){const two=R(2),half=R(1,2),G=R(g),vA=qd(qm(Q.m0,qs(Q.v0,Q.v)),Q.mA),mAB=qa(Q.mA,Q.mB),vc=qd(qm(Q.mA,vA),mAB),
+Lmin=qd(qm(Q.mB,qsq(vA)),qm(qm(two,qm(Q.mu,G)),mAB)),ts=qd(qs(vA,vc),qm(Q.mu,G)),
+Qf=qs(qm(half,qm(Q.mA,qsq(vA))),qm(half,qm(mAB,qsq(vc)))),E0=qm(half,qm(Q.m0,qsq(Q.v0))),Eb=qm(half,qm(Q.m0,qsq(Q.v))),EA=qm(half,qm(Q.mA,qsq(vA))),Qp=qs(qs(E0,Eb),EA),
+urel=qs(Q.v,vA),ok=qv(urel)>0&&qv(Q.v)<qv(Q.v0),f=ok?qd(qs(qsq(Q.v0),qsq(urel)),qm(qm(two,Q.w),qa(qd(R(1),Q.m0),qd(R(1),Q.mA)))):R(0);
+return{vA,vc,Lmin,ts,Qf,E0,Eb,EA,Qp,f,ok,EAB:qm(half,qm(mAB,qsq(vc))),rA:qd(qm(half,qm(Q.mA,qsq(vc))),EA),rB:qd(qm(half,qm(Q.mB,qsq(vc))),EA),rQ:qd(Qf,EA),fit:qv(Lmin)<=qv(qs(Q.L,Q.w))};},
+init(P){return{t:0,ph:0,xb:-0.35,vb:P.v0,xA:0,vA:0,yA:DECK,vyA:0,xB:0,vB:0,Qp:0,Qf:0,hole:0,tc:null};},
+h(s){return s.ph<=1?2e-6:1e-3;},
+fast(s){return s.ph<=1;},
+step(s,h,P){const{m0,mA,mB,mu}=P,X0=X;s.t+=h;
+if(s.ph===0){s.xb+=s.vb*h;s.xA+=s.vA*h;if(s.xb>=s.xA)s.ph=1;}
+else if(s.ph===1){const f=qv(X0.f);s.vb-=f/m0*h;s.vA+=f/mA*h;s.xb+=s.vb*h;s.xA+=s.vA*h;s.hole=Math.min(P.w,s.xb-s.xA);
+if(s.xb-s.xA>=P.w||s.vb<=s.vA){s.ph=2;s.vb=P.v;s.vA=qv(X0.vA);s.Qp=qv(X0.Qp);s.hole=P.w;}}
+else{s.xb+=s.vb*h;
+// 滑动阶段：加速度分段恒定，按匀变速公式精确推进；共速时刻在步内精确求出
+if(s.ph===2){const fr=mu*mA*g,aA=-fr/mA,aB=fr/mB,dv=s.vA-s.vB,tau=Math.min(h,dv/(aB-aA));
+s.xA+=s.vA*tau+.5*aA*tau*tau;s.xB+=s.vB*tau+.5*aB*tau*tau;s.Qf+=fr*(dv*tau-.5*(aB-aA)*tau*tau);s.vA+=aA*tau;s.vB+=aB*tau;
+if(tau<h){const vc=qv(X0.vc);s.vA=s.vB=vc;s.ph=3;s.tc=s.t-h+tau;s.Qf=qv(X0.Qf);s.xA+=vc*(h-tau);s.xB+=vc*(h-tau);}}
+else{s.xA+=s.vA*h;s.xB+=s.vB*h;}
+if(s.ph===4){s.vyA-=g*h;s.yA+=s.vyA*h;if(s.yA<=0){s.yA=0;s.vyA=0;s.ph=5;}}
+else if(s.ph<4&&s.xA+P.w/2>s.xB+P.L){s.ph=4;}}},
+tsBase(){return 0.5;},tsSlow(P){return 0.0004;},
+tPre(P){const t=qv(X.ok?X.ts:R(1));return Math.max(1.6,t*1.6+0.01);},
+events(s,E){if(s.tc!=null&&E.tc==null)E.tc=s.tc;if(s.ph>=2&&E.tp==null)E.tp=s.t;},
+tg(E){return E.tc?E.tc*1.4:1.5;},
+rec(s,P){const{mA,mB}=P;return{v:{A:s.vA,B:s.vB},x:{A:s.xA,B:s.xB,d:s.xA-s.xB},E:{A:.5*mA*s.vA**2,B:.5*mB*s.vB**2,Q:s.Qf}};},
+G:{gv:{title:"速度—时间图像（A、B）",note:"子弹穿过 A 的时间极短（约 0.3 ms），A 的速度在 t≈0 时突变为 <i class=f>v</i><sub>A</sub>；两线之间的面积 = A 相对 B 滑行的距离",f:"v",ylab:[["速度 ",0],["v",1],[" / (m·s⁻¹)",0]],
+s:[{k:"A",c:"#8A6440",t:[["物体 A",0]]},{k:"B",c:"#5D6B86",t:[["平板车 B",0]]}],mark:E=>E.tc,
+leg:X=>[{c:"#8A6440",line:1,t:[["物体 A：",0],["v",1],["A",0],[" = ",0],["",0,X.vA],[" m/s → ",0],["",0,X.vc],[" m/s",0]]},{c:"#5D6B86",line:1,t:[["平板车 B：0 → ",0],["v",1],["共",0],[" = ",0],["",0,X.vc],[" m/s",0]]},{c:"rgba(201,100,66,.2)",t:[["两线之间面积 = 相对滑行距离 = ",0],["",0,X.Lmin],[" m",0]]}],
+extra(x,A,now,E){const hs=H.filter(h=>h.t<=now);fillBetween(x,A,hs.map(h=>[h.t,h.v.A]),hs.map(h=>[h.t,h.v.B]),"rgba(201,100,66,.2)");if(E.tc&&now>=E.tc){x.fillStyle=C.clay;x.beginPath();x.arc(A.X(E.tc),A.Y(qv(X.vc)),4.5,0,7);x.fill();rich(x,[["共速 ",0],["v",1],[" = ",0],["",0,X.vc],[" m/s，",0],["t",1],[" = ",0],["",0,X.ts],[" s",0]],A.X(E.tc)+8,A.Y(qv(X.vc))-14,12.5,"left","#9E4429");}}},
+gx:{title:"位移—时间图像",note:"<i class=f>x</i> 为左端相对起点的位移；共速后两线平行",f:"x",ylab:[["位移 ",0],["x",1],[" / m",0]],s:[{k:"A",c:"#8A6440",t:[["物体 A ",0],["x",1],["A",0]]},{k:"B",c:"#5D6B86",t:[["平板车 B ",0],["x",1],["B",0]]},{k:"d",c:C.clay,dash:[5,4],t:[["A 相对 B 的位移 ",0],["Δx",1]]}],mark:E=>E.tc},
+ge:{title:"能量—时间图像（滑动阶段）",note:"A 获得的动能一部分转为 B 的动能，一部分因摩擦生热 <i class=f>Q</i>",f:"E",ylab:[["能量 ",0],["E",1],[" / J",0]],
+s:[{k:"A",c:"#8A6440",t:[["A 的动能",0]]},{k:"B",c:"#5D6B86",t:[["B 的动能",0]]},{k:"Q",c:C.clay,t:[["摩擦生热 ",0],["Q",1]]}],mark:E=>E.tc,dash:[],
+leg:X=>[{c:"#8A6440",line:1,t:[["A 的动能",0]]},{c:"#5D6B86",line:1,t:[["B 的动能",0]]},{c:C.clay,line:1,t:[["摩擦生热 ",0],["Q",1],[" → ",0],["",0,X.Qf],[" J",0]]},{c:"#1F1E1D",line:1,t:[["A 刚获得的动能 = ",0],["",0,X.EA],[" J（虚线）",0]]}]}},
+view(P){const K=Math.min(300,640/(P.L+0.5));return{K,ox:230,gy:262};},
+camFocus(s,P){return s.xB+P.L/2;},camAnchor:520,track(s,P){return[s.xB+P.L/2];},
+world(v,s,P){const L=P.L;wCart(v,s.xB,L,DECK,TH,WR,"B");
+// A（穿孔随子弹延伸）
+const ay=s.ph>=4?s.yA:DECK;wBlock(v,s.xA,ay,P.w,HA,"A");
+if(s.hole>0){ctx.fillStyle="rgba(60,35,15,.55)";const hy=v.Y(ay+HA/2),hh=Math.max(1.5,Math.min(3*v.K/K,6));ctx.fillRect(v.X(s.xA),hy-hh,s.hole*v.K,hh*2);}
+// 子弹
+const by=DECK+HA/2;if(!offscreen(v,s.xb,by,"子弹 "+fx(s.vb,0)+" m/s →"))wBullet(v,s.xb,by);
+if(v.main){if(s.ph===0)wArrow(v,s.xb-0.25,by+0.12,1,40,C.clay,"v₀");
+// 相对滑行距离标注
+if(s.ph>=2&&s.ph<4){const d=s.xA-s.xB,y=DECK+HA+0.08;ctx.strokeStyle=C.clay;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(v.X(s.xB),v.Y(y));ctx.lineTo(v.X(s.xA),v.Y(y));ctx.stroke();ctx.fillStyle=C.clay;ctx.font="12px "+GF;ctx.textAlign="right";ctx.fillText("A 相对 B 滑行 "+fx(d,3)+" m",v.X(s.xA)-4,v.Y(y)-6);ctx.textAlign="left";}
+ctx.strokeStyle="rgba(201,100,66,.35)";ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(v.X(s.xB+L),v.Y(DECK+0.02));ctx.lineTo(v.X(s.xB+L),v.Y(DECK+HA+0.15));ctx.stroke();ctx.setLineDash([]);}},
+mag(s,P){return{x:s.xA+P.w/2,y:DECK+HA/2,z:2.6,r:[24,300,992,166],title:"放大镜 · 跟随物体 A"};},
+status(s){return["子弹飞向 A","子弹穿过 A（时间极短，摩擦力的冲量可忽略）","A 在 B 上滑动：A 减速，B 加速","A、B 共速，一起匀速运动","A 从 B 右端滑落","A 落地后在光滑地面上匀速运动"][s.ph];},
+bars(s,P){const vm=Math.max(qv(X.vA),1)*1.1;return[["子弹 v",s.vb,C.brass,P.v0],["物体 A",s.vA,"#8A6440",vm],["平板车 B",s.vB,"#5D6B86",vm]];},
+pie(s,P,X){const E=qv(X.EA),a=.5*P.mA*s.vA**2/E,b=.5*P.mB*s.vB**2/E;const sl=s.ph>=2;return{tgt:sl?[a,b,Math.max(0,1-a-b)]:[0,0,0],cols:["#8A6440","#5D6B86",C.clay],names:["A 的动能","B 的动能","摩擦生热 <i class=f>Q</i>"],done:s.ph===3,fr:[X.rA,X.rB,X.rQ],unit:" <i class=f>E</i><sub>A</sub>"};},
+live(s,P){const{m0,mA,mB}=P;return[["系统（子弹+A+B）总动量",fx(m0*s.vb+mA*s.vA+mB*s.vB,4)+" kg·m/s"],["初始总动量",fx(m0*P.v0,4)+" kg·m/s"],["A+B 总动量",fx(mA*s.vA+mB*s.vB,4)+" kg·m/s"],["子弹穿 A 生热",fx(s.Qp,2)+" J"],["A、B 摩擦生热",fx(s.Qf,3)+" J"],["A 相对 B 滑行",fx(s.ph>=2?s.xA-s.xB:0,4)+" m"]];},
+sol(X,P){const i=t=>`<span class="f">${t}</span>`,V=(q,u)=>`<span class="v">${exH(q,u)}</span>`,st=(n,h)=>`<div class="step"><span class="n">${n}</span><div>${h}</div></div>`;
+if(!X.ok)return `<div class="warn">当前参数下 ${i("v")} 不大于 ${i("v")}<sub>A</sub>（或 ${i("v")} ≥ ${i("v")}₀），子弹不可能以 ${i("v")} 射穿 A，请调整参数。</div>`;
+return st(1,`<b>(1)</b> 子弹穿过 A 时间极短，内力远大于 B 对 A 的摩擦力，B 尚未参与；子弹与 A 组成的系统动量守恒（向右为正）：<br>${i("m")}₀${i("v")}₀ = ${i("m")}₀${i("v")} + ${i("m")}<sub>A</sub>${i("v")}<sub>A</sub> ⇒ ${i("v")}<sub>A</sub> = ${i("m")}₀(${i("v")}₀ − ${i("v")}) / ${i("m")}<sub>A</sub> = ${V(X.vA,"m/s")}`)+
+st(2,`<b>(2)</b> A 在 B 上滑动，A、B 系统所受合外力为零，动量守恒：${i("m")}<sub>A</sub>${i("v")}<sub>A</sub> = (${i("m")}<sub>A</sub>+${i("m")}<sub>B</sub>)${i("v")}<sub>共</sub><br>⇒ ${i("v")}<sub>共</sub> = ${i("m")}₀(${i("v")}₀ − ${i("v")}) / (${i("m")}<sub>A</sub>+${i("m")}<sub>B</sub>) = ${V(X.vc,"m/s")}，方向向右`)+
+st(3,`<b>拓展</b> 摩擦力 ${i("f")} = μ${i("m")}<sub>A</sub>${i("g")}，摩擦生热 ${i("Q")} = ${i("f")}·Δ${i("x")}（Δ${i("x")} 为 A 相对 B 的位移）。由能量守恒：<br>μ${i("m")}<sub>A</sub>${i("g")}${i("L")} = ½${i("m")}<sub>A</sub>${i("v")}<sub>A</sub>² − ½(${i("m")}<sub>A</sub>+${i("m")}<sub>B</sub>)${i("v")}<sub>共</sub>² = ${V(X.Qf,"J")}<br>⇒ ${i("L")}<sub>min</sub> = ${i("m")}<sub>B</sub>${i("v")}<sub>A</sub>² / [2μ${i("g")}(${i("m")}<sub>A</sub>+${i("m")}<sub>B</sub>)] = ${V(X.Lmin,"m")}（A 视为质点）`)+
+st(4,`<b>补充</b> 滑行时间：对 A，μ${i("g")}${i("t")} = ${i("v")}<sub>A</sub> − ${i("v")}<sub>共</sub> ⇒ ${i("t")} = ${V(X.ts,"s")}；子弹穿过 A 损失的机械能 = ${V(X.Qp,"J")}（转化为内能）`)+
+`<div class="ansbox">答案：${i("v")}<sub>A</sub> = ${exH(X.vA,"m/s")}；${i("v")}<sub>共</sub> = ${exH(X.vc,"m/s")}；B 至少长 ${exH(X.Lmin,"m")}</div>`+
+(X.fit?"":`<div class="warn">当前车长（动画补设）小于 ${exH(X.Lmin,"m")} + A 的宽度，A 会从 B 右端滑落，动画按实际情况演示。</div>`)+
+`<div class="fnote">动画补设说明：A 的宽度用于演示子弹穿过 A，子弹所受阻力取恒定值 ${i("f")} = ${exH(X.f,"N")}，使射出速度恰为 ${i("v")}；穿过时间约 ${fx(2*P.w/(P.v0+P.v-qv(X.vA))*1000,2)} ms，此间忽略 B 对 A 的摩擦（与题设“时间极短”一致）。车长不影响答案。</div>`;}};
+
+</script>
+<script src="../../common/engine.js"></script>
+<script>engineStart();</script>
+</body></html>
