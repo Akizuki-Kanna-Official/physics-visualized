@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,600&display=swap">
+<title>第 14 页 · 小球落入可动半圆槽</title>
+<link rel="stylesheet" href="../../common/cw.css">
+</head><body><div id="app">
+<header class="top"><span class="tag">模型四 · 滑块—曲面（第 14 页）</span><h1>第 3 题　小球落入光滑半圆槽（多选）</h1>
+<div class="tools"><label class="sw"><input type="checkbox" id="clawdOn" checked><i></i>显示小人</label>
+<div class="fzc"><span>字号</span><button id="fzm" aria-label="减小字号">A−</button><input type="range" id="fz" min="50" max="400" step="10" value="100"><button id="fzp" aria-label="增大字号">A＋</button><b id="fzv">100%</b></div></div></header>
+<main class="main">
+<section class="left"><div class="stage" id="scene"><canvas id="c"></canvas><div id="clawd" class="clawd"></div></div><div class="hint chip" id="hint">动画按时间缩放播放</div></section>
+<section class="right"><nav class="tabs" id="tabs"><i class="ind" id="ind"></i><button data-t="sol" class="on">解题过程</button><button data-t="gr">运动图像</button><button data-t="en">能量饼图</button></nav>
+<div class="tabbody">
+<div class="tab on" id="t-sol"><div class="pager" id="pg-sol"><p class="q">（多选）如图所示，光滑的半圆槽置于光滑的水平地面上，从一定高度自由下落的小球 <span class="f">m</span> 恰能沿半圆槽边缘的切线方向滑入原先静止的槽内，对此情况，下列说法正确的是（　　）<br>A. 小球第一次离开槽时，将向右上方做斜抛运动<br>B. 小球第一次离开槽时，将做竖直上抛运动<br>C. 小球离开槽后，仍能落回槽内，而槽将做往复运动<br>D. 槽一直向右运动</p>
+<p class="fnote">题目未给数值，全部为<b>示例数值</b>。</p><h3>解答</h3><div id="ans"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-gr"><div class="seg" id="seg"><button data-g="gv" class="on">v–t</button><button data-g="gx">x–t</button><button data-g="ge">E–t</button></div>
+<div class="pager" id="pg-gr"><div id="gb"><h4 id="gtitle"></h4><canvas id="gv" class="on"></canvas><canvas id="gx"></canvas><canvas id="ge"></canvas></div><div class="gleg" id="gleg"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-en"><div class="pager" id="pg-en"><h3>系统机械能的分配</h3><canvas id="pie"></canvas><div id="pieLeg" class="pleg"></div><h3>实时数据</h3><div id="live" class="live"></div></div><div class="pgnav"></div></div>
+</div></section></main>
+<footer class="bot"><div class="ctl"><div class="btns"><button class="primary" id="play">▶ 开始播放</button><button id="pause">⏸ 暂停</button><button id="rst">↺ 重置</button></div><label class="sw bt"><input type="checkbox" id="bt" checked><i></i>子弹时间</label></div><div class="params" id="params"></div></footer>
+</div>
+<script src="../../common/exact.js"></script><script src="../../common/canvas.js"></script><script src="../../common/graph.js"></script><script src="../../common/pie.js"></script><script src="../../common/clawd.js"></script><script src="../../common/scene.js"></script><script src="../../common/ui.js"></script><script src="../../common/draw.js"></script>
+<script>
+const KEY="p14";
+const defs=[["m","小球质量 m","kg",0.2,5,0.1,1,"e"],["M","槽的质量 M","kg",0.5,10,0.5,4,"e"],["R","半圆槽半径 R","m",0.3,2,0.1,0.8,"e"],["h","释放点高出槽口 h","m",0.05,2,0.05,0.2,"e"]];
+const g=10,RB=0.07,BASE=0.2,RIM=0.15;
+const M={title:"第 14 页 · 小球落入可动半圆槽",clawdX:960,clawdY:472,
+extraTags(){return{g:["半圆槽、地面均光滑；小球恰好沿槽边缘切线（竖直）滑入"]};},
+exact(Q){const G=R(g),vin=qroot(qm(R(2),qm(G,Q.h))),E=qm(qm(Q.m,G),qa(Q.h,Q.R)),mt=qa(Q.m,Q.M),u2=qd(qm(R(2),qm(E,Q.M)),qm(Q.m,mt)),U2=qd(qm(R(2),qm(E,Q.m)),qm(Q.M,mt)),shift=qd(qm(R(2),qm(Q.m,Q.R)),mt);
+return{vin,u:qroot(u2),U:qroot(U2),shift,E};},
+init(P){return{t:0,ph:0,X:0,V:0,th:Math.PI/2,om:0,yb:BASE+P.R+P.h,vy:0,side:1,n:0};},
+h(s){return s.ph===1?5e-5:1e-3;},fast(){return false;},
+yc(P){return BASE+P.R;},
+step(s,h,P){const{m,M:Mg,R:Rr}=P;s.t+=h;const yc=M.yc(P);
+if(s.ph===0){s.yb+=s.vy*h-.5*g*h*h;s.vy-=g*h;s.X+=s.V*h;if(s.yb<=yc&&s.vy<0){s.vy=-Math.sqrt(s.vy*s.vy-2*g*(yc-s.yb));// 沿切线进入：相对槽的速度竖直
+s.ph=1;s.n++;const v=s.vy;s.yb=yc;s.th=s.side*Math.PI/2;s.om=s.side>0?v/Rr:-v/Rr;s.V=0;}return;}
+if(s.ph===1){const acc=(p,o)=>{const c=Math.cos(p),sn=Math.sin(p),a11=Mg+m,a12=m*Rr*c,b1=m*Rr*sn*o*o,a21=c,a22=Rr,b2=-g*sn,det=a11*a22-a12*a21;return[(b1*a22-a12*b2)/det,(a11*b2-a21*b1)/det];};
+const d=y=>{const[aX,aP]=acc(y[2],y[3]);return[y[1],aX,y[3],aP];},y=[s.X,s.V,s.th,s.om],k1=d(y),k2=d(y.map((v,i)=>v+k1[i]*h/2)),k3=d(y.map((v,i)=>v+k2[i]*h/2)),k4=d(y.map((v,i)=>v+k3[i]*h));
+[s.X,s.V,s.th,s.om]=y.map((v,i)=>v+h/6*(k1[i]+2*k2[i]+2*k3[i]+k4[i]));
+if(Math.abs(s.th)<0.02&&!s.bot){s.bot=1;s.ub=Math.abs(s.V+Rr*Math.cos(s.th)*s.om);s.Ub=Math.abs(s.V);}
+if(Math.abs(s.th)>=Math.PI/2){// 到达另一侧槽口：相对速度竖直，水平总动量为零 ⇒ 二者水平速度都为零，小球竖直上抛
+s.side=Math.sign(s.th);s.th=s.side*Math.PI/2;s.vy=Rr*Math.abs(s.om);if(Math.abs(s.vy-sval(X.vin))<0.02)s.vy=sval(X.vin);s.V=0;s.ph=0;s.yb=yc;s.bot=0;if(!s.tx){s.tx=s.t;s.shift=s.X;}}}},
+bpos(s,P){const yc=M.yc(P);if(s.ph===1)return[s.X+P.R*Math.sin(s.th),yc-P.R*Math.cos(s.th)];return[s.X+s.side*P.R,s.yb];},
+check(s){return{ub:s.ub,Ub:s.Ub,shift:s.shift,tx:s.tx};},
+tsBase(){return 0.5;},tsSlow(){return 0.5;},tPre(P){return 12;},
+events(s,E){if(s.n>=1&&!E.ti)E.ti=s.t;if(s.tx&&!E.tx)E.tx=s.tx;},tg(E){return E.tx?E.tx*2.6:4;},
+rec(s,P){const[bx,by]=M.bpos(s,P),vx=s.ph===1?s.V+P.R*Math.cos(s.th)*s.om:0,vy=s.ph===1?P.R*Math.sin(s.th)*s.om:s.vy;return{v:{bx:vx,by:vy,X:s.V},x:{X:s.X,y:by-M.yc(P)},E:{b:.5*P.m*(vx*vx+vy*vy),X:.5*P.M*s.V**2,p:P.m*g*(by-M.yc(P)+P.R)}};},
+G:{gv:{title:"速度—时间图像（向右为正）",note:"小球在槽内时槽先向右后向左运动……水平总动量恒为零；小球到达对侧槽口时二者水平速度都为零，小球竖直上抛",f:"v",ylab:[["速度 ",0],["v",1],[" / (m·s⁻¹)",0]],s:[{k:"bx",c:C.clay,t:[["小球水平分速度",0]]},{k:"by",c:C.clay,dash:[4,4],w:1.4,t:[["小球竖直分速度",0]]},{k:"X",c:C.slate,t:[["槽",0]]}],mark:E=>E.tx},
+gx:{title:"槽的位置与小球高度",note:"实线：槽的位移（往复运动）；虚线：小球相对槽口的高度",f:"x",ylab:[["",0],["x",1],[" / m",0]],s:[{k:"X",c:C.slate,t:[["槽的位移",0]]},{k:"y",c:C.clay,dash:[5,4],t:[["小球相对槽口高度",0]]}],mark:E=>E.tx},
+ge:{title:"能量—时间图像（以槽底为重力势能零点）",note:"系统机械能守恒；小球飞出槽口时槽的动能为零",f:"E",ylab:[["能量 ",0],["E",1],[" / J",0]],s:[{k:"b",c:C.clay,t:[["小球动能",0]]},{k:"X",c:C.slate,t:[["槽动能",0]]},{k:"p",c:C.sage,t:[["小球重力势能",0]]}],mark:E=>E.tx}},
+view(P){const K=Math.min(200,280/(P.R+BASE+P.h+0.3));return{K,ox:420,gy:420};},
+world(v,s,P){const Rr=P.R,X0=s.X,yc=M.yc(P),wl=X0-Rr-RIM,wr=X0+Rr+RIM;
+ctx.fillStyle="#C9CFDA";ctx.strokeStyle=C.ink;ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(v.X(wl),v.Y(0));ctx.lineTo(v.X(wl),v.Y(yc));ctx.lineTo(v.X(X0-Rr),v.Y(yc));
+for(let a=-Math.PI/2;a<=Math.PI/2+1e-6;a+=0.03)ctx.lineTo(v.X(X0+Rr*Math.sin(a)),v.Y(yc-Rr*Math.cos(a)));ctx.lineTo(v.X(wr),v.Y(yc));ctx.lineTo(v.X(wr),v.Y(0));ctx.closePath();ctx.fill();ctx.stroke();
+ctx.fillStyle=C.ink;ctx.font="italic 600 15px 'Source Serif 4',serif";ctx.fillText("M",v.X(X0)-6,v.Y(0.07));
+const[bx,by]=M.bpos(s,P);let cx=bx,cy=by;if(s.ph===1){cx=X0+(Rr-RB)*Math.sin(s.th);cy=yc-(Rr-RB)*Math.cos(s.th);}else{cx=bx-s.side*RB;cy=by;}
+wBall(v,cx,cy,RB,C.clay,"m");
+if(v.main){ctx.strokeStyle="rgba(201,100,66,.45)";ctx.setLineDash([4,4]);[[0,"初始位置"]].forEach(()=>{ctx.beginPath();ctx.moveTo(v.X(0),v.Y(-0.02));ctx.lineTo(v.X(0),v.Y(yc+0.1));ctx.stroke();});ctx.setLineDash([]);ctx.fillStyle=C.muted;ctx.font="11px "+GF;ctx.fillText("槽中心初始位置",v.X(0)+4,v.Y(yc+0.12));
+ctx.fillStyle=C.clay;ctx.font="12px "+GF;ctx.fillText("槽的位移 "+fx(s.X,3)+" m",v.X(wr)+10,v.Y(yc));}},
+status(s,P){if(s.ph===0)return s.n===0?"小球自由下落，槽静止":(s.vy>0?"小球离开槽口做竖直上抛运动，槽静止":"小球竖直落回槽口");return"小球在槽内滑动：系统水平动量为零且守恒，槽与小球水平方向反向运动";},
+bars(s,P){const r=M.rec(s,P).v,m=sval(X.u);return[["小球（水平）",r.bx,C.clay,m],["槽",r.X,C.slate,m]];},
+pie(s,P,X){const E=qv(X.E),r=M.rec(s,P).E;return{tgt:[r.b/E,r.X/E,r.p/E],cols:[C.clay,C.slate,C.sage],names:["小球动能","槽动能","小球重力势能（以槽底为零）"],done:false,fr:null};},
+live(s,P){const r=M.rec(s,P);return[["水平总动量",fx(P.m*r.v.bx+P.M*s.V,4)+" kg·m/s"],["机械能",fx(r.E.b+r.E.X+r.E.p,4)+" J"],["小球进入槽内的次数",String(s.n)],["槽的位移",fx(s.X,4)+" m"]];},
+sol(X,P){const i=t=>`<span class="f">${t}</span>`,st=(n,h)=>`<div class="step"><span class="n">${n}</span><div>${h}</div></div>`,ok=t=>`<b style="color:#3f7f4f">${t}</b>`,no=t=>`<b style="color:#C96442">${t}</b>`;
+return `<div class="fnote">题目没有给数值，动画取<b>示例数值</b>：${i("m")} = ${P.m} kg、${i("M")} = ${P.M} kg、${i("R")} = ${P.R} m、释放点高出槽口 ${P.h} m。</div>`+
+st(1,`<b>守恒判断</b>：小球进入槽时速度竖直向下，系统水平总动量为零；此后水平方向不受外力，<b>水平动量守恒且恒为零</b>；各面光滑，<b>机械能守恒</b>。`)+
+st(2,`<b>槽内</b>：小球从右侧滑下时对槽的压力有向右的水平分量，槽向右运动、小球水平速度向左；过最低点后槽减速……任一时刻 ${i("mv")}<sub>球x</sub> + ${i("Mv")}<sub>槽</sub> = 0。<br>示例：进入速度 ${surdH(X.vin,"m/s")}；最低点小球 ${surdH(X.u,"m/s")}、槽 ${surdH(X.U,"m/s")}；小球从一侧到另一侧，槽移动 2${i("mR")}/(${i("M")}+${i("m")}) = ${exH(X.shift,"m")}。`)+
+st(3,`<b>A、B</b>　小球到达另一侧槽口时，相对槽的速度沿切线竖直向上，二者水平速度相同；又水平总动量为零 ⇒ 二者水平速度都为零，小球<b>竖直上抛</b>。${no("A 错误")}，${ok("B 正确")}`)+
+st(4,`<b>C、D</b>　由机械能守恒，小球上升到原来的高度后竖直落回同一槽口，再进入槽内，向原来一侧运动……槽时而向右、时而向左，做<b>往复运动</b>。${ok("C 正确")}，${no("D 错误")}`)+
+`<div class="ansbox">答案：BC（与课件一致）</div>`+
+`<div class="fnote">小球与槽<b>永远往复运动</b>（周期运动，不会停）；系统质心水平位置不变，镜头不需要跟随。</div>`;}};
+
+</script>
+<script src="../../common/engine.js"></script>
+<script>engineStart();</script>
+</body></html>
