@@ -8,8 +8,8 @@ vm.runInContext(fs.readFileSync(path.join(__dirname,"../common/exact.js"),"utf8"
 vm.runInContext("const C={clay:'',ink:'',muted:'',brass:'',wood2:'',slate:'',sage:'',plum:''};let H=[],K=100,VIEW={};const $=()=>null;"+scripts[0]+";this.M=M;this.defs=defs;",ctx);
 const exp=JSON.parse(fs.readFileSync(path.join(__dirname,"expected.json"),"utf8"))[key]||{};
 vm.runInContext(`var P={},PX={};defs.forEach(d=>{P[d[0]]=d[6];PX[d[0]]=qparse(String(d[6]));});var X=M.exact(PX,P);`,ctx);
-let bad=0;for(const k in exp){const x=ctx.X[k];let v;if(x==null){console.log("缺少",k);bad++;continue;}v=x.n!==undefined?Number(x.n)/Number(x.d):x.r?ctx.sval(x):x;
-const ok=Math.abs(v-exp[k])<1e-9*Math.max(1,Math.abs(exp[k]));if(!ok)bad++;console.log((ok?"✓":"✗")+" "+k+" = "+(x.n!==undefined?(x.d===1n?x.n:x.n+"/"+x.d):v)+"  (python "+exp[k]+")");}
+let bad=0;for(const k in exp){const x=ctx.X[k];let v;if(x==null){console.log("缺少",k);bad++;continue;}v=x.r!==undefined?vm.runInContext("sval",ctx)(x):x.n!==undefined?Number(x.n)/Number(x.d):x;
+const ok=Math.abs(v-exp[k])<1e-9*Math.max(1,Math.abs(exp[k]));if(!ok)bad++;console.log((ok?"✓":"✗")+" "+k+" = "+(x.r!==undefined?"≈"+v:x.n!==undefined?(x.d===1n?x.n:x.n+"/"+x.d):v)+"  (python "+exp[k]+")");}
 // 仿真
 vm.runInContext(`var s=M.init(P),T=M.tPre(P)*${process.argv[4]||1},n=0,EV={};var ev=[];var lastph=s.ph;while(s.t<T&&n<2e7){M.step(s,Math.min(M.h(s,P),T-s.t+1e-12),P);n++;if(M.events)M.events(s,EV,P);if(s.ph!==lastph){ev.push([s.ph,+s.t.toFixed(6)]);lastph=s.ph;}}`,ctx);
 console.log("仿真阶段切换 [ph,t]:",JSON.stringify(ctx.ev));console.log("事件:",JSON.stringify(ctx.EV));
