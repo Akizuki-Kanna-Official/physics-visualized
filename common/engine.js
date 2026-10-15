@@ -30,7 +30,7 @@ for(let i=0;i<FIV.length;i++){const[a,e]=FIV[i];if(st.t>e+hold)continue;if(st.t<
 function advance(dS){let rem=dS,n=0;while(rem>1e-15&&n<2e5){const h=Math.min(M.h(st,P),rem);M.step(st,h,P);rem-=h;n++;}}
 function frame(t){if(lastT==null)lastT=t;const dt=Math.min((t-lastT)/1000,.05);lastT=t;
 if(run){if(TSc==null)TSc=tsTarget();const tg=tsTarget();TSc=slow?tsEase2(TSc,tg,dt,0.35):tg;advance(dt*TSc);
-const f=M.camFocus?M.camFocus(st,P):null;if(f!=null){const tgt=Math.max(M.camMin==null?0:M.camMin,(f*K+VIEW.ox)-(M.camAnchor||CW/2));const T1=M.camNeg?tgt:Math.max(0,tgt);cam.tv=cam.lt==null?0:(T1-cam.lt)/Math.max(dt,1e-6);cam.lt=T1;camStep(cam,T1,dt,M.camW||2.2,cam.tv);}
+const f=M.camFocus?M.camFocus(st,P):null;if(f!=null){const tgt=Math.max(M.camMin==null?(M.camNeg?-1e12:0):M.camMin,(f*K+VIEW.ox)-(M.camAnchor||CW/2));const T1=M.camNeg?tgt:Math.max(0,tgt);cam.tv=cam.lt==null?0:(T1-cam.lt)/Math.max(dt,1e-6);cam.lt=T1;camStep(cam,T1,dt,M.camW||2.2,cam.tv);}
 const mg=M.mag?M.mag(st,P):null;if(mg){MAG.on=true;MAG.z+=(mg.z-MAG.z)*(1-Math.exp(-dt/0.6));}}
 draw();chipUpd();requestAnimationFrame(frame);}
 function chipUpd(){const ts=run||st.t>0?(TSc||tsTarget()):tsTarget();chipSet(slow,1/ts);}
