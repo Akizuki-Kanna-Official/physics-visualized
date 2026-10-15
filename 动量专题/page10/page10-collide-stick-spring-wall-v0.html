@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,600&display=swap">
+<title>第 10 页 · 碰撞粘合 + 弹簧 + 墙</title>
+<link rel="stylesheet" href="../../common/cw.css">
+</head><body><div id="app">
+<header class="top"><span class="tag">模型三 · 簧类（第 10 页）</span><h1>第 2 题　C 撞 A 粘合后压缩靠墙的弹簧</h1>
+<div class="tools"><label class="sw"><input type="checkbox" id="clawdOn" checked><i></i>显示小人</label>
+<div class="fzc"><span>字号</span><button id="fzm" aria-label="减小字号">A−</button><input type="range" id="fz" min="50" max="400" step="10" value="100"><button id="fzp" aria-label="增大字号">A＋</button><b id="fzv">100%</b></div></div></header>
+<main class="main">
+<section class="left"><div class="stage" id="scene"><canvas id="c"></canvas><div id="clawd" class="clawd"></div></div><div class="hint chip" id="hint">动画按时间缩放播放</div></section>
+<section class="right"><nav class="tabs" id="tabs"><i class="ind" id="ind"></i><button data-t="sol" class="on">解题过程</button><button data-t="gr">运动图像</button><button data-t="en">能量饼图</button></nav>
+<div class="tabbody">
+<div class="tab on" id="t-sol"><div class="pager" id="pg-sol"><p class="q">物体 A、B 的质量分别是 <span class="f">m</span><sub>A</sub> = 4 kg、<span class="f">m</span><sub>B</sub> = 6 kg，用轻弹簧相连接放在光滑的水平面上，物体 B 左侧与竖直墙相接触。另有一个质量为 <span class="f">m</span><sub>C</sub> = 2 kg 的物体 C 以速度 <span class="f">v</span>₀ 向左运动，与物体 A 碰后立即粘在一起不再分开，然后以 <span class="f">v</span> = 2 m/s 的共同速度压缩弹簧。<br>(1) 物体 C 的初速度 <span class="f">v</span>₀ 为多大？(2) 弹簧压缩最短时的弹性势能；(3) AC 一起压弹簧到 B 物体刚要离开竖直墙壁过程中，弹簧弹力对 B 的冲量大小；(4) 在 B 离开墙壁之后，弹簧的最大弹性势能；(5) B 的最大速度是多少？<br>拓展：若题中 C 起初静止，某时刻给 C 一个向左的瞬时冲量，大小为 6 N·s，则 C 的速度为？</p>
+<p class="fnote">质量、共同速度、冲量均为<b>题目给的</b>；劲度系数与弹簧原长为<b>动画补设</b>。</p><h3>解答</h3><div id="ans"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-gr"><div class="seg" id="seg"><button data-g="gv" class="on">v–t</button><button data-g="gx">x–t</button><button data-g="ge">E–t</button></div>
+<div class="pager" id="pg-gr"><div id="gb"><h4 id="gtitle"></h4><canvas id="gv" class="on"></canvas><canvas id="gx"></canvas><canvas id="ge"></canvas></div><div class="gleg" id="gleg"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-en"><div class="pager" id="pg-en"><h3>C 初动能的去向</h3><canvas id="pie"></canvas><div id="pieLeg" class="pleg"></div><h3>实时数据</h3><div id="live" class="live"></div></div><div class="pgnav"></div></div>
+</div></section></main>
+<footer class="bot"><div class="ctl"><div class="btns"><button class="primary" id="play">▶ 开始播放</button><button id="pause">⏸ 暂停</button><button id="rst">↺ 重置</button></div><label class="sw bt"><input type="checkbox" id="bt" checked><i></i>子弹时间</label></div><div class="params" id="params"></div></footer>
+</div>
+<script src="../../common/exact.js"></script><script src="../../common/canvas.js"></script><script src="../../common/graph.js"></script><script src="../../common/pie.js"></script><script src="../../common/clawd.js"></script><script src="../../common/scene.js"></script><script src="../../common/ui.js"></script><script src="../../common/draw.js"></script>
+<script>
+const KEY="p10";
+const defs=[["mA","A 的质量 mA","kg",0.5,10,0.5,4,"g"],["mB","B 的质量 mB","kg",0.5,10,0.5,6,"g"],["mC","C 的质量 mC","kg",0.5,10,0.5,2,"g"],["v","AC 共同速度 v","m/s",0.5,6,0.5,2,"g"],["J","拓展：给 C 的冲量","N·s",1,20,1,6,"g"],["k","劲度系数 k","N/m",20,400,1,96,"a"],["l0","弹簧原长","m",0.5,2,0.1,1,"a"]];
+const W=0.25,HH=0.22,GAP=0.6,KC=1e5;
+const M={title:"第 10 页 · 碰撞粘合 + 弹簧 + 墙",camNeg:true,
+exact(Q){const half=R(1,2),mAC=qa(Q.mA,Q.mC),v0=qd(qm(mAC,Q.v),Q.mC),Ep=qm(half,qm(mAC,qsq(Q.v))),I=qm(R(2),qm(mAC,Q.v)),mt=qa(mAC,Q.mB),vp=qd(qm(mAC,Q.v),mt),Ep2=qs(Ep,qm(half,qm(mt,qsq(vp)))),
+vBmax=qd(qm(R(2),qm(mAC,Q.v)),mt),vAC2=qd(qm(qs(mAC,Q.mB),Q.v),mt),ext=qd(Q.J,Q.mC),E0=qm(half,qm(Q.mC,qsq(v0))),Qc=qs(E0,Ep),xm=qroot(qd(qm(R(2),Ep),Q.k));
+return{v0,Ep,I,vp,Ep2,vBmax,vAC2,ext,E0,Qc,xm,mAC,extAC:qd(Q.J,mAC),rQ:qd(Qc,E0),rE:qd(Ep,E0),tooShort:sval(xm)>=qv(Q.l0)*0.85};},
+init(P){const xA=0.0+W+P.l0;return{t:0,ph:0,xB:0,vB:0,xA,vA:0,xC:xA+W+GAP,vC:-qv(X.v0),Iw:0,Isp:0,wall:1};},
+h(s){if(s.ph===0)return Math.max(2e-6,Math.min(2e-3,(s.xC-s.xA-W)/Math.abs(s.vC)/4));return s.ph===1?2e-6:2e-4;},fast(s){return s.ph===1;},
+step(s,h,P){const{mA,mB,mC,k,l0}=P;s.t+=h;
+// 弹簧力（压缩为正，推 A 向右、推 B 向左）
+const Fs=()=>k*(l0-(s.xA-s.xB-W));
+if(s.ph<=1){const d=(s.xA+W)-s.xC;if(s.ph===0&&d>=0)s.ph=1;const Fc=s.ph===1?KC*Math.max(0,d):0,F=Fs();
+s.vC+=Fc/mC*h;s.vA+=(F-Fc)/mA*h;s.xC+=s.vC*h;s.xA+=s.vA*h;
+if(s.ph===1&&s.vC>=s.vA){// 相对速度为零：粘在一起不再分开，取精确共同速度
+s.vA=s.vC=(mA*s.vA+mC*s.vC)/(mA+mC);if(Math.abs(s.vA+P.v)<2e-3)s.vA=s.vC=-P.v;s.ph=2;s.tc=s.t;s.dc=s.xA+W-s.xC;}return;}
+// AC 整体与 B（速度 Verlet）；B 靠墙：弹簧压缩时墙提供支持力，B 不动
+const mAC=mA+mC,aOf=()=>{const F=Fs();let aB=-F/mB;if(s.wall&&F>0){aB=0;}return[F/mAC,aB,F];};
+let[aA,aB,F0]=aOf();s.xA+=s.vA*h+.5*aA*h*h;s.xB+=s.vB*h+.5*aB*h*h;let[aA2,aB2,F1]=aOf();s.vA+=.5*(aA+aA2)*h;s.vB+=.5*(aB+aB2)*h;
+if(s.wall){s.Isp+=.5*(F0+F1)*h;if(F1<=0&&s.vA>0){s.wall=0;s.tw=s.t;s.Iw=s.Isp;if(Math.abs(s.vA-P.v)<5e-3)s.vA=P.v;}else{s.xB=0;s.vB=0;}}
+s.xC=s.xA+W-s.dc;s.vC=s.vA;const c=l0-(s.xA-s.xB-W);if(s.wall&&c>(s.cmax||0))s.cmax=c;if(!s.wall&&c>(s.cmax2||0))s.cmax2=c;if(s.vB>(s.vBmax||0))s.vBmax=s.vB;},
+check(s){return{cmax:s.cmax,Ep:.5*96*(s.cmax||0)**2,Iwall:s.Iw,tLeave:s.tw,cmax2:s.cmax2,vBmax:s.vBmax};},
+tsBase(){return 0.5;},tsSlow(){return 0.002;},
+tPre(P){const mAC=P.mA+P.mC,w=Math.sqrt(P.k*(mAC+P.mB)/(mAC*P.mB));return GAP/qv(X.v0)+Math.PI*Math.sqrt(mAC/P.k)+2*Math.PI/w*2.2+0.1;},
+events(s,E){if(s.tc&&!E.tc)E.tc=s.tc;if(s.tw&&!E.tw)E.tw=s.tw;},
+tg(E,P){const mAC=P.mA+P.mC,w=Math.sqrt(P.k*(mAC+P.mB)/(mAC*P.mB));return (E.tw||1)+2*Math.PI/w*2;},
+rec(s,P){const c=P.l0-(s.xA-s.xB-W),mAC=P.mA+P.mC;return{v:{A:s.vA,C:s.vC,B:s.vB},x:{c},E:{C:s.ph<2?.5*P.mC*s.vC**2:0,AC:s.ph<2?.5*P.mA*s.vA**2:.5*mAC*s.vA**2,B:.5*P.mB*s.vB**2,p:.5*P.k*c*c,Q:s.ph<2?0:qv(X.Qc)}};},
+G:{gv:{title:"速度—时间图像（向右为正）",note:"C 撞 A 后立即粘合（时间极短）；弹簧恢复原长时 B 离开墙；之后 AC 与 B 交替加速、减速，质心匀速",f:"v",ylab:[["速度 ",0],["v",1],[" / (m·s⁻¹)",0]],s:[{k:"C",c:C.brass,t:[["C",0]]},{k:"A",c:"#8A6440",dash:[6,3],t:[["A（粘合后即 AC）",0]]},{k:"B",c:C.slate,t:[["B",0]]}],mark:E=>E.tw},
+gx:{title:"弹簧形变量—时间图像",note:"正值为压缩；靠墙阶段最大压缩对应 Ep = 12 J，离墙后最大压缩对应 6 J",f:"x",ylab:[["压缩量 ",0],["x",1],[" / m",0]],s:[{k:"c",c:C.clay,t:[["弹簧压缩量",0]]}],mark:E=>E.tw},
+ge:{title:"能量—时间图像",note:"粘合瞬间损失 24 J（变为内能）；之后机械能守恒",f:"E",ylab:[["能量 ",0],["E",1],[" / J",0]],s:[{k:"C",c:C.brass,t:[["C 动能",0]]},{k:"AC",c:"#8A6440",t:[["A（AC）动能",0]]},{k:"B",c:C.slate,t:[["B 动能",0]]},{k:"p",c:C.plum,t:[["弹性势能",0]]},{k:"Q",c:C.clay,t:[["碰撞内能",0]]}],mark:E=>E.tc}},
+view(P){const K=Math.min(240,640/(P.l0+3*W+GAP+0.4));return{K,ox:130,gy:262};},
+camFocus(s,P){const mt=P.mA+P.mB+P.mC;return (P.mB*(s.xB+W/2)+P.mA*(s.xA+W/2)+P.mC*(s.xC+W/2))/mt;},
+onReset(P){const K=Math.min(240,640/(P.l0+3*W+GAP+0.4));M.camAnchor=130+K*M.camFocus(M.init(P),P);},
+track(s,P){return[M.camFocus(s,P)];},
+world(v,s,P){if(v.main||v.z)wWall(v,0,0,0.6,-1);wSpring(v,s.xB+W,s.xA,HH/2,10,0.04);wBlock(v,s.xB,0,W,HH,"B",STEEL);wBlock(v,s.xA,0,W,HH,"A");wBlock(v,s.xC,0,W,HH,"C",WOOD);
+if(v.main){const c=P.l0-(s.xA-s.xB-W);ctx.fillStyle=C.clay;ctx.font="12px "+GF;ctx.fillText((c>=0?"压缩量 ":"伸长量 ")+fx(Math.abs(c),3)+" m",v.X(s.xB+W),v.Y(HH)-34);
+if(s.ph===0)wArrow(v,s.xC+W+0.05,HH+0.1,-1,40,C.clay,"v₀");if(!s.wall){ctx.fillStyle=C.slate;ctx.fillText("B 已离开墙",v.X(s.xB),v.Y(HH)-52);}
+const cm=M.camFocus(s,P);ctx.fillStyle="#999";ctx.beginPath();ctx.moveTo(v.X(cm),v.Y(-0.02));ctx.lineTo(v.X(cm)-5,v.Y(-0.02)+8);ctx.lineTo(v.X(cm)+5,v.Y(-0.02)+8);ctx.fill();ctx.font="11px "+GF;ctx.fillText("质心",v.X(cm)-11,v.Y(-0.02)+42);}},
+mag(s,P){return{x:s.xA+W,y:HH/2,z:3,r:[24,300,420,166],title:"放大镜 · A、C 接触处"};},
+status(s,P){if(s.ph===0)return"C 向左运动，靠近 A";if(s.ph===1)return"C 与 A 碰撞（时间极短，弹簧来不及形变）";const c=P.l0-(s.xA-s.xB-W);if(s.wall)return s.vA<0?"AC 一起压缩弹簧，B 被墙挡住不动":"弹簧恢复，推 AC 向右，B 仍靠墙";return c>1e-4?"B 离墙后：弹簧压缩，AC 减速、B 加速":c<-1e-4?"弹簧被拉长：B 减速、AC 加速":"弹簧处于原长";},
+bars(s,P){const m=qv(X.v0);return[["C",s.vC,C.brass,m],["A",s.vA,"#8A6440",m],["B",s.vB,C.slate,m]];},
+pie(s,P,X){const E=qv(X.E0),r=M.rec(s,P).E;return{tgt:[r.C/E,r.AC/E,r.B/E,r.p/E,r.Q/E],cols:[C.brass,"#8A6440",C.slate,C.plum,C.clay],names:["C 动能","A（AC）动能","B 动能","弹性势能","碰撞内能"],done:false,fr:null};},
+live(s,P){const c=P.l0-(s.xA-s.xB-W);return[["系统总动量（向右为正）",fx(P.mC*s.vC+P.mA*s.vA+P.mB*s.vB,4)+" kg·m/s"],["靠墙阶段弹簧对 B 的冲量",fx(s.wall?s.Isp:s.Iw,4)+" N·s"],["弹性势能",fx(.5*P.k*c*c,4)+" J"],["已出现的 B 最大速度",fx(s.vBmax||0,4)+" m/s"]];},
+sol(X,P){const i=t=>`<span class="f">${t}</span>`,V=(q,u)=>`<span class="v">${exH(q,u)}</span>`,st=(n,h)=>`<div class="step"><span class="n">${n}</span><div>${h}</div></div>`,m=k=>i("m")+"<sub>"+k+"</sub>";
+return `<div class="fnote">题目文字“共同速度压……”被图片遮住，按“以 ${i("v")} = 2 m/s 的共同速度压缩弹簧”理解。取向左为正方向（动画、图像取向右为正）。</div>`+
+st(1,`<b>(1)</b> C 与 A 碰撞时间极短，弹簧来不及形变，C、A 动量守恒：${m("C")}${i("v")}₀ = (${m("A")}+${m("C")})${i("v")} ⇒ ${i("v")}₀ = ${V(X.v0,"m/s")}`)+
+st(2,`<b>(2)</b> B 靠墙不动，AC 压缩弹簧到速度为零时最短，AC 动能全部变为弹性势能：${i("E")}<sub>p</sub> = ½(${m("A")}+${m("C")})${i("v")}² = ${V(X.Ep,"J")}（碰撞中损失 ${exH(X.Qc,"J")} 变为内能）`)+
+st(3,`<b>(3)</b> 弹簧恢复原长时 AC 速度大小仍为 ${i("v")}、方向向右，此后弹簧被拉长，B 刚要离开墙。弹簧对 B 的弹力与对 AC 的弹力大小时刻相等，故冲量大小相等：<br>${i("I")} = (${m("A")}+${m("C")})${i("v")} − [−(${m("A")}+${m("C")})${i("v")}] = 2(${m("A")}+${m("C")})${i("v")} = ${V(X.I,"N·s")}（墙对 B 的冲量也为此值）`)+
+st(4,`<b>(4)</b> B 离墙后系统动量守恒，弹簧最长（或最短）时三者共速：(${m("A")}+${m("C")})${i("v")} = (${m("A")}+${m("B")}+${m("C")})${i("v")}′ ⇒ ${i("v")}′ = ${V(X.vp,"m/s")}<br>${i("E")}<sub>p</sub>′ = ½(${m("A")}+${m("C")})${i("v")}² − ½(${m("A")}+${m("B")}+${m("C")})${i("v")}′² = ${V(X.Ep2,"J")}`)+
+st(5,`<b>(5)</b> 弹簧恢复原长时 B 速度最大（相当于弹性碰撞）：<br>${i("v")}<sub>B max</sub> = 2(${m("A")}+${m("C")})${i("v")}/(${m("A")}+${m("B")}+${m("C")}) = ${V(X.vBmax,"m/s")}，此时 AC 速度为 ${V(X.vAC2,"m/s")}`)+
+`<div class="ansbox">答案：(1) ${exH(X.v0,"m/s")}；(2) ${exH(X.Ep,"J")}；(3) ${exH(X.I,"N·s")}；(4) ${exH(X.Ep2,"J")}；(5) ${exH(X.vBmax,"m/s")}</div>`+
+st(6,`<b>拓展</b>：C 原来静止，受向左的瞬时冲量 ${exH(P.J!=null?qparse(String(P.J)):R(6),"N·s")}，由动量定理 ${i("I")} = ${m("C")}${i("v")}<sub>C</sub> ⇒ ${i("v")}<sub>C</sub> = ${V(X.ext,"m/s")}（若冲量作用在已粘合的 AC 上，则速度为 ${exH(X.extAC,"m/s")}）`)+
+`<div class="fnote">动画补设：劲度系数 ${i("k")} 与弹簧原长不影响答案，只决定最大压缩量 ${surdH(X.xm,"m")} 和振动快慢。B 离墙后弹簧两端物体<b>永远往复振动</b>，质心以 ${exH(X.vp,"m/s")} 匀速向右，镜头跟随质心。</div>`+(X.tooShort?`<div class="warn">最大压缩量接近弹簧原长，请增大 ${i("k")} 或原长。</div>`:"");}};
+
+</script>
+<script src="../../common/engine.js"></script>
+<script>engineStart();</script>
+</body></html>
