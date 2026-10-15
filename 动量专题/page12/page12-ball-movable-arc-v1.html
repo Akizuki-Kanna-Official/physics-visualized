@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,600&display=swap">
+<title>第 12 页 · 小球滑上可动圆弧轨道</title>
+<link rel="stylesheet" href="../../common/cw.css">
+</head><body><div id="app">
+<header class="top"><span class="tag">模型四 · 滑块—曲面（第 12 页）</span><h1>第 1 题　小球滑上质量 2m 的光滑圆弧轨道</h1>
+<div class="tools"><label class="sw"><input type="checkbox" id="clawdOn" checked><i></i>显示小人</label>
+<div class="fzc"><span>字号</span><button id="fzm" aria-label="减小字号">A−</button><input type="range" id="fz" min="50" max="400" step="10" value="100"><button id="fzp" aria-label="增大字号">A＋</button><b id="fzv">100%</b></div></div></header>
+<main class="main">
+<section class="left"><div class="stage" id="scene"><canvas id="c"></canvas><div id="clawd" class="clawd"></div></div><div class="hint chip" id="hint">动画按时间缩放播放</div></section>
+<section class="right"><nav class="tabs" id="tabs"><i class="ind" id="ind"></i><button data-t="sol" class="on">解题过程</button><button data-t="gr">运动图像</button><button data-t="en">能量饼图</button></nav>
+<div class="tabbody">
+<div class="tab on" id="t-sol"><div class="pager" id="pg-sol"><p class="q">如图所示，有一质量为 <span class="f">m</span> 的小球，以速度 <span class="f">v</span>₀ 滑上静置于光滑水平面上的光滑圆弧轨道。已知圆弧轨道的质量为 2<span class="f">m</span>，小球在上升过程中始终未能冲出圆弧，重力加速度为 <span class="f">g</span>，求：(1) 小球在圆弧轨道上能上升的最大高度（用 <span class="f">v</span>₀、<span class="f">g</span> 表示）；(2) 小球离开圆弧轨道时的速度大小；(3) 该过程 <span class="f">m</span> 对光滑圆弧轨道做功？<br>思考：1. 系统动量守恒、机械能守恒吗？2. <span class="f">m</span> 滑上 M 到达最大高度时有何特点？离地高度 <span class="f">h</span>？3. 最低点二者分离时，二者速度如何算？</p>
+<p class="fnote">质量比 2<span class="f">m</span> : <span class="f">m</span> 为<b>题目给的</b>；<span class="f">m</span>、<span class="f">v</span>₀ 为<b>示例数值</b>；圆弧半径为<b>动画补设</b>。</p><h3>解答</h3><div id="ans"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-gr"><div class="seg" id="seg"><button data-g="gv" class="on">v–t</button><button data-g="gx">h–t</button><button data-g="ge">E–t</button></div>
+<div class="pager" id="pg-gr"><div id="gb"><h4 id="gtitle"></h4><canvas id="gv" class="on"></canvas><canvas id="gx"></canvas><canvas id="ge"></canvas></div><div class="gleg" id="gleg"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-en"><div class="pager" id="pg-en"><h3>小球初动能 ½<i class=f>mv</i>₀² 的去向</h3><canvas id="pie"></canvas><div id="pieLeg" class="pleg"></div><h3>实时数据</h3><div id="live" class="live"></div></div><div class="pgnav"></div></div>
+</div></section></main>
+<footer class="bot"><div class="ctl"><div class="btns"><button class="primary" id="play">▶ 开始播放</button><button id="pause">⏸ 暂停</button><button id="rst">↺ 重置</button></div><label class="sw bt"><input type="checkbox" id="bt" checked><i></i>子弹时间</label></div><div class="params" id="params"></div></footer>
+</div>
+<script src="../../common/exact.js"></script><script src="../../common/canvas.js"></script><script src="../../common/graph.js"></script><script src="../../common/pie.js"></script><script src="../../common/clawd.js"></script><script src="../../common/scene.js"></script><script src="../../common/ui.js"></script><script src="../../common/draw.js"></script>
+<script>
+const KEY="p12";
+const defs=[["m","小球质量 m","kg",0.2,5,0.1,1,"e"],["v0","初速度 v₀","m/s",1,10,0.5,6,"e"],["R","圆弧半径 R","m",0.5,3,0.1,1.5,"a"]];
+const g=10,RB=0.12;
+const M={title:"第 12 页 · 小球滑上可动圆弧轨道",camNeg:true,clawdX:960,clawdY:472,
+extraTags(){return{g:["圆弧轨道质量 2<i class=f>m</i>，光滑；水平面光滑；小球未冲出圆弧"]};},
+exact(Q){const half=R(1,2),G=R(g),m=Q.m,Mb=qm(R(2),m),v=qd(Q.v0,R(3)),h=qd(qsq(Q.v0),qm(R(3),G)),v1=qd(qs(R(0),Q.v0),R(3)),v2=qd(qm(R(2),Q.v0),R(3)),W=qm(half,qm(Mb,qsq(v2))),E0=qm(half,qm(m,qsq(Q.v0)));
+return{v,h,v1,v2,W,E0,r1:qd(qm(half,qm(m,qsq(v1))),E0),r2:qd(W,E0),rh:qd(qm(qm(m,G),h),E0),out:qv(h)>=qv(Q.R)};},
+init(P){return{t:0,ph:0,xb:-1.2,X:0,V:0,phi:0,om:0,vb:P.v0};},
+h(s){return s.ph===1?2e-4:1e-3;},fast(){return false;},
+step(s,h,P){const m=P.m,Mb=2*m,Rr=P.R;s.t+=h;
+if(s.ph===0){s.xb+=s.vb*h;s.X+=s.V*h;if(s.xb>=s.X){s.ph=1;s.phi=0;s.om=(s.vb-s.V)/Rr;s.xb=s.X;}return;}
+if(s.ph===2){s.xb+=s.vb*h;s.X+=s.V*h;return;}
+// 拉格朗日方程：(M+m)Ẍ + mR(cosφ·φ̈ − sinφ·φ̇²) = 0；Rφ̈ + cosφ·Ẍ + g sinφ = 0
+const acc=(p,o)=>{const c=Math.cos(p),sn=Math.sin(p),a11=Mb+m,a12=m*Rr*c,b1=m*Rr*sn*o*o,a21=c,a22=Rr,b2=-g*sn,det=a11*a22-a12*a21;return[(b1*a22-a12*b2)/det,(a11*b2-a21*b1)/det];};
+const d=y=>{const[aX,aP]=acc(y[2],y[3]);return[y[1],aX,y[3],aP];},y=[s.X,s.V,s.phi,s.om],k1=d(y),k2=d(y.map((v,i)=>v+k1[i]*h/2)),k3=d(y.map((v,i)=>v+k2[i]*h/2)),k4=d(y.map((v,i)=>v+k3[i]*h));
+[s.X,s.V,s.phi,s.om]=y.map((v,i)=>v+h/6*(k1[i]+2*k2[i]+2*k3[i]+k4[i]));s.xb=s.X+Rr*Math.sin(s.phi);s.vb=s.V+Rr*Math.cos(s.phi)*s.om;
+const yb=Rr-Rr*Math.cos(s.phi);if(yb>(s.hmax||0)){s.hmax=yb;s.vtop=s.V;}
+if(s.phi<=0&&s.om<0){s.ph=2;s.tx=s.t;const v1=qv(X.v1),v2=qv(X.v2);if(Math.abs(s.vb-v1)<5e-3&&Math.abs(s.V-v2)<5e-3){s.vb=v1;s.V=v2;}s.xb=s.X;s.phi=0;}},
+yb(s,P){return s.ph===1?P.R-P.R*Math.cos(s.phi):0;},
+check(s){return{hmax:s.hmax,vtop:s.vtop,vb:s.vb,V:s.V};},
+tsBase(){return 0.5;},tsSlow(){return 0.5;},tPre(P){return 12;},
+events(s,E){if(s.ph>=1&&!E.ti)E.ti=s.t;if(s.tx&&!E.tx)E.tx=s.tx;},tg(E){return E.tx?E.tx+0.8:4;},
+rec(s,P){const yb=M.yb(s,P),vy=s.ph===1?P.R*Math.sin(s.phi)*s.om:0;return{v:{b:s.vb,X:s.V},x:{y:yb},E:{b:.5*P.m*(s.vb**2+vy**2),X:.5*2*P.m*s.V**2,p:P.m*g*yb}};},
+G:{gv:{title:"水平速度—时间图像",note:"小球在圆弧上时轨道一直加速；最高点二者水平速度相等；回到底端分离：小球反向 v₀/3，轨道 2v₀/3",f:"v",ylab:[["速度 ",0],["v",1],[" / (m·s⁻¹)",0]],s:[{k:"b",c:C.clay,t:[["小球（水平分速度）",0]]},{k:"X",c:C.slate,t:[["圆弧轨道",0]]}],mark:E=>E.tx},
+gx:{title:"小球离地高度—时间图像",note:"最高点 h = v₀²/(3g)，此时小球竖直速度为零",f:"x",ylab:[["高度 ",0],["h",1],[" / m",0]],s:[{k:"y",c:C.clay,t:[["小球高度",0]]}],mark:E=>E.tx},
+ge:{title:"能量—时间图像",note:"系统机械能守恒；分离后轨道动能 = 小球对轨道做的功",f:"E",ylab:[["能量 ",0],["E",1],[" / J",0]],s:[{k:"b",c:C.clay,t:[["小球动能",0]]},{k:"X",c:C.slate,t:[["轨道动能",0]]},{k:"p",c:C.sage,t:[["小球重力势能",0]]}],mark:E=>E.tx}},
+view(P){const K=Math.min(200,330/(P.R+0.3));return{K,ox:420,gy:400};},
+camFocus(s,P){return s.X+P.R/2;},
+onReset(P){const K=Math.min(200,330/(P.R+0.3));M.camAnchor=420+K*M.camFocus(M.init(P),P);},
+track(s,P){return[M.camFocus(s,P)];},
+world(v,s,P){const Rr=P.R,X0=s.X,top=Rr+0.12,wd=Rr+0.18;
+if(!offscreen(v,X0+wd/2,Rr/2,"圆弧轨道")){ctx.fillStyle="#C9CFDA";ctx.strokeStyle=C.ink;ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(v.X(X0),v.Y(0));for(let a=0;a<=Math.PI/2+1e-6;a+=0.03)ctx.lineTo(v.X(X0+Rr*Math.sin(a)),v.Y(Rr-Rr*Math.cos(a)));ctx.lineTo(v.X(X0+Rr),v.Y(top));ctx.lineTo(v.X(X0+wd),v.Y(top));ctx.lineTo(v.X(X0+wd),v.Y(0));ctx.closePath();ctx.fill();ctx.stroke();
+ctx.fillStyle=C.ink;ctx.font="italic 600 16px 'Source Serif 4',serif";ctx.fillText("2m",v.X(X0+Rr*0.75),v.Y(0.12));}
+const a=s.ph===1?s.phi:0,cx=s.ph===1?X0+Rr*Math.sin(a)-RB*Math.sin(a):s.xb,cy=s.ph===1?Rr-Rr*Math.cos(a)+RB*Math.cos(a):RB;
+if(!offscreen(v,cx,cy,"小球"))wBall(v,cx,cy,RB,C.clay,"m");
+if(v.main){if(s.ph===0)wArrow(v,cx+0.15,cy+0.25,1,40,C.clay,"v₀");if(s.hmax){ctx.strokeStyle="rgba(201,100,66,.45)";ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(v.X(X0-0.3),v.Y(s.hmax));ctx.lineTo(v.X(X0+Rr+0.4),v.Y(s.hmax));ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=C.clay;ctx.font="12px "+GF;ctx.fillText("已达最大高度 "+fx(s.hmax,3)+" m",v.X(X0+Rr+0.45),v.Y(s.hmax)+4);}
+const cm=M.camFocus(s,P);ctx.fillStyle="#999";ctx.beginPath();ctx.moveTo(v.X(cm),v.Y(-0.02));ctx.lineTo(v.X(cm)-5,v.Y(-0.02)+8);ctx.lineTo(v.X(cm)+5,v.Y(-0.02)+8);ctx.fill();ctx.font="11px "+GF;ctx.fillText("质心",v.X(cm)-11,v.Y(-0.02)+42);}},
+status(s,P){if(s.ph===0)return"小球在光滑水平面上匀速滑向轨道";if(s.ph===2)return"小球离开轨道：小球向左、轨道向右，各自匀速，永远分离";return s.om>0?"小球沿圆弧上升：轨道受压力加速，小球水平速度减小":"小球沿圆弧滑下：轨道继续加速";},
+bars(s,P){return[["小球",s.vb,C.clay,P.v0],["轨道",s.V,C.slate,P.v0]];},
+pie(s,P,X){const E=qv(X.E0),r=M.rec(s,P).E;return{tgt:[r.b/E,r.X/E,r.p/E],cols:[C.clay,C.slate,C.sage],names:["小球动能","轨道动能","小球重力势能"],done:s.ph===2,fr:[X.r1,X.r2,R(0)]};},
+live(s,P){return[["水平总动量",fx(P.m*s.vb+2*P.m*s.V,4)+" kg·m/s"],["机械能",fx(Object.values(M.rec(s,P).E).reduce((a,b)=>a+b,0),4)+" J"],["已达最大高度",fx(s.hmax||0,4)+" m"]];},
+sol(X,P){const i=t=>`<span class="f">${t}</span>`,V=(q,u)=>`<span class="v">${exH(q,u)}</span>`,st=(n,h)=>`<div class="step"><span class="n">${n}</span><div>${h}</div></div>`;
+return `<div class="fnote">题目用字母 ${i("m")}、${i("v")}₀、${i("g")} 表示，动画取<b>示例数值</b> ${i("m")} = ${P.m} kg、${i("v")}₀ = ${P.v0} m/s、${i("g")} = 10 m/s²，括号内为示例数值结果。</div>`+
+st(1,`<b>思考 1</b>：系统竖直方向受重力与支持力，合力不为零（小球有竖直加速度），<b>总动量不守恒，水平方向动量守恒</b>；接触面光滑，只有重力做功，<b>机械能守恒</b>。`)+
+st(2,`<b>思考 2 / (1)</b> 小球到达最大高度时竖直速度为零，<b>二者水平速度相等</b>：${i("mv")}₀ = (${i("m")}+2${i("m")})${i("v")} ⇒ ${i("v")} = ${i("v")}₀/3（${V(X.v,"m/s")}）<br>½${i("mv")}₀² = ½·3${i("m")}${i("v")}² + ${i("mgh")} ⇒ ${i("h")} = ${i("v")}₀²/(3${i("g")})（${V(X.h,"m")}）`)+
+st(3,`<b>思考 3 / (2)</b> 回到最低点分离，相当于弹性碰撞：${i("mv")}₀ = ${i("mv")}₁ + 2${i("mv")}₂，½${i("mv")}₀² = ½${i("mv")}₁² + ½·2${i("mv")}₂²<br>⇒ ${i("v")}₁ = −${i("v")}₀/3（${V(X.v1,"m/s")}，大小 ${i("v")}₀/3、方向向左），${i("v")}₂ = 2${i("v")}₀/3（${V(X.v2,"m/s")}）`)+
+st(4,`<b>(3)</b> 对圆弧轨道用动能定理：${i("W")} = ½·2${i("m")}${i("v")}₂² = 4${i("mv")}₀²/9（${V(X.W,"J")}）；小球对轨道做正功，轨道对小球做等量负功。`)+
+`<div class="ansbox">答案：(1) ${i("h")} = ${i("v")}₀²/(3${i("g")})；(2) ${i("v")}₀/3（向左）；(3) 4${i("mv")}₀²/9</div>`+
+`<div class="fnote">动画补设：圆弧半径 ${i("R")} = ${P.R} m（须大于 ${i("h")}，保证小球不冲出）。分离后小球以 ${i("v")}₀/3 向左、轨道以 2${i("v")}₀/3 向右，<b>永远匀速分离</b>，镜头跟随圆弧轨道，地面刻度滚动表示轨道一直向右运动；小球离开画面后用左边缘箭头指示。</div>`+(X.out?`<div class="warn">当前 ${i("R")} ≤ ${i("h")}：小球会冲出圆弧，与题设不符，请增大 ${i("R")}。</div>`:"");}};
+
+</script>
+<script src="../../common/engine.js"></script>
+<script>engineStart();</script>
+</body></html>
