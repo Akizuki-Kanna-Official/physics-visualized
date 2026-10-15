@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,600&display=swap">
+<title>第 4 页 · 弹丸射入沙箱摆</title>
+<link rel="stylesheet" href="../../common/cw.css">
+</head><body><div id="app">
+<header class="top"><span class="tag">模型一 · 子弹—木块（第 4 页）</span><h1>第 3 题　弹丸射入沙箱摆</h1>
+<div class="tools"><label class="sw"><input type="checkbox" id="clawdOn" checked><i></i>显示小人</label>
+<div class="fzc"><span>字号</span><button id="fzm" aria-label="减小字号">A−</button><input type="range" id="fz" min="50" max="400" step="10" value="100"><button id="fzp" aria-label="增大字号">A＋</button><b id="fzv">100%</b></div></div></header>
+<main class="main">
+<section class="left"><div class="stage" id="scene"><canvas id="c"></canvas><div id="clawd" class="clawd"></div></div><div class="hint chip" id="hint">动画按时间缩放播放</div></section>
+<section class="right"><nav class="tabs" id="tabs"><i class="ind" id="ind"></i><button data-t="sol" class="on">解题过程</button><button data-t="gr">运动图像</button><button data-t="en">能量饼图</button></nav>
+<div class="tabbody">
+<div class="tab on" id="t-sol"><div class="pager" id="pg-sol"><p class="q">如图，用长为 <span class="f">L</span> 的轻绳悬挂一质量为 <span class="f">M</span> 的沙箱，沙箱静止。一质量为 <span class="f">m</span> 的弹丸以速度 <span class="f">v</span> 水平射入沙箱并留在其中，随后与沙箱共同摆动一小角度。不计空气阻力。对子弹射向沙箱到与其共同摆过一小角度的过程（　）<br>A．若保持 <span class="f">m</span>、<span class="f">v</span>、<span class="f">L</span> 不变，<span class="f">M</span> 变大，则系统损失的机械能变小<br>B．若保持 <span class="f">M</span>、<span class="f">v</span>、<span class="f">L</span> 不变，<span class="f">m</span> 变大，则系统损失的机械能变小<br>C．若保持 <span class="f">M</span>、<span class="f">m</span>、<span class="f">L</span> 不变，<span class="f">v</span> 变大，则系统损失的机械能变大<br>D．若保持 <span class="f">M</span>、<span class="f">m</span>、<span class="f">v</span> 不变，<span class="f">L</span> 变大，则系统损失的机械能变大<br>附加：子弹打入沙箱瞬间，绳子拉力？</p>
+<p class="fnote">题目只给字母，页面采用<b>示例数值</b>（拖动参数可直接检验各选项）；弹丸所受阻力 <span class="f">f</span> 为沙箱对弹丸的阻力。</p><h3>解答</h3><div id="ans"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-gr"><div class="seg" id="seg"><button data-g="gv" class="on">v–t</button><button data-g="gx">θ–t</button><button data-g="ge">E–t</button></div>
+<div class="pager" id="pg-gr"><div id="gb"><h4 id="gtitle"></h4><canvas id="gv" class="on"></canvas><canvas id="gx"></canvas><canvas id="ge"></canvas></div><div class="gleg" id="gleg"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-en"><div class="pager" id="pg-en"><h3>弹丸初动能去向</h3><canvas id="pie"></canvas><div id="pieLeg" class="pleg"></div><h3>实时数据</h3><div id="live" class="live"></div></div><div class="pgnav"></div></div>
+</div></section></main>
+<footer class="bot"><div class="ctl"><div class="btns"><button class="primary" id="play">▶ 开始播放</button><button id="pause">⏸ 暂停</button><button id="rst">↺ 重置</button></div><label class="sw bt"><input type="checkbox" id="bt" checked><i></i>子弹时间</label></div><div class="params" id="params"></div></footer>
+</div>
+<script src="../../common/exact.js"></script><script src="../../common/canvas.js"></script><script src="../../common/graph.js"></script><script src="../../common/pie.js"></script><script src="../../common/clawd.js"></script><script src="../../common/scene.js"></script><script src="../../common/ui.js"></script><script src="../../common/draw.js"></script>
+<script>
+const KEY="p4";
+const defs=[["m","弹丸质量 m","kg",0.005,0.1,0.005,0.01,"e"],["M","沙箱质量 M","kg",0.5,5,0.01,0.99,"e"],["v","弹丸速度 v","m/s",10,300,1,100,"e"],["L","绳长 L","m",0.3,2,0.05,1,"e"],["b","沙箱边长","m",0.1,0.3,0.01,0.2,"a"],["d","打入深度","m",0.02,0.15,0.01,0.1,"a"]];
+const g=10,TOP=0.3;
+const M={title:"第 4 页 · 弹丸射入沙箱摆",ground:false,clawdX:960,clawdY:472,
+extraTags(){return{e:["重力加速度 <i class=f>g</i> = 10 m/s²"]};},
+exact(Q){const half=R(1,2),G=R(g),mM=qa(Q.m,Q.M),vp=qd(qm(Q.m,Q.v),mM),dE=qd(qm(qm(Q.m,Q.M),qsq(Q.v)),qm(R(2),mM)),T=qa(qm(mM,G),qd(qm(mM,qsq(vp)),Q.L)),h=qd(qsq(vp),qm(R(2),G)),cos=qs(R(1),qd(h,Q.L)),E0=qm(half,qm(Q.m,qsq(Q.v))),f=qd(dE,Q.d);
+return{vp,dE,T,h,cos,E0,f,Ek:qs(E0,dE),rQ:qd(dE,E0),rK:qd(qs(E0,dE),E0),big:qv(h)>=qv(Q.L)};},
+init(P){return{t:0,ph:0,xb:-P.b/2-0.3,vb:P.v,th:0,om:0,pen:0,Q:0};},
+h(s){return s.ph<=1?1e-6:1e-3;},fast(s){return s.ph<=1;},
+step(s,h,P){const{m,M:Mb,L,b}=P;s.t+=h;
+if(s.ph<=1){// 沙箱（单摆，受弹丸的水平阻力）与弹丸：显式小步
+const fr=s.ph===1?qv(X.f):0,face=L*Math.sin(s.th)-b/2;
+const al=(-Mb*g*Math.sin(s.th)*L+fr*Math.cos(s.th)*L)/(Mb*L*L);s.om+=al*h;s.th+=s.om*h;s.vb-=fr/m*h;s.xb+=s.vb*h;
+const vbox=L*s.om*Math.cos(s.th);if(s.ph===0&&s.xb>=L*Math.sin(s.th)-b/2)s.ph=1;
+if(s.ph===1){s.Q+=fr*(s.vb-vbox)*h;s.pen=s.xb-(L*Math.sin(s.th)-b/2);if(s.vb<=vbox){// 相对静止：弹丸留在沙箱中，按角动量守恒合为一体
+s.om=(Mb*L*s.om+m*s.vb*Math.cos(s.th))/((Mb+m)*L);s.ph=2;s.Q=qv(X.dE);s.tc=s.t;}}}
+else{// 共同摆动：RK4 积分 θ'' = −(g/L) sin θ
+const f=(th,om)=>[om,-g/L*Math.sin(th)],[a1,b1]=f(s.th,s.om),[a2,b2]=f(s.th+a1*h/2,s.om+b1*h/2),[a3,b3]=f(s.th+a2*h/2,s.om+b2*h/2),[a4,b4]=f(s.th+a3*h,s.om+b3*h);
+const om0=s.om;s.th+=h/6*(a1+2*a2+2*a3+a4);s.om+=h/6*(b1+2*b2+2*b3+b4);if(om0>0&&s.om<=0&&!s.thmax)s.thmax=s.th;}},
+tsBase(){return 1;},tsSlow(){return 0.0012;},
+tPre(P){return 2*Math.PI*Math.sqrt(P.L/g)*1.6;},events(s,E){if(s.tc&&!E.tc)E.tc=s.tc;if(s.thmax&&!E.thmax)E.thmax=s.thmax;},
+tg(E,P){return 2*Math.PI*Math.sqrt(P.L/g)*1.25;},
+rec(s,P){const{m,M:Mb,L}=P,mt=s.ph>=2?m+Mb:Mb,vt=L*s.om;return{v:{box:vt},x:{th:s.th*180/Math.PI},E:{k:.5*mt*vt*vt,p:mt*g*L*(1-Math.cos(s.th)),q:s.Q,kb:s.ph>=2?0:.5*m*s.vb*s.vb}};},
+G:{gv:{title:"沙箱速度—时间图像",note:"射入瞬间（约 2 ms）沙箱速度由 0 突变为 <i class=f>v</i>′，之后做单摆往复运动",f:"v",ylab:[["沙箱速度 ",0],["v",1],[" / (m·s⁻¹)",0]],s:[{k:"box",c:"#8A6440",t:[["沙箱（切向速度）",0]]}],
+leg:X=>[{c:"#8A6440",line:1,t:[["沙箱切向速度；射入后 ",0],["v",1],["′ = ",0],["",0,X.vp],[" m/s",0]]}]},
+gx:{title:"摆角—时间图像",note:"射入后只有重力做功，机械能守恒，摆角往复变化（不衰减）",f:"x",ylab:[["摆角 ",0],["θ",1],[" / °",0]],s:[{k:"th",c:C.clay,t:[["摆角 θ",0]]}],fmt:v=>+v.toFixed(0)+""},
+ge:{title:"能量—时间图像",note:"机械能损失只发生在射入过程；摆动中动能与重力势能相互转化，总量不变",f:"E",ylab:[["能量 ",0],["E",1],[" / J",0]],s:[{k:"kb",c:C.brass,t:[["弹丸动能",0]]},{k:"k",c:"#8A6440",t:[["沙箱（含弹丸）动能",0]]},{k:"p",c:"#5D6B86",t:[["重力势能",0]]},{k:"q",c:C.clay,t:[["内能 ",0],["Q",1]]}],
+leg:X=>[{c:C.brass,line:1,t:[["弹丸动能",0]]},{c:"#8A6440",line:1,t:[["沙箱（含弹丸）动能",0]]},{c:"#5D6B86",line:1,t:[["重力势能",0]]},{c:C.clay,line:1,t:[["损失的机械能 Δ",0],["E",1],[" = ",0],["",0,X.dE],[" J",0]]}]}},
+view(P){const K=330/(P.L+0.15);return{K,ox:520,gy:120+(P.L+TOP)*K};},
+world(v,s,P){const{L,b}=P,py=L+TOP,bx=L*Math.sin(s.th),by=py-L*Math.cos(s.th);
+// 天花板与绳
+const X0=v.X(0),Y0=v.Y(py);ctx.strokeStyle=C.ink;ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(X0-70,Y0);ctx.lineTo(X0+70,Y0);ctx.stroke();ctx.strokeStyle="#B9B4A6";ctx.lineWidth=1;for(let x=X0-66;x<X0+70;x+=9){ctx.beginPath();ctx.moveTo(x,Y0);ctx.lineTo(x+7,Y0-7);ctx.stroke();}
+if(v.main){ctx.setLineDash([3,4]);ctx.strokeStyle="#D6D2C5";ctx.beginPath();ctx.moveTo(X0,Y0);ctx.lineTo(X0,v.Y(py-L-b));ctx.stroke();ctx.setLineDash([]);}
+ctx.strokeStyle="#3D3929";ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(X0,Y0);ctx.lineTo(v.X(bx),v.Y(by+b/2));ctx.stroke();
+ctx.save();ctx.translate(v.X(bx),v.Y(by));ctx.rotate(s.th);ctx.translate(-v.X(bx),-v.Y(by));wBlock(v,bx-b/2,by-b/2,b,b,"M",["#D8C39A","#B49A6A"],4);
+if(s.ph>=1){ctx.fillStyle="rgba(90,60,20,.45)";const hh=Math.max(1.5,2.5*v.K/K);ctx.fillRect(v.X(bx-b/2),v.Y(by)-hh,Math.min(s.pen,b)*v.K,hh*2);}
+if(s.ph>=1){const tip=bx-b/2+Math.min(s.pen,b);wBullet(v,tip,by,0.03);}ctx.restore();
+if(s.ph===0){wBullet(v,s.xb,py-L,0.03);if(v.main)wArrow(v,s.xb-0.12,py-L+0.06,1,40,C.clay,"v");}
+if(v.main&&s.ph>=2){ctx.fillStyle=C.muted;ctx.font="12px "+GF;ctx.fillText("θ = "+fx(s.th*180/Math.PI,1)+"°",X0+10,Y0+40);
+const hh=(L-L*Math.cos(s.th));ctx.fillText("上升高度 "+fx(hh*100,2)+" cm",X0+10,Y0+58);}},
+mag(s,P){const L=P.L;return{x:L*Math.sin(s.th),y:P.L+TOP-L*Math.cos(s.th),z:2.6,r:[24,250,300,210],title:"放大镜 · 跟随沙箱"};},
+track(s,P){return[P.L*Math.sin(s.th)];},
+status(s){return["弹丸飞向沙箱","弹丸射入沙箱（时间极短，绳仍近似竖直）","弹丸与沙箱一起摆动（只有重力做功，机械能守恒）"][s.ph];},
+bars(s,P){return[["弹丸",s.ph<2?s.vb:P.L*s.om*Math.cos(s.th),C.brass,P.v],["沙箱（水平）",P.L*s.om*Math.cos(s.th),"#8A6440",Math.max(qv(X.vp),.1)*1.2]];},
+pie(s,P,X){const E=qv(X.E0),r=s.ph>=2?[0,(.5*(P.m+P.M)*(P.L*s.om)**2)/E,(P.m+P.M)*g*P.L*(1-Math.cos(s.th))/E]:[.5*P.m*s.vb**2/E,.5*P.M*(P.L*s.om)**2/E,0];return{tgt:[r[0],r[1],r[2],Math.max(0,1-r[0]-r[1]-r[2])],cols:[C.brass,"#8A6440","#5D6B86",C.clay],names:["弹丸动能","沙箱动能","重力势能","内能（损失的机械能）"],done:s.ph>=2,fr:[R(0),null,null,X.rQ]};},
+live(s,P){const{m,M:Mb,L}=P,mt=s.ph>=2?m+Mb:Mb,T=mt*(g*Math.cos(s.th)+L*s.om*s.om)+0;return[["水平总动量",fx((s.ph<2?m*s.vb:0)+mt*L*s.om*Math.cos(s.th),4)+" kg·m/s"],["初动量 mv",fx(m*P.v,4)+" kg·m/s"],["绳子拉力 T",fx(s.ph>=2?T:Mb*(g*Math.cos(s.th)+L*s.om*s.om),3)+" N"],["机械能（沙箱+弹丸）",fx(s.ph>=2?.5*mt*(L*s.om)**2+mt*g*L*(1-Math.cos(s.th)):.5*m*s.vb**2+.5*Mb*(L*s.om)**2,4)+" J"],["已损失机械能",fx(s.Q,4)+" J"]];},
+sol(X,P){const i=t=>`<span class="f">${t}</span>`,V=(q,u)=>`<span class="v">${exH(q,u)}</span>`,st=(n,h)=>`<div class="step"><span class="n">${n}</span><div>${h}</div></div>`,o=(k,ok,h)=>`<div class="opt"><b class="${ok?"ok":"no"}">${k} ${ok?"✔":"✘"}</b><div>${h}</div></div>`;
+return st(1,`<b>分析过程</b>：①弹丸射入沙箱，时间极短，绳仍竖直，水平方向系统不受外力，<b>水平动量守恒</b>；这是完全非弹性碰撞，机械能有损失。②一起摆动时只有重力做功，<b>机械能守恒，不再损失</b>。所以损失的机械能只在射入过程中产生。`)+
+st(2,`${i("mv")} = (${i("M")}+${i("m")})${i("v")}′ ⇒ ${i("v")}′ = ${i("mv")}/(${i("M")}+${i("m")}) = ${V(X.vp,"m/s")}<br>Δ${i("E")} = ½${i("mv")}² − ½(${i("M")}+${i("m")})${i("v")}′² = ${i("Mmv")}² / [2(${i("M")}+${i("m")})] = ${V(X.dE,"J")}`)+
+st(3,`把 Δ${i("E")} 写成便于判断的形式：Δ${i("E")} = ${i("mv")}² / [2(1 + ${i("m")}/${i("M")})] = ${i("Mv")}² / [2(${i("M")}/${i("m")} + 1)]，与 ${i("L")} 无关。`)+
+o("A",0,`${i("m")}、${i("v")}、${i("L")} 不变，${i("M")} 变大 ⇒ ${i("m")}/${i("M")} 变小 ⇒ Δ${i("E")} <b>变大</b>，不是变小。`)+
+o("B",0,`${i("M")}、${i("v")}、${i("L")} 不变，${i("m")} 变大 ⇒ ${i("M")}/${i("m")} 变小 ⇒ Δ${i("E")} <b>变大</b>。`)+
+o("C",1,`${i("M")}、${i("m")}、${i("L")} 不变，${i("v")} 变大 ⇒ Δ${i("E")} ∝ ${i("v")}² 变大。`)+
+o("D",0,`Δ${i("E")} 与绳长 ${i("L")} 无关，${i("L")} 变大 Δ${i("E")} 不变。`)+
+`<div class="ansbox">答案：C（与课件一致）</div>`+
+st(4,`<b>附加</b>：射入后瞬间沙箱在最低点，绳子拉力与重力的合力提供向心力：${i("T")} − (${i("M")}+${i("m")})${i("g")} = (${i("M")}+${i("m")})${i("v")}′²/${i("L")}<br>⇒ ${i("T")} = (${i("M")}+${i("m")})${i("g")} + ${i("m")}²${i("v")}²/[(${i("M")}+${i("m")})${i("L")}] = ${V(X.T,"N")}`)+
+st(5,`<b>补充</b>：摆起高度 ${i("h")} = ${i("v")}′²/(2${i("g")}) = ${V(X.h,"m")}，cos θ<sub>max</sub> = 1 − ${i("h")}/${i("L")} = ${exH(X.cos)}（θ<sub>max</sub> ≈ ${fx(Math.acos(qv(X.cos))*180/Math.PI,1)}°）`)+
+(X.big?`<div class="warn">当前参数下 ${i("h")} ≥ ${i("L")}，已不是“小角度摆动”，请调小 ${i("v")} 或调大 ${i("M")}。</div>`:"")+
+`<div class="fnote">动画补设：沙箱边长、打入深度 ${i("d")}（取恒定阻力 ${i("f")} = Δ${i("E")}/${i("d")} = ${exH(X.f,"N")}）只用于演示射入过程，不影响 Δ${i("E")}、${i("v")}′、${i("T")}；射入期间绳的偏转极小（约 10⁻⁵ rad），仿真中按角动量守恒合为一体。</div>`;}};
+
+</script>
+<script src="../../common/engine.js"></script>
+<script>engineStart();</script>
+</body></html>
