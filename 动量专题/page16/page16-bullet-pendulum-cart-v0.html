@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,600&display=swap">
+<title>第 16 页 · 子弹射入悬挂木块（可动小车）</title>
+<link rel="stylesheet" href="../../common/cw.css">
+</head><body><div id="app">
+<header class="top"><span class="tag">模型四 · 滑块—曲面（第 16 页）</span><h1>第 5 题　子弹射入悬挂在小车下的木块</h1>
+<div class="tools"><label class="sw"><input type="checkbox" id="clawdOn" checked><i></i>显示小人</label>
+<div class="fzc"><span>字号</span><button id="fzm" aria-label="减小字号">A−</button><input type="range" id="fz" min="50" max="400" step="10" value="100"><button id="fzp" aria-label="增大字号">A＋</button><b id="fzv">100%</b></div></div></header>
+<main class="main">
+<section class="left"><div class="stage" id="scene"><canvas id="c"></canvas><div id="clawd" class="clawd"></div></div><div class="hint chip" id="hint">动画按时间缩放播放</div></section>
+<section class="right"><nav class="tabs" id="tabs"><i class="ind" id="ind"></i><button data-t="sol" class="on">解题过程</button><button data-t="gr">运动图像</button><button data-t="en">能量饼图</button></nav>
+<div class="tabbody">
+<div class="tab on" id="t-sol"><div class="pager" id="pg-sol"><p class="q">如图所示，光滑悬空轨道上静止一质量为 3<span class="f">m</span> 的小车 A，用一段不可伸长的轻质细绳悬挂一质量为 2<span class="f">m</span> 的木块 B。一质量为 <span class="f">m</span> 的子弹以水平速度 <span class="f">v</span>₀ 射入木块（时间极短），在以后的运动过程中，细绳离开竖直方向的最大角度小于 90°，试求：（不计空气阻力，重力加速度为 <span class="f">g</span>）(1) 子弹射入木块 B 时产生的热量；(2) 木块 B 能摆起的最大高度；附加：A 的最大速度？</p>
+<p class="fnote">质量比 3<span class="f">m</span> : 2<span class="f">m</span> : <span class="f">m</span> 为<b>题目给的</b>；<span class="f">m</span>、<span class="f">v</span>₀ 为<b>示例数值</b>；绳长、射入深度为<b>动画补设</b>。</p><h3>解答</h3><div id="ans"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-gr"><div class="seg" id="seg"><button data-g="gv" class="on">v–t</button><button data-g="gx">h–t</button><button data-g="ge">E–t</button></div>
+<div class="pager" id="pg-gr"><div id="gb"><h4 id="gtitle"></h4><canvas id="gv" class="on"></canvas><canvas id="gx"></canvas><canvas id="ge"></canvas></div><div class="gleg" id="gleg"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-en"><div class="pager" id="pg-en"><h3>子弹初动能 ½<i class=f>mv</i>₀² 的去向</h3><canvas id="pie"></canvas><div id="pieLeg" class="pleg"></div><h3>实时数据</h3><div id="live" class="live"></div></div><div class="pgnav"></div></div>
+</div></section></main>
+<footer class="bot"><div class="ctl"><div class="btns"><button class="primary" id="play">▶ 开始播放</button><button id="pause">⏸ 暂停</button><button id="rst">↺ 重置</button></div><label class="sw bt"><input type="checkbox" id="bt" checked><i></i>子弹时间</label></div><div class="params" id="params"></div></footer>
+</div>
+<script src="../../common/exact.js"></script><script src="../../common/canvas.js"></script><script src="../../common/graph.js"></script><script src="../../common/pie.js"></script><script src="../../common/clawd.js"></script><script src="../../common/scene.js"></script><script src="../../common/ui.js"></script><script src="../../common/draw.js"></script>
+<script>
+const KEY="p16";
+const defs=[["m","子弹质量 m","kg",0.02,1,0.01,0.1,"e"],["v0","子弹速度 v₀","m/s",1,20,0.5,6,"e"],["l","细绳长度","m",0.2,1.5,0.05,0.5,"a"],["dp","射入深度","m",0.01,0.1,0.01,0.04,"a"]];
+const g=10,BW=0.14,AW=0.36,AH=0.16;
+const M={title:"第 16 页 · 子弹射入悬挂木块（悬点在可动小车上）",ground:false,clawdX:960,clawdY:472,
+extraTags(){return{g:["小车 A 质量 3<i class=f>m</i>、木块 B 质量 2<i class=f>m</i>；轨道光滑；细绳不可伸长，最大摆角小于 90°；射入时间极短"]};},
+exact(Q){const half=R(1,2),G=R(g),v1=qd(Q.v0,R(3)),v2=qd(Q.v0,R(6)),E0=qm(half,qm(Q.m,qsq(Q.v0))),Qh=qd(qm(Q.m,qsq(Q.v0)),R(3)),h=qd(qsq(Q.v0),qm(R(36),G)),f=qd(Qh,Q.dp);
+return{v1,v2,Q:Qh,h,vAmax:v1,E0,f,rQ:qd(Qh,E0),cosmax:qs(R(1),qd(h,Q.l)),over:qv(h)>=qv(Q.l)};},
+init(P){return{t:0,ph:0,X:0,V:0,phi:0,om:0,xb:-0.5,vb:P.v0,pen:0,Q:0};},
+h(s,P){if(s.ph===0)return Math.max(2e-6,Math.min(2e-3,(-BW/2-s.xb)/s.vb/4));return s.ph===1?2e-6:2e-4;},fast(s){return s.ph===1;},
+bob(s,P){return[s.X+P.l*Math.sin(s.phi),-P.l*Math.cos(s.phi)];},
+step(s,h,P){const m=P.m,Ma=3*m,l=P.l;s.t+=h;
+if(s.ph===0){s.xb+=s.vb*h;if(s.xb>=M.bob(s,P)[0]-BW/2){s.ph=1;s.x0=s.xb;}return;}
+const mb=s.ph===1?2*m:3*m,F=s.ph===1?qv(X.f):0;
+// 拉格朗日方程（含子弹对 B 的水平阻力 F）：(M_A+m_B)Ẍ + m_B·l(cosφ·φ̈ − sinφ·φ̇²) = F；lφ̈ + cosφ·Ẍ + g sinφ = F cosφ/m_B
+const acc=(p,o)=>{const c=Math.cos(p),sn=Math.sin(p),a11=Ma+mb,a12=mb*l*c,b1=F+mb*l*sn*o*o,a21=c,a22=l,b2=-g*sn+F*c/mb,det=a11*a22-a12*a21;return[(b1*a22-a12*b2)/det,(a11*b2-a21*b1)/det];};
+const d=y=>{const[aX,aP]=acc(y[2],y[3]);return[y[1],aX,y[3],aP];},y=[s.X,s.V,s.phi,s.om],k1=d(y),k2=d(y.map((v,i)=>v+k1[i]*h/2)),k3=d(y.map((v,i)=>v+k2[i]*h/2)),k4=d(y.map((v,i)=>v+k3[i]*h));
+[s.X,s.V,s.phi,s.om]=y.map((v,i)=>v+h/6*(k1[i]+2*k2[i]+2*k3[i]+k4[i]));
+const vB=s.V+l*Math.cos(s.phi)*s.om;
+if(s.ph===1){s.vb-=F/m*h;s.xb+=s.vb*h;s.pen=s.xb-(M.bob(s,P)[0]-BW/2);s.Q+=F*Math.max(0,(s.vb-vB))*h;
+if(s.vb<=vB){s.ph=2;s.tc=s.t;s.Q=qv(X.Q);s.vB1=vB;}return;}
+s.xb=M.bob(s,P)[0]-BW/2+s.pen;s.vb=vB;const hb=l*(1-Math.cos(s.phi));if(hb>(s.hmax||0))s.hmax=hb;if(s.V>(s.vAmax||0))s.vAmax=s.V;},
+check(s){return{vB1:s.vB1,hmax:s.hmax,vAmax:s.vAmax,Q:s.Q,tc:s.tc};},
+tsBase(){return 0.5;},tsSlow(){return 0.006;},
+tPre(P){return 0.6+4*2*Math.PI*Math.sqrt(P.l/g)+2;},events(s,E){if(s.tc&&!E.tc)E.tc=s.tc;},tg(E,P){return (E.tc||0.1)+3*2*Math.PI*Math.sqrt(P.l/g*0.5);},
+rec(s,P){const vB=s.V+P.l*Math.cos(s.phi)*s.om,vy=P.l*Math.sin(s.phi)*s.om,mb=s.ph<2?2*P.m:3*P.m,hb=P.l*(1-Math.cos(s.phi));return{v:{b:s.ph<2?s.vb:vB,B:vB,A:s.V},x:{h:hb},E:{b:s.ph<2?.5*P.m*s.vb**2:0,B:.5*mb*(vB*vB+vy*vy),A:.5*3*P.m*s.V**2,p:mb*g*hb,Q:s.ph<2?s.Q:qv(X.Q)}};},
+G:{gv:{title:"速度—时间图像（水平分速度）",note:"射入后 B（含子弹）v₀/3；摆到最高点时与 A 共速 v₀/6；摆回最低点时 A 速度最大 v₀/3、B 速度为 0，如此往复",f:"v",ylab:[["速度 ",0],["v",1],[" / (m·s⁻¹)",0]],s:[{k:"b",c:C.brass,w:1.4,t:[["子弹",0]]},{k:"B",c:"#8A6440",t:[["木块 B",0]]},{k:"A",c:C.slate,t:[["小车 A",0]]}],mark:E=>E.tc},
+gx:{title:"木块 B 上升高度—时间图像",note:"最大高度 v₀²/(36g)",f:"x",ylab:[["高度 ",0],["h",1],[" / m",0]],s:[{k:"h",c:"#8A6440",t:[["B 上升高度",0]]}],mark:E=>E.tc},
+ge:{title:"能量—时间图像",note:"射入过程损失 ⅓mv₀²（变为内能）；之后机械能守恒",f:"E",ylab:[["能量 ",0],["E",1],[" / J",0]],s:[{k:"b",c:C.brass,t:[["子弹动能",0]]},{k:"B",c:"#8A6440",t:[["B 动能",0]]},{k:"A",c:C.slate,t:[["A 动能",0]]},{k:"p",c:C.sage,t:[["B 重力势能",0]]},{k:"Q",c:C.clay,t:[["射入生热",0]]}],mark:E=>E.tc}},
+view(P){const K=Math.min(320,230/(P.l+AH+0.15));return{K,ox:300,gy:170};},
+camFocus(s,P){return (3*s.X+3*M.bob(s,P)[0])/6;},onReset(P){const v=M.view(P);M.camAnchor=v.ox+v.K*0;},track(s,P){return[M.camFocus(s,P)];},
+world(v,s,P){const l=P.l,[bx,by]=M.bob(s,P);
+// 轨道（带世界坐标刻度，随镜头滚动）
+ctx.strokeStyle=C.ink;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,v.Y(0));ctx.lineTo(2000,v.Y(0));ctx.stroke();
+if(v.main){ctx.lineWidth=1;ctx.fillStyle=C.muted;ctx.font="10px "+GF;const x0=Math.floor((v.cam-v.ox)/v.K/0.25)*0.25-1;for(let x=x0;x<x0+12;x+=0.25){const X1=v.X(x);if(X1<0||X1>1100)continue;ctx.beginPath();ctx.moveTo(X1,v.Y(0));ctx.lineTo(X1,v.Y(0)+5);ctx.stroke();if(Math.abs(x/0.5-Math.round(x/0.5))<1e-6)ctx.fillText(x.toFixed(1)+" m",X1-10,v.Y(0)+16);}}
+// 小车 A
+const ax=s.X;ctx.fillStyle="#fff";ctx.strokeStyle=C.ink;[ax-AW/4,ax+AW/4].forEach(x=>{ctx.beginPath();ctx.arc(v.X(x),v.Y(0.035),0.035*v.K,0,7);ctx.fill();ctx.stroke();});
+wBlock(v,ax-AW/2,0.07,AW,AH,"A",STEEL);
+ctx.strokeStyle=C.ink;ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(v.X(ax),v.Y(0));ctx.lineTo(v.X(bx),v.Y(by));ctx.stroke();
+wBlock(v,bx-BW/2,by-BW/2,BW,BW,"B");
+if(s.ph<2||v.z)if(!offscreen(v,s.xb,by,"子弹"))wBullet(v,s.xb,by,0.03);
+if(v.main){if(s.ph===0)wArrow(v,s.xb-0.08,by+0.12,1,36,C.clay,"v₀");if(s.hmax){ctx.strokeStyle="rgba(201,100,66,.45)";ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(v.X(bx)-80,v.Y(-l+s.hmax));ctx.lineTo(v.X(bx)+80,v.Y(-l+s.hmax));ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=C.clay;ctx.font="12px "+GF;ctx.fillText("最大高度 "+fx(s.hmax,3)+" m",v.X(bx)+84,v.Y(-l+s.hmax)+4);}
+const cm=M.camFocus(s,P);ctx.fillStyle="#999";ctx.beginPath();ctx.moveTo(v.X(cm),v.Y(-l-0.12));ctx.lineTo(v.X(cm)-5,v.Y(-l-0.12)+8);ctx.lineTo(v.X(cm)+5,v.Y(-l-0.12)+8);ctx.fill();ctx.font="11px "+GF;ctx.fillText("质心（水平位置）",v.X(cm)-40,v.Y(-l-0.12)+22);}},
+mag(s,P){const[bx,by]=M.bob(s,P);return{x:bx,y:by,z:3,r:[600,200,330,160],title:"放大镜 · 子弹射入木块"};},
+status(s,P){if(s.ph===0)return"子弹水平飞向木块 B";if(s.ph===1)return"子弹射入 B（时间极短，绳仍竖直，小车 A 几乎不动）";return s.om>0?"B 向右摆起：绳的拉力使小车 A 加速":s.om<0?"B 向左摆回：小车 A 继续加速":"B 摆到最高点，与 A 共速";},
+bars(s,P){const r=M.rec(s,P).v;return[["子弹",r.b,C.brass,P.v0],["B",r.B,"#8A6440",P.v0],["A",r.A,C.slate,P.v0]];},
+pie(s,P,X){const E=qv(X.E0),r=M.rec(s,P).E;return{tgt:[r.b/E,r.B/E,r.A/E,r.p/E,r.Q/E],cols:[C.brass,"#8A6440",C.slate,C.sage,C.clay],names:["子弹动能","B 动能","A 动能","B 重力势能","射入生热"],done:false,fr:null};},
+live(s,P){const r=M.rec(s,P);return[["水平总动量",fx(P.m*(s.ph<2?s.vb:0)+(s.ph<2?2:3)*P.m*r.v.B+3*P.m*s.V,4)+" kg·m/s"],["射入生热",fx(r.E.Q,4)+" J"],["已出现的 B 最大高度",fx(s.hmax||0,4)+" m"],["已出现的 A 最大速度",fx(s.vAmax||0,4)+" m/s"]];},
+sol(X,P){const i=t=>`<span class="f">${t}</span>`,V=(q,u)=>`<span class="v">${exH(q,u)}</span>`,st=(n,h)=>`<div class="step"><span class="n">${n}</span><div>${h}</div></div>`;
+return `<div class="fnote">题目用字母表示，动画取<b>示例数值</b> ${i("m")} = ${P.m} kg、${i("v")}₀ = ${P.v0} m/s、${i("g")} = 10 m/s²（括号内为示例结果）。</div>`+
+st(1,`<b>(1)</b> 射入时间极短，绳来不及偏转，小车 A 不参与；子弹与 B 动量守恒：${i("mv")}₀ = 3${i("mv")}₁ ⇒ ${i("v")}₁ = ${i("v")}₀/3（${V(X.v1,"m/s")}）<br>${i("Q")} = ½${i("mv")}₀² − ½·3${i("mv")}₁² = ⅓${i("mv")}₀²（${V(X.Q,"J")}）`)+
+st(2,`<b>(2)</b> B 摆到最高点时与 A 水平速度相同。水平动量守恒：3${i("mv")}₁ = 6${i("mv")}₂ ⇒ ${i("v")}₂ = ${i("v")}₀/6（${V(X.v2,"m/s")}）；机械能守恒：½·3${i("mv")}₁² = ½·6${i("mv")}₂² + 3${i("mgh")} ⇒ ${i("h")} = ${i("v")}₀²/(36${i("g")})（${V(X.h,"m")}）`)+
+st(3,`<b>附加：A 的最大速度</b>　绳对 A 的拉力水平分量在 B 摆向右侧时一直向右，A 一直加速，直到 B 摆回最低点（绳竖直）。此时相当于弹性碰撞，质量相等（3${i("m")} 与 3${i("m")}）交换速度：${i("v")}<sub>A max</sub> = ${i("v")}₁ = ${i("v")}₀/3（${V(X.vAmax,"m/s")}），B 速度为 0。`)+
+`<div class="ansbox">答案：(1) ⅓${i("mv")}₀²；(2) ${i("v")}₀²/(36${i("g")})；A 的最大速度 ${i("v")}₀/3（与课件一致）</div>`+
+`<div class="fnote">动画补设：绳长 ${P.l} m、射入深度 ${P.dp} m（阻力 ${exH(X.f,"N")}）、小车与木块尺寸，不影响答案。之后 A 与 B <b>永远交替加速、减速</b>（B 来回摆动），质心以 ${exH(X.v2,"m/s")} 匀速向右，镜头跟随质心，轨道刻度随之滚动。</div>`+(X.over?`<div class="warn">当前绳长小于最大高度，摆角会超过 90°，与题设不符，请增大绳长。</div>`:"");}};
+
+</script>
+<script src="../../common/engine.js"></script>
+<script>engineStart();</script>
+</body></html>
