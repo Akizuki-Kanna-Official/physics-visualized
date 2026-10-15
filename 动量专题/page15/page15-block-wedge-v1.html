@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,600&display=swap">
+<title>第 15 页 · 物块冲上可动楔形物体</title>
+<link rel="stylesheet" href="../../common/cw.css">
+</head><body><div id="app">
+<header class="top"><span class="tag">模型四 · 滑块—曲面（第 15 页）</span><h1>第 4 题　物块冲上光滑楔形物体（多选）</h1>
+<div class="tools"><label class="sw"><input type="checkbox" id="clawdOn" checked><i></i>显示小人</label>
+<div class="fzc"><span>字号</span><button id="fzm" aria-label="减小字号">A−</button><input type="range" id="fz" min="50" max="400" step="10" value="100"><button id="fzp" aria-label="增大字号">A＋</button><b id="fzv">100%</b></div></div></header>
+<main class="main">
+<section class="left"><div class="stage" id="scene"><canvas id="c"></canvas><div id="clawd" class="clawd"></div></div><div class="hint chip" id="hint">动画按时间缩放播放</div></section>
+<section class="right"><nav class="tabs" id="tabs"><i class="ind" id="ind"></i><button data-t="sol" class="on">解题过程</button><button data-t="gr">运动图像</button><button data-t="en">能量饼图</button></nav>
+<div class="tabbody">
+<div class="tab on" id="t-sol"><div class="pager" id="pg-sol"><p class="q">质量为 <span class="f">M</span> 的楔形物体静止在光滑的水平地面上，其斜面光滑且足够长，与水平方向的夹角为 θ。一个质量为 <span class="f">m</span> 的小物块从斜面底端以初速度 <span class="f">v</span>₀ 沿斜面向上开始运动。当小物块沿斜面向上运动到最高点时，速度大小为 <span class="f">v</span>，距地面高度为 <span class="f">h</span>，重力加速度为 <span class="f">g</span>，则下列关系式中正确的是（　　）<br>A. <span class="f">mv</span>₀ = (<span class="f">m</span>+<span class="f">M</span>)<span class="f">v</span>　B. <span class="f">mv</span>₀cos θ = (<span class="f">m</span>+<span class="f">M</span>)<span class="f">v</span><br>C. <span class="f">mgh</span> = ½<span class="f">m</span>(<span class="f">v</span>₀ sin θ)²　D. <span class="f">mgh</span> + ½(<span class="f">m</span>+<span class="f">M</span>)<span class="f">v</span>² = ½<span class="f">mv</span>₀²</p>
+<p class="fnote">题目未给数值，全部为<b>示例数值</b>（θ = 37°）。</p><h3>解答</h3><div id="ans"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-gr"><div class="seg" id="seg"><button data-g="gv" class="on">v–t</button><button data-g="gx">h–t</button><button data-g="ge">E–t</button></div>
+<div class="pager" id="pg-gr"><div id="gb"><h4 id="gtitle"></h4><canvas id="gv" class="on"></canvas><canvas id="gx"></canvas><canvas id="ge"></canvas></div><div class="gleg" id="gleg"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-en"><div class="pager" id="pg-en"><h3>物块初动能 ½<i class=f>mv</i>₀² 的去向</h3><canvas id="pie"></canvas><div id="pieLeg" class="pleg"></div><h3>实时数据</h3><div id="live" class="live"></div></div><div class="pgnav"></div></div>
+</div></section></main>
+<footer class="bot"><div class="ctl"><div class="btns"><button class="primary" id="play">▶ 开始播放</button><button id="pause">⏸ 暂停</button><button id="rst">↺ 重置</button></div><label class="sw bt"><input type="checkbox" id="bt" checked><i></i>子弹时间</label></div><div class="params" id="params"></div></footer>
+</div>
+<script src="../../common/exact.js"></script><script src="../../common/canvas.js"></script><script src="../../common/graph.js"></script><script src="../../common/pie.js"></script><script src="../../common/clawd.js"></script><script src="../../common/scene.js"></script><script src="../../common/ui.js"></script><script src="../../common/draw.js"></script>
+<script>
+const KEY="p15";
+const defs=[["m","物块质量 m","kg",0.2,5,0.1,1,"e"],["M","楔形物体质量 M","kg",0.5,10,0.5,3,"e"],["sn","sin θ","",0.2,0.8,0.05,0.6,"e"],["v0","初速度 v₀","m/s",1,10,0.5,5,"e"]];
+const g=10,BS=0.18;
+const M={title:"第 15 页 · 物块冲上可动楔形物体",camNeg:true,clawdX:960,clawdY:472,
+extraTags(){return{g:["地面光滑；斜面光滑且足够长"],a:["斜面长度按“足够长”画成最大位移的 1.3 倍"]};},
+cs(P){return Math.sqrt(1-P.sn*P.sn);},
+exact(Q){const half=R(1,2),G=R(g),c2=qs(R(1),qsq(Q.sn)),c=qroot(c2),mt=qa(Q.m,Q.M),v=smq(c,qd(qm(Q.m,Q.v0),mt)),v2=qm(qsq(qd(qm(Q.m,Q.v0),mt)),c2),
+E0=qm(half,qm(Q.m,qsq(Q.v0))),h=qd(qs(E0,qm(half,qm(mt,v2))),qm(Q.m,G)),hC=qd(qsq(qm(Q.v0,Q.sn)),qm(R(2),G));
+return{v,h,hC,E0,v2};},
+init(P){return{t:0,ph:0,X:0,V:0,s:0,sd:P.v0,xb:0,yb:0,vbx:P.v0*M.cs(P),vby:P.v0*P.sn};},
+h(){return 1e-3;},fast(){return false;},
+step(s,h,P){const{m,M:Mw,sn}=P,c=M.cs(P);s.t+=h;
+if(s.ph===0){const as=-g*sn*(Mw+m)/(Mw+m-m*c*c),aX=-m*c*as/(Mw+m);// 匀加速：精确公式
+let tau=h;if(s.sd<0&&s.s+s.sd*h+.5*as*h*h<=0){tau=(-s.sd-Math.sqrt(s.sd*s.sd-2*as*s.s))/as;}
+s.s+=s.sd*tau+.5*as*tau*tau;s.X+=s.V*tau+.5*aX*tau*tau;s.sd+=as*tau;s.V+=aX*tau;
+if(s.sd<=0&&!s.top){s.top=1;s.ttop=s.t-h+tau;s.htop=s.s*sn;s.vtop=s.V;}
+s.xb=s.X+s.s*c;s.yb=s.s*sn;s.vbx=s.V+s.sd*c;s.vby=s.sd*sn;
+if(tau<h||s.s<=0){// 回到斜面底端：地面吸收竖直速度，物块水平滑走
+s.s=0;s.yb=0;s.ph=1;s.tb=s.t-h+tau;s.vby=0;s.Qg=.5*m*(s.sd*sn)**2;s.X+=s.V*(h-tau);s.xb=s.X+s.vbx*(h-tau);s.xb0=s.xb-s.X;}return;}
+s.X+=s.V*h;s.xb+=s.vbx*h;},
+check(s){return{htop:s.htop,vtop:s.vtop,vbx:s.vbx,V:s.V,Qg:s.Qg};},
+tsBase(){return 0.5;},tsSlow(){return 0.5;},tPre(P){return 12;},
+events(s,E){if(s.ttop&&!E.ttop)E.ttop=s.ttop;if(s.tb&&!E.tb)E.tb=s.tb;},tg(E){return E.tb?E.tb*1.3:3;},
+rec(s,P){return{v:{bx:s.vbx,by:s.vby,X:s.V},x:{y:s.ph===0?s.yb:0},E:{b:.5*P.m*(s.vbx**2+s.vby**2),X:.5*P.M*s.V**2,p:P.m*g*(s.ph===0?s.yb:0),Q:s.Qg||0}};},
+G:{gv:{title:"速度—时间图像（向右为正）",note:"物块在斜面上时二者都做匀变速运动；最高点水平共速 v；回到底端时物块 (−2, −3) m/s，竖直分速度被地面吸收",f:"v",ylab:[["速度 ",0],["v",1],[" / (m·s⁻¹)",0]],s:[{k:"bx",c:C.clay,t:[["物块水平分速度",0]]},{k:"by",c:C.clay,dash:[4,4],w:1.4,t:[["物块竖直分速度",0]]},{k:"X",c:C.slate,t:[["楔形物体",0]]}],mark:E=>E.ttop},
+gx:{title:"物块离地高度—时间图像",note:"最高点高度 h（最高点物块仍有水平速度 v，故 h 小于选项 C 的值）",f:"x",ylab:[["高度 ",0],["h",1],[" / m",0]],s:[{k:"y",c:C.clay,t:[["物块高度",0]]}],mark:E=>E.ttop},
+ge:{title:"能量—时间图像",note:"物块在斜面上时系统机械能守恒；回到底端撞地，竖直分速度对应的动能变为内能",f:"E",ylab:[["能量 ",0],["E",1],[" / J",0]],s:[{k:"b",c:C.clay,t:[["物块动能",0]]},{k:"X",c:C.slate,t:[["楔形物体动能",0]]},{k:"p",c:C.sage,t:[["物块重力势能",0]]},{k:"Q",c:C.muted||"#999",t:[["落地损失",0]]}],mark:E=>E.ttop}},
+view(P){const Lw=M.Lw(P),c=M.cs(P),K=Math.min(220,Math.min(600/(Lw*c+1.5),250/(Lw*P.sn+0.3)));return{K,ox:260,gy:400};},
+Lw(P){const c=M.cs(P),mt=P.m+P.M,v2=(P.m*P.v0*c/mt)**2,h=(.5*P.m*P.v0**2-.5*mt*v2)/(P.m*g);return Math.max(0.6,1.3*h/P.sn);},
+camFocus(s,P){const Lw=M.Lw(P),c=M.cs(P);return s.X+Lw*c/2;},
+onReset(P){const v=M.view(P);M.camAnchor=v.ox+v.K*M.camFocus(M.init(P),P);},track(s,P){return[M.camFocus(s,P)];},
+world(v,s,P){const Lw=M.Lw(P),c=M.cs(P),sn=P.sn,X0=s.X;
+if(!offscreen(v,X0+Lw*c*0.7,0.1,"楔形物体")){ctx.fillStyle="#C9CFDA";ctx.strokeStyle=C.ink;ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(v.X(X0),v.Y(0));ctx.lineTo(v.X(X0+Lw*c),v.Y(Lw*sn));ctx.lineTo(v.X(X0+Lw*c),v.Y(0));ctx.closePath();ctx.fill();ctx.stroke();
+ctx.fillStyle=C.ink;ctx.font="italic 600 15px 'Source Serif 4',serif";ctx.fillText("M",v.X(X0+Lw*c*0.72),v.Y(Lw*sn*0.3));ctx.font="12px "+GF;ctx.fillText("θ",v.X(X0)+30,v.Y(0)-5);
+if(v.main&&s.htop){ctx.strokeStyle="rgba(201,100,66,.5)";ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(v.X(X0+Lw*c+0.05),v.Y(s.htop));ctx.lineTo(v.X(X0+Lw*c+0.05),v.Y(0));ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=C.clay;ctx.fillText("h = "+fx(s.htop,3)+" m",v.X(X0+Lw*c)+10,v.Y(s.htop/2));}}
+const ang=s.ph===0?Math.asin(sn):0,bx=s.xb,by=s.ph===0?s.yb:0;
+if(!offscreen(v,bx,by,"物块")){ctx.save();ctx.translate(v.X(bx),v.Y(by));ctx.rotate(-ang);wBlock({K:v.K,X:x=>(x-BS/2)*v.K,Y:y=>-y*v.K},0,0,BS,BS,"m",WOOD);ctx.restore();}
+if(v.main&&s.t===0)wArrow(v,bx+0.1,by+0.3,1,36,C.clay,"v₀");},
+status(s,P){if(s.ph===1)return"物块回到地面：地面吸收竖直速度，物块向左、楔形物体向右，各自匀速，永远分离";return s.sd>0?"物块沿斜面上滑：楔形物体被压向右加速":"物块沿斜面下滑：楔形物体继续向右加速";},
+bars(s,P){return[["物块（水平）",s.vbx,C.clay,P.v0],["楔形物体",s.V,C.slate,P.v0]];},
+pie(s,P,X){const E=qv(X.E0),r=M.rec(s,P).E;return{tgt:[r.b/E,r.X/E,r.p/E,r.Q/E],cols:[C.clay,C.slate,C.sage,"#999"],names:["物块动能","楔形物体动能","物块重力势能","落地损失（变为内能）"],done:s.ph===1,fr:null};},
+live(s,P){return[["水平总动量",fx(P.m*s.vbx+P.M*s.V,4)+" kg·m/s"],["初始水平动量 mv₀cosθ",fx(P.m*P.v0*M.cs(P),4)+" kg·m/s"],["初始竖直动量 mv₀sinθ（不守恒）",fx(P.m*P.v0*P.sn,4)+" kg·m/s"],["已达最大高度",fx(s.htop||0,4)+" m"]];},
+sol(X,P){const i=t=>`<span class="f">${t}</span>`,st=(n,h)=>`<div class="step"><span class="n">${n}</span><div>${h}</div></div>`,ok=t=>`<b style="color:#3f7f4f">${t}</b>`,no=t=>`<b style="color:#C96442">${t}</b>`;
+return `<div class="fnote">题目用字母表示，动画取<b>示例数值</b>：${i("m")} = ${P.m} kg、${i("M")} = ${P.M} kg、sin θ = ${P.sn}、${i("v")}₀ = ${P.v0} m/s，括号内为示例结果。</div>`+
+st(1,`<b>守恒判断</b>：系统水平方向不受外力，<b>水平动量守恒</b>；竖直方向地面支持力与重力不平衡（物块有竖直加速度），总动量不守恒；斜面与地面光滑，<b>机械能守恒</b>。`)+
+st(2,`<b>A、B</b>　物块到最高点时相对楔形物体静止，二者速度相同（都沿水平方向），大小为 ${i("v")}。初始水平动量为 ${i("mv")}₀cos θ：${i("mv")}₀cos θ = (${i("m")}+${i("M")})${i("v")}（${i("v")} = ${surdH(X.v,"m/s")}）。${no("A 错误")}（把竖直方向的动量也算进来了），${ok("B 正确")}`)+
+st(3,`<b>C、D</b>　机械能守恒：${i("mgh")} + ½(${i("m")}+${i("M")})${i("v")}² = ½${i("mv")}₀²（${i("h")} = ${exH(X.h,"m")}），${ok("D 正确")}。<br>选项 C 只把竖直分速度的动能变成势能，${i("h")}<sub>C</sub> = (${i("v")}₀ sin θ)²/(2${i("g")}) = ${exH(X.hC,"m")} ≠ ${i("h")}；实际上物块相对斜面运动，水平、竖直速度都在变化，${no("C 错误")}。`)+
+`<div class="ansbox">答案：BD（与课件一致）</div>`+
+st(4,`<b>后续</b>：物块滑回斜面底端时（示例数值）楔形物体 2 m/s 向右，物块速度 (−2, −3) m/s；地面吸收竖直分速度（损失 4.5 J），物块以 2 m/s 向左匀速，二者<b>永远分离</b>，镜头跟随楔形物体（地面刻度滚动），物块离开画面后用左边缘箭头指示。`);}};
+
+</script>
+<script src="../../common/engine.js"></script>
+<script>engineStart();</script>
+</body></html>
