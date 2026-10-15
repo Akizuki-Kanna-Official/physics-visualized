@@ -55,7 +55,7 @@ const t=$("t-"+TAB);if(t.animate){const kf=springKF(...SNAPPY,0,1,.4);t.animate(
 document.querySelectorAll("#seg button").forEach(b=>b.onclick=()=>{GSEL=b.dataset.g;document.querySelectorAll("#seg button").forEach(x=>x.classList.toggle("on",x===b));Object.keys(GMAP).forEach(i=>$(i).classList.toggle("on",i===GSEL));PG["pg-gr"]=0;layoutTab();
 const c=$(GSEL);if(c.animate){const kf=springKF(...SNAPPY,0,1,.35);c.animate(kf.map(p=>({opacity:Math.min(1,p)})),{duration:350});}});
 $("fz").oninput=e=>setFZ(e.target.value/100);$("fzm").onclick=()=>setFZ(FZ-.1);$("fzp").onclick=()=>setFZ(FZ+.1);
-const cOn=$("clawdOn");cOn.checked=!(LS&&LS.getItem(KEY+".clawd")==="0");const applyC=()=>{$("clawd").style.display=cOn.checked?"":"none";try{LS.setItem(KEY+".clawd",cOn.checked?"1":"0")}catch(e){}};cOn.onchange=applyC;applyC();
+const cOn=$("clawdOn");cOn.checked=!!(LS&&LS.getItem(KEY+".clawd")==="1");const applyC=()=>{$("clawd").style.display=cOn.checked?"":"none";try{LS.setItem(KEY+".clawd",cOn.checked?"1":"0")}catch(e){}};cOn.onchange=applyC;applyC();
 const op=onParam||(()=>{reset();layoutTab();});
 defs.forEach(d=>{const n=$(d[0]+"n");$(d[0]).oninput=()=>{if(n)n.value=$(d[0]).value;op();};
 // 数值输入框：可输入任意小数（精确转分数），超出范围夹到端点；滑块同步到最近刻度
