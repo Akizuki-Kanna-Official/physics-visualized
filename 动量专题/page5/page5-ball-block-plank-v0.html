@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,600&display=swap">
+<title>第 5 页 · 小球撞 A 反弹，A 在木板 B 上滑动</title>
+<link rel="stylesheet" href="../../common/cw.css">
+</head><body><div id="app">
+<header class="top"><span class="tag">模型二 · 滑块—木板（第 5 页）</span><h1>第 1 题　小球撞物块，物块在木板上滑动</h1>
+<div class="tools"><label class="sw"><input type="checkbox" id="clawdOn" checked><i></i>显示小人</label>
+<div class="fzc"><span>字号</span><button id="fzm" aria-label="减小字号">A−</button><input type="range" id="fz" min="50" max="400" step="10" value="100"><button id="fzp" aria-label="增大字号">A＋</button><b id="fzv">100%</b></div></div></header>
+<main class="main">
+<section class="left"><div class="stage" id="scene"><canvas id="c"></canvas><div id="clawd" class="clawd"></div></div><div class="hint chip" id="hint">动画按时间缩放播放</div></section>
+<section class="right"><nav class="tabs" id="tabs"><i class="ind" id="ind"></i><button data-t="sol" class="on">解题过程</button><button data-t="gr">运动图像</button><button data-t="en">能量饼图</button></nav>
+<div class="tabbody">
+<div class="tab on" id="t-sol"><div class="pager" id="pg-sol"><p class="q">如图所示，在光滑水平面上叠放着 A、B 两物体，质量分别为 <span class="f">m</span><sub>A</sub>、<span class="f">m</span><sub>B</sub>，A 与 B 间的动摩擦因数为 μ，质量为 <span class="f">m</span> 的小球以水平速度 <span class="f">v</span> 射向 A，然后以 <span class="f">v</span>/5 的速度返回，求：(1) A 与 B 相对静止时的速度；(2) 木板 B 至少多长，A 才不至于滑落。<br>问题 1：系统动量守恒吗？机械能守恒吗？问题 2：损失机械能如何计算？问题 3：要使 m 不从 M 上滑下，板至少多长？m 在 M 上的滑行时间？</p>
+<p class="fnote">题目只给字母，页面采用<b>示例数值</b>；A 所受摩擦力 <span class="f">f</span> = μ<span class="f">m</span><sub>A</sub><span class="f">g</span>，<span class="f">g</span> = 10 m/s²，地面光滑。</p><h3>解答</h3><div id="ans"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-gr"><div class="seg" id="seg"><button data-g="gv" class="on">v–t</button><button data-g="gx">x–t</button><button data-g="ge">E–t</button></div>
+<div class="pager" id="pg-gr"><div id="gb"><h4 id="gtitle"></h4><canvas id="gv" class="on"></canvas><canvas id="gx"></canvas><canvas id="ge"></canvas></div><div class="gleg" id="gleg"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-en"><div class="pager" id="pg-en"><h3>小球初动能去向</h3><canvas id="pie"></canvas><div id="pieLeg" class="pleg"></div><h3>实时数据</h3><div id="live" class="live"></div></div><div class="pgnav"></div></div>
+</div></section></main>
+<footer class="bot"><div class="ctl"><div class="btns"><button class="primary" id="play">▶ 开始播放</button><button id="pause">⏸ 暂停</button><button id="rst">↺ 重置</button></div><label class="sw bt"><input type="checkbox" id="bt" checked><i></i>子弹时间</label></div><div class="params" id="params"></div></footer>
+</div>
+<script src="../../common/exact.js"></script><script src="../../common/canvas.js"></script><script src="../../common/graph.js"></script><script src="../../common/pie.js"></script><script src="../../common/clawd.js"></script><script src="../../common/scene.js"></script><script src="../../common/ui.js"></script><script src="../../common/draw.js"></script>
+<script>
+const KEY="p5";
+const defs=[["m","小球质量 m","kg",0.2,5,0.1,1,"e"],["v","小球速度 v","m/s",1,30,0.5,10,"e"],["mA","A 的质量 mA","kg",0.5,10,0.1,2,"e"],["mB","木板 B 质量 mB","kg",0.5,10,0.1,4,"e"],["mu","动摩擦因数 μ","",0.1,1,0.05,0.4,"e"],["L","木板长","m",1,8,0.1,4,"a"]];
+const g=10,HA=0.25,TH=0.12,RB=0.08,KC=2e5;
+const M={title:"第 5 页 · 小球撞 A 反弹，A 在木板 B 上滑动",
+exact(Q){const half=R(1,2),G=R(g),v5=qd(Q.v,R(5)),vA=qd(qm(Q.m,qa(Q.v,v5)),Q.mA),mAB=qa(Q.mA,Q.mB),vc=qd(qm(Q.mA,vA),mAB),Lmin=qd(qm(Q.mB,qsq(vA)),qm(qm(R(2),qm(Q.mu,G)),mAB)),
+ts=qd(qm(Q.mB,vc),qm(qm(Q.mu,Q.mA),G)),Qf=qs(qm(half,qm(Q.mA,qsq(vA))),qm(half,qm(mAB,qsq(vc)))),E0=qm(half,qm(Q.m,qsq(Q.v))),Eb=qm(half,qm(Q.m,qsq(v5))),EA=qm(half,qm(Q.mA,qsq(vA))),Ec=qs(qs(E0,Eb),EA),e=qd(qa(vA,v5),Q.v);
+return{v:Q.v,v5,vA,vc,Lmin,ts,Qf,E0,Eb,EA,Ec,e,ok:qv(Ec)>=-1e-12,rb:qd(Eb,E0),rc:qd(Ec,E0),rA:qd(qm(half,qm(Q.mA,qsq(vc))),E0),rB:qd(qm(half,qm(Q.mB,qsq(vc))),E0),rQ:qd(Qf,E0),fit:qv(Lmin)<=P.L-HA};},
+init(P){return{t:0,ph:0,xb:-0.5,vb:P.v,xA:0,vA:0,xB:0,vB:0,dm:0,Qf:0,Qc:0};},
+h(s){if(s.ph===0)return Math.max(2e-5,Math.min(1e-3,(s.xA-s.xb-RB)/Math.max(s.vb,1e-9)/4));return s.ph===1?2e-5:1e-3;},fast(s){return s.ph===1;},
+step(s,h,P){const{m,mA,mB,mu}=P;s.t+=h;
+if(s.ph<=1){const dl=s.xb+RB-s.xA;let F=0;if(dl>0){s.ph=1;const e=qv(X.e),k2=KC/(e*e);if(s.vb-s.vA>0){s.dm=Math.max(s.dm,dl);F=KC*dl;}else{F=Math.max(0,k2*(dl-s.dm*(1-e*e)));}}
+s.vb-=F/m*h;s.vA+=F/mA*h;s.xb+=s.vb*h;s.xA+=s.vA*h;
+if(s.ph===1&&F===0&&s.vb<s.vA){s.ph=2;s.vb=-qv(X.v5);s.vA=qv(X.vA);s.Qc=qv(X.Ec);}return;}
+s.xb+=s.vb*h;
+if(s.ph===2){const fr=mu*mA*g,aA=-fr/mA,aB=fr/mB,dv=s.vA-s.vB,tau=Math.min(h,dv/(aB-aA));
+s.xA+=s.vA*tau+.5*aA*tau*tau;s.xB+=s.vB*tau+.5*aB*tau*tau;s.Qf+=fr*(dv*tau-.5*(aB-aA)*tau*tau);s.vA+=aA*tau;s.vB+=aB*tau;
+if(tau<h){const vc=qv(X.vc);s.vA=s.vB=vc;s.ph=3;s.tc=s.t-h+tau;s.Qf=qv(X.Qf);s.xA+=vc*(h-tau);s.xB+=vc*(h-tau);}
+if(s.xA+HA>s.xB+P.L&&s.ph===2)s.fall=1;}
+else{s.xA+=s.vA*h;s.xB+=s.vB*h;}},
+tsBase(){return 0.5;},tsSlow(){return 0.0025;},
+tPre(P){return Math.max(1.6,qv(X.ts)*1.6+0.06);},events(s,E){if(s.tc&&!E.tc)E.tc=s.tc;},tg(E){return E.tc?E.tc*1.4:1.5;},
+rec(s,P){return{v:{b:s.vb,A:s.vA,B:s.vB},x:{A:s.xA,B:s.xB,d:s.xA-s.xB},E:{b:.5*P.m*s.vb**2,A:.5*P.mA*s.vA**2,B:.5*P.mB*s.vB**2,Qc:s.Qc,Q:s.Qf}};},
+G:{gv:{title:"速度—时间图像",note:"碰撞（约 6 ms）使小球速度由 <i class=f>v</i> 变为 −<i class=f>v</i>/5、A 获得 <i class=f>v</i><sub>A</sub>；之后 A 减速、B 加速至共速；两线间面积 = 相对滑行距离",f:"v",ylab:[["速度 ",0],["v",1],[" / (m·s⁻¹)",0]],
+s:[{k:"b",c:"#6E778A",t:[["小球",0]]},{k:"A",c:"#8A6440",t:[["A",0]]},{k:"B",c:C.sage,t:[["B",0]]}],mark:E=>E.tc,
+leg:X=>[{c:"#6E778A",line:1,t:[["小球：",0],["",0,X.v],[" → −",0],["",0,X.v5],[" m/s（向左）",0]]},{c:"#8A6440",line:1,t:[["A：",0],["",0,X.vA],[" → ",0],["",0,X.vc],[" m/s",0]]},{c:C.sage,line:1,t:[["B：0 → ",0],["",0,X.vc],[" m/s",0]]},{c:"rgba(201,100,66,.2)",t:[["两线之间面积 = ",0],["L",1],["min",0],[" = ",0],["",0,X.Lmin],[" m",0]]}],
+extra(x,A,now,E){const hs=H.filter(h=>h.t<=now&&h.v.A>0);fillBetween(x,A,hs.map(h=>[h.t,h.v.A]),hs.map(h=>[h.t,h.v.B]),"rgba(201,100,66,.2)");if(E.tc&&now>=E.tc){x.fillStyle=C.clay;x.beginPath();x.arc(A.X(E.tc),A.Y(qv(X.vc)),4.5,0,7);x.fill();rich(x,[["共速 ",0],["v",1],[" = ",0],["",0,X.vc],[" m/s，滑行 ",0],["t",1],[" = ",0],["",0,X.ts],[" s",0]],A.X(E.tc)+8,A.Y(qv(X.vc))-14,12.5,"left","#9E4429");}}},
+gx:{title:"位移—时间图像",note:"A、B 左端相对起点的位移；共速后平行",f:"x",ylab:[["位移 ",0],["x",1],[" / m",0]],s:[{k:"A",c:"#8A6440",t:[["A",0]]},{k:"B",c:C.sage,t:[["B",0]]},{k:"d",c:C.clay,dash:[5,4],t:[["A 相对 B 的位移",0]]}],mark:E=>E.tc},
+ge:{title:"能量—时间图像",note:"碰撞损失一部分机械能；A 在 B 上滑动时再因摩擦生热",f:"E",ylab:[["能量 ",0],["E",1],[" / J",0]],s:[{k:"b",c:"#6E778A",t:[["小球动能",0]]},{k:"A",c:"#8A6440",t:[["A 动能",0]]},{k:"B",c:C.sage,t:[["B 动能",0]]},{k:"Qc",c:C.plum,t:[["碰撞损失",0]]},{k:"Q",c:C.clay,t:[["摩擦生热",0]]}],mark:E=>E.tc}},
+view(P){const K=Math.min(220,660/(P.L+0.6));return{K,ox:230,gy:262};},camFocus(s,P){return s.xB+P.L/2;},camAnchor:560,track(s,P){return[s.xB+P.L/2];},
+world(v,s,P){wBlock(v,s.xB,0,P.L,TH,"B",["#C9B79A","#A8977A"],4);wBlock(v,s.xA,TH,HA,HA,"A");
+if(!offscreen(v,s.xb,TH+HA/2,"小球 "+fx(s.vb,1)+" m/s"))wBall(v,s.xb,TH+HA/2,RB,"#7D8AA6");
+if(v.main){if(s.ph===0)wArrow(v,s.xb,TH+HA/2+0.2,s.vb,4,C.clay,"v");if(s.ph>=2&&s.xb>-1e9)wArrow(v,s.xb,TH+HA/2+0.2,s.vb,4,C.clay,"v/5");
+if(s.ph>=2){const d=s.xA-s.xB,y=TH+HA+0.12;ctx.strokeStyle=C.clay;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(v.X(s.xB),v.Y(y));ctx.lineTo(v.X(s.xA),v.Y(y));ctx.stroke();ctx.fillStyle=C.clay;ctx.font="12px "+GF;ctx.textAlign="right";ctx.fillText("A 相对 B 滑行 "+fx(d,3)+" m",v.X(s.xA)-4,v.Y(y)-6);ctx.textAlign="left";}}},
+mag(s,P){return s.t<0.2||s.ph<=1?{x:s.xA,y:TH+HA/2,z:3,r:[24,300,500,166],title:"放大镜 · 碰撞处（A 左侧面）"}:{x:s.xA,y:TH+HA/2,z:3,r:[24,300,500,166],title:"放大镜 · 跟随 A 左侧面"};},
+status(s){return["小球飞向 A","小球与 A 碰撞（时间极短）","A 在 B 上滑动：A 减速，B 加速；小球以 v/5 向左运动","A、B 共速，一起匀速运动"][s.ph];},
+bars(s,P){return[["小球",s.vb,"#6E778A",P.v],["A",s.vA,"#8A6440",P.v],["木板 B",s.vB,C.sage,P.v]];},
+pie(s,P,X){const E=qv(X.E0),a=[.5*P.m*s.vb**2/E,.5*P.mA*s.vA**2/E,.5*P.mB*s.vB**2/E,s.Qc/E,s.Qf/E];return{tgt:a,cols:["#6E778A","#8A6440",C.sage,C.plum,C.clay],names:["小球动能","A 动能","B 动能","碰撞损失的机械能","摩擦生热"],done:s.ph===3,fr:[X.rb,X.rA,X.rB,X.rc,X.rQ]};},
+live(s,P){return[["系统总动量",fx(P.m*s.vb+P.mA*s.vA+P.mB*s.vB,4)+" kg·m/s"],["初始总动量 mv",fx(P.m*P.v,4)+" kg·m/s"],["碰撞损失机械能",fx(s.Qc,3)+" J"],["摩擦生热",fx(s.Qf,3)+" J"],["A 相对 B 滑行",fx(s.ph>=2?s.xA-s.xB:0,4)+" m"]];},
+sol(X,P){const i=t=>`<span class="f">${t}</span>`,V=(q,u)=>`<span class="v">${exH(q,u)}</span>`,st=(n,h)=>`<div class="step"><span class="n">${n}</span><div>${h}</div></div>`,mA=i("m")+"<sub>A</sub>",mB=i("m")+"<sub>B</sub>",vA=i("v")+"<sub>A</sub>",vc=i("v")+"<sub>共</sub>";
+return (X.ok?"":`<div class="warn">当前参数下碰撞后动能大于碰前，违反能量守恒，请增大 ${mA} 或减小 ${i("m")}。</div>`)+
+st(1,`<b>碰撞</b>（时间极短，摩擦力冲量可忽略）：小球与 A 动量守恒，向右为正：${i("mv")} = ${i("m")}(−${i("v")}/5) + ${mA}${vA} ⇒ ${vA} = 6${i("mv")}/(5${mA}) = ${V(X.vA,"m/s")}<br>恢复系数 ${i("e")} = ${exH(X.e)}，碰撞损失机械能 ${V(X.Ec,"J")}（≥ 0，过程可能发生）`)+
+st(2,`<b>(1)</b> A 在 B 上滑动，A、B 动量守恒：${mA}${vA} = (${mA}+${mB})${vc} ⇒ ${vc} = 6${i("mv")}/[5(${mA}+${mB})] = ${V(X.vc,"m/s")}，方向向右<br>（也可对小球、A、B 整体：${i("mv")} = −${i("mv")}/5 + (${mA}+${mB})${vc}）`)+
+st(3,`<b>(2)</b> 摩擦力 ${i("f")} = μ${mA}${i("g")}；能量守恒 μ${mA}${i("g")}${i("L")} = ½${mA}${vA}² − ½(${mA}+${mB})${vc}² = ${V(X.Qf,"J")}<br>⇒ ${i("L")}<sub>min</sub> = ${mB}${vA}²/[2μ${i("g")}(${mA}+${mB})] = 18${i("m")}²${i("v")}²${mB}/[25μ${i("g")}${mA}²(${mA}+${mB})] = ${V(X.Lmin,"m")}`)+
+st(4,`<b>问题 3</b> 滑行时间：对 B 用动量定理 μ${mA}${i("g")}${i("t")} = ${mB}${vc} ⇒ ${i("t")} = ${V(X.ts,"s")}`)+
+st(5,`<b>问题 1、2</b>：小球、A、B 组成的系统合外力为零，动量守恒；碰撞与滑动摩擦都使机械能减少，机械能不守恒。损失的机械能 = 碰撞损失 ${exH(X.Ec,"J")} + 摩擦生热 ${i("Q")} = ${i("f")}·Δ${i("x")} = ${exH(X.Qf,"J")}`)+
+`<div class="ansbox">答案：(1) ${vc} = ${exH(X.vc,"m/s")}，向右；(2) ${i("L")}<sub>min</sub> = ${exH(X.Lmin,"m")}；滑行时间 ${exH(X.ts,"s")}</div>`+
+`<div class="fnote">动画补设：碰撞用刚度很大的接触弹力（加载/卸载刚度不同，使恢复系数恰为 ${exH(X.e)}），碰撞约 6 ms，结束时速度与解析值一致；小球按水平运动处理（不考虑其下落）；木板长 ${P.L} m（A 视为质点时只需 ${exH(X.Lmin,"m")}，A 边长 0.25 m 也算进去仍够长）。</div>`;}};
+
+</script>
+<script src="../../common/engine.js"></script>
+<script>engineStart();</script>
+</body></html>
