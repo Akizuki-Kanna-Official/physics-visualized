@@ -33,7 +33,7 @@ if(run){if(TSc==null)TSc=tsTarget();const tg=tsTarget();TSc=slow?tsEase2(TSc,tg,
 const f=M.camFocus?M.camFocus(st,P):null;if(f!=null){const tgt=Math.max(M.camMin==null?(M.camNeg?-1e12:0):M.camMin,(f*K+VIEW.ox)-(M.camAnchor||CW/2));const T1=M.camNeg?tgt:Math.max(0,tgt);cam.tv=cam.lt==null?0:(T1-cam.lt)/Math.max(dt,1e-6);cam.lt=T1;camStep(cam,T1,dt,M.camW||2.2,cam.tv);}
 const mg=M.mag?M.mag(st,P):null;if(mg){MAG.on=true;MAG.z+=(mg.z-MAG.z)*(1-Math.exp(-dt/0.6));}}
 draw();chipUpd();requestAnimationFrame(frame);}
-function chipUpd(){const ts=run||st.t>0?(TSc||tsTarget()):tsTarget();chipSet(slow,1/ts);}
+function chipUpd(){const ts=run||st.t>0?(TSc||tsTarget()):tsTarget();if(!FIV.length){const h=`本题没有极短过程：两种模式都按真实比例播放，屏幕速度与物理速度严格成正比（<b>×${ts===1?1:"1/"+fx(1/ts,1)}</b>）`;if(h!==chipLast){$("hint").innerHTML=h;$("hint").classList.add("off");chipLast=h;}return;}chipSet(slow,1/ts);}
 function mkView(){const v=M.view(P);K=v.K;VIEW={K,mainK:K,ox:v.ox,gy:v.gy,cam:cam.x,X:x=>v.ox+x*K-cam.x,Y:y=>v.gy-y*K,main:1};return VIEW;}
 function draw(){ctx.clearRect(0,0,CW,CH);mkView();
 if(M.ground!==false)drawGround({gy:VIEW.gy,cam:cam.x,K,ox:VIEW.ox,label:M.groundLabel,neg:1});
