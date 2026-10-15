@@ -12,11 +12,11 @@ const B=id=>document.getElementById(id),bs=()=>[B('play').disabled,B('pause').di
 const L=[];L.push(['初始',bs()]);B('play').click();frame(0);frame(16.7);frame(33.3);L.push(['开始',bs()]);B('pause').click();frame(50);frame(66);L.push(['暂停',bs()]);
 B('pause').click();frame(83);frame(100);L.push(['继续',bs()]);B('rst').click();frame(116);L.push(['重置',bs()]);R.btn=L;
 for(const mode of [1,0]){const bt=B('bt');bt.checked=!!mode;bt.onchange();reset();run=true;lastT=null;
-let prev=null,pv=null,maxR=1,maxRi=-1,minX=1e9,maxX=-1e9,stopped=false,n=Math.round(%f*60),offs=0,jumps=[];
-for(let i=0;i<=n;i++){frame(i*1000/60);if(!run)stopped=true;
+let pts=null,maxTs=1,prev=null,pv=null,maxR=1,maxRi=-1,minX=1e9,maxX=-1e9,stopped=false,n=Math.round(%f*60),offs=0,jumps=[];
+for(let i=0;i<=n;i++){frame(i*1000/60);if(!run)stopped=true;if(typeof TSc!=='undefined'&&TSc){if(pts)maxTs=Math.max(maxTs,TSc/pts,pts/TSc);pts=TSc;}
 const tr=(M.track?M.track(st,P):[]).map(x=>VIEW.X(x));if(tr.length){const sx=tr[0];minX=Math.min(minX,sx);maxX=Math.max(maxX,sx);if(sx<0||sx>CW)offs++;
 if(prev!=null){const v=sx-prev;if(pv!=null&&Math.abs(v)>0.5&&Math.abs(pv)>0.5){const r=Math.max(Math.abs(v/pv),Math.abs(pv/v));if(r>maxR){maxR=r;maxRi=i;}if(r>1.15&&jumps.length<6)jumps.push([i,+st.t.toFixed(5),+r.toFixed(3),+pv.toFixed(2),+v.toFixed(2)]);}pv=v;}prev=sx;}}
-R['bt'+mode]={t:+st.t.toFixed(4),stopped,maxR:+maxR.toFixed(4),maxRi,minX:+minX.toFixed(1),maxX:+maxX.toFixed(1),offFrames:offs,jumps,status:M.status(st,P)};}
+R['bt'+mode]={maxTsRatio:+maxTs.toFixed(4),t:+st.t.toFixed(4),stopped,maxR:+maxR.toFixed(4),maxRi,minX:+minX.toFixed(1),maxX:+maxX.toFixed(1),offFrames:offs,jumps,status:M.status(st,P)};}
 }catch(e){__e.push(String(e&&e.stack||e).slice(0,400))}R.err=__e;document.documentElement.setAttribute('data-r',JSON.stringify(R));})();</script>"""%secs
 s=s.replace('<head>','<head>'+head,1);i=s.rfind('</body>');s=s[:i]+tail+s[i:]
 d=os.path.dirname(os.path.abspath(src));tmp=os.path.join(d,'.__rt_'+os.path.basename(src));open(tmp,'w',encoding='utf8').write(s)
