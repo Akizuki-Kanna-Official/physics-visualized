@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,600&display=swap">
+<title>第 1 题 · 子弹打木块</title>
+<style>
+:root{--bg:#F5F4EE;--card:#FCFBF8;--surface:#FFFFFF;--ink:#1F1E1D;--ink2:#3D3929;--muted:#7A776D;--line:#E3E0D5;--clay:#C96442;--clay-hover:#B5573A;--clay-light:#FBF3EF;--clay2:#E8B9A5;--sage:#6F7F63;--wood:#B98A5E;
+--serif:'Tiempos Text','Copernicus','Source Serif 4','Noto Serif SC','Source Han Serif SC','Songti SC',serif;--math:'Source Serif 4','Times New Roman',Georgia,serif;
+/* 取自 open-claude-ui cds-theme.css */
+--a1:hsla(0,0%,8%,.05);--a2:hsla(0,0%,8%,.10);--a3:hsla(0,0%,8%,.20);
+--shadow-sm:0 1px 2px 0 rgba(0,0,0,.05),0 2px 8px 0 rgba(0,0,0,.08);
+--shadow-lg:0 4px 8px 0 rgba(0,0,0,.06),0 12px 28px -2px rgba(0,0,0,.08);
+--panel-shadow:0 0 0 1px var(--a2),0 1px 2px 0 rgba(0,0,0,.03),0 2px 8px 0 rgba(0,0,0,.04);
+--panel-shadow-hover:0 0 0 1px var(--a3),0 4px 16px -2px rgba(0,0,0,.09);
+--composer-shadow:0 4px 20px rgba(0,0,0,.035),inset 0 0 0 1px var(--a2);
+--focus:inset 0 0 0 1px #FCFBF8,0 0 0 1.5px var(--clay),0 0 6px 1px rgba(201,100,66,.25);
+--r-lg:8px;--r-panel:10px;--r-xl:12px;--r-2xl:16px;--r-bubble:18px;--r-composer:20px;
+--ease-expo:cubic-bezier(.16,1,.3,1);--ease-press:cubic-bezier(.32,.72,0,1);--ease-overshoot:cubic-bezier(.34,1.3,.64,1);--fade:28px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.wrap{max-width:1040px;margin:0 auto;padding:56px 28px 80px}
+.tag{display:inline-block;font-size:12.5px;letter-spacing:.06em;color:var(--clay);background:var(--clay-light);box-shadow:inset 0 0 0 1px rgba(201,100,66,.22);border-radius:999px;padding:3px 12px;margin-bottom:16px}
+h1{font-family:var(--serif);font-weight:600;font-size:32px;line-height:1.3;margin:0 0 14px;letter-spacing:-.005em}
+.q{color:var(--ink2);font-size:16.5px;line-height:1.9;max-width:860px;margin:0}
+.stage{position:relative;margin-top:30px;background:var(--card);border-radius:var(--r-composer);box-shadow:var(--composer-shadow);overflow:hidden;transition:box-shadow .2s var(--ease-expo)}
+.stage:hover{box-shadow:0 4px 24px rgba(0,0,0,.06),inset 0 0 0 1px var(--a3)}
+canvas{display:block;width:100%;height:auto}
+.bar{display:flex;gap:8px;align-items:center;padding:12px 16px;border-top:1px solid var(--a2)}
+button{font:inherit;font-size:14.5px;border-radius:var(--r-panel);padding:8px 16px;cursor:pointer;border:0;background:hsla(0,0%,8%,.06);color:var(--ink);transition:background-color .15s,box-shadow .15s;outline:none;will-change:transform;user-select:none}
+button:hover{background:rgba(21,21,21,.10)}
+button:focus-visible{box-shadow:var(--focus)}
+button.primary{background:var(--clay);color:#fff;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+button.primary:hover{background:var(--clay-hover)}
+button.ghost{background:transparent;font-size:13px;padding:4px 10px;color:var(--muted)}button.ghost:hover{background:var(--a1);color:var(--ink)}
+.hint{margin-left:auto;font-size:13.5px;color:var(--muted)}
+.params{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:20px}
+.p{background:var(--card);border-radius:var(--r-xl);padding:12px 14px;box-shadow:var(--panel-shadow);transition:box-shadow .2s var(--ease-expo)}
+.p:hover{box-shadow:var(--panel-shadow-hover)}
+.p .k{font-size:13px;color:var(--muted)}.p .val{font-size:19px;font-weight:600;margin:2px 0 6px;font-variant-numeric:tabular-nums;font-family:var(--math)}.p .val small{font-size:12.5px;color:var(--muted);font-weight:400;margin-left:3px;font-family:var(--serif)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:4px;background:var(--a2);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--clay);border:3px solid #fff;box-shadow:0 0 0 1px var(--clay2),0 1px 3px rgba(0,0,0,.15);cursor:pointer;transition:transform .22s var(--ease-overshoot)}
+input[type=range]:active::-webkit-slider-thumb{transform:scale(1.18)}
+input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:var(--focus)}
+input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--clay);border:3px solid #fff}
+.sec{display:flex;align-items:baseline;gap:10px;margin:36px 2px 12px}.sec h2{font-size:20px;font-weight:600;margin:0}.sec span{font-size:13.5px;color:var(--muted)}
+.graphs{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.gcard{background:var(--card);border-radius:var(--r-2xl);box-shadow:var(--panel-shadow);padding:14px 14px 10px;transition:box-shadow .2s var(--ease-expo)}
+.gcard:hover{box-shadow:var(--panel-shadow-hover)}
+.gcard.wide{grid-column:1/-1}
+.gcard h4{margin:0 4px 6px;font-size:15.5px;font-weight:600;display:flex;align-items:baseline;gap:8px}.gcard h4 em{font-style:normal;font-size:12.5px;color:var(--muted);font-weight:400}
+.cols{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;margin-top:20px;align-items:start}
+.box{background:var(--card);border-radius:var(--r-2xl);padding:18px 22px;box-shadow:var(--panel-shadow);transition:box-shadow .2s var(--ease-expo)}
+.box:hover{box-shadow:var(--panel-shadow-hover)}
+.box h3{font-family:var(--serif);font-size:18px;font-weight:600;margin:0 0 10px;display:flex;align-items:center}
+.box h3 button{margin-left:auto}
+.expand{overflow:hidden}
+.scroll{max-height:440px;overflow:auto;padding-right:6px;--ft:0px;--fb:0px;
+-webkit-mask-image:linear-gradient(to bottom,transparent,rgba(0,0,0,.05) calc(var(--ft)*.15),rgba(0,0,0,.15) calc(var(--ft)*.3),rgba(0,0,0,.30) calc(var(--ft)*.45),rgba(0,0,0,.50) calc(var(--ft)*.6),rgba(0,0,0,.70) calc(var(--ft)*.75),rgba(0,0,0,.85) calc(var(--ft)*.87),#000 var(--ft),#000 calc(100% - var(--fb)),rgba(0,0,0,.85) calc(100% - var(--fb)*.87),rgba(0,0,0,.70) calc(100% - var(--fb)*.75),rgba(0,0,0,.50) calc(100% - var(--fb)*.6),rgba(0,0,0,.30) calc(100% - var(--fb)*.45),rgba(0,0,0,.15) calc(100% - var(--fb)*.3),rgba(0,0,0,.05) calc(100% - var(--fb)*.15),transparent);
+mask-image:linear-gradient(to bottom,transparent,rgba(0,0,0,.05) calc(var(--ft)*.15),rgba(0,0,0,.15) calc(var(--ft)*.3),rgba(0,0,0,.30) calc(var(--ft)*.45),rgba(0,0,0,.50) calc(var(--ft)*.6),rgba(0,0,0,.70) calc(var(--ft)*.75),rgba(0,0,0,.85) calc(var(--ft)*.87),#000 var(--ft),#000 calc(100% - var(--fb)),rgba(0,0,0,.85) calc(100% - var(--fb)*.87),rgba(0,0,0,.70) calc(100% - var(--fb)*.75),rgba(0,0,0,.50) calc(100% - var(--fb)*.6),rgba(0,0,0,.30) calc(100% - var(--fb)*.45),rgba(0,0,0,.15) calc(100% - var(--fb)*.3),rgba(0,0,0,.05) calc(100% - var(--fb)*.15),transparent);scrollbar-width:thin;scrollbar-color:var(--a2) transparent}
+.step{display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--a1);font-size:15.5px;line-height:1.85;color:var(--ink2)}
+.step:first-of-type{border-top:0}
+.n{flex:none;width:22px;height:22px;border-radius:50%;background:var(--clay-light);box-shadow:inset 0 0 0 1px rgba(201,100,66,.2);color:var(--clay);font-size:12px;font-weight:600;display:grid;place-items:center;margin-top:4px}
+.v{color:var(--clay);font-weight:600;font-variant-numeric:tabular-nums}
+.f{font-family:var(--math);font-style:italic}
+.note{margin-top:10px;font-size:14px;border-radius:var(--r-panel);padding:9px 12px}
+.note.ok{background:#EEF1EA;color:#4E5E43;box-shadow:inset 0 0 0 1px rgba(78,94,67,.12)}.note.bad{background:#F8E7E0;color:#9E4429;box-shadow:inset 0 0 0 1px rgba(158,68,41,.15)}
+.live .r{display:flex;justify-content:space-between;padding:8px 0;border-top:1px solid var(--a1);font-size:15px;color:var(--ink2)}
+.live .r:first-of-type{border-top:0}.live .r b{font-variant-numeric:tabular-nums;color:var(--ink);font-weight:600;font-family:var(--math)}
+.fnote{margin:8px 0 0;font-size:14px;color:var(--muted)}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.86em;line-height:1.15;margin:0 2px;font-family:var(--math)}.fr>span:first-child{border-bottom:1px solid currentColor;padding:0 2px 1px}.fr>span:last-child{padding:1px 2px 0}
+.rt>span{border-top:1px solid currentColor;padding-left:1px}.ap{color:var(--muted);font-weight:400;font-size:.8em}
+#pie{margin-top:10px}
+.meter{height:6px;border-radius:6px;background:var(--a1);margin:4px 0 2px;overflow:hidden;display:flex}
+.meter i{display:block;height:100%}
+.legend{display:flex;gap:14px;font-size:12.5px;color:var(--muted);margin-top:6px}.legend span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;background:var(--c)}
+.clawd{position:absolute;left:34px;top:0;width:96px;height:105px;pointer-events:none}.clawd svg{width:100%;height:100%;display:block}
+@media (max-width:760px){.graphs{grid-template-columns:1fr}.params{grid-template-columns:repeat(2,1fr)}.cols{grid-template-columns:1fr}}
+
+/* ===== 希沃 16:9 舞台 ===== */
+html,body{height:100%;margin:0;overflow:hidden;background:#E6E3DA}
+#app{--fz:1;--fzc:1;position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;background:var(--bg);display:flex;flex-direction:column;overflow:hidden;font-size:calc(18px*var(--fz));box-shadow:0 0 0 1px var(--a2)}
+.top{flex:none;display:flex;align-items:center;gap:calc(18px*var(--fzc));padding:calc(16px*var(--fzc)) 36px calc(12px*var(--fzc))}
+.top .tag{margin:0;font-size:calc(14px*var(--fzc))}
+.top h1{margin:0;font-size:calc(30px*var(--fzc));white-space:nowrap}
+.tools{margin-left:auto;display:flex;align-items:center;gap:calc(24px*var(--fzc));font-size:calc(16px*var(--fzc));color:var(--ink2);white-space:nowrap}
+.sw{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}.sw input{display:none}
+.sw i{position:relative;width:calc(52px*var(--fzc));height:calc(30px*var(--fzc));border-radius:999px;background:var(--a2);transition:background .2s var(--ease-expo)}
+.sw i:after{content:"";position:absolute;left:3px;top:3px;width:calc(30px*var(--fzc) - 6px);height:calc(30px*var(--fzc) - 6px);border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .3s var(--ease-overshoot)}
+.sw input:checked+i{background:var(--clay)}.sw input:checked+i:after{transform:translateX(calc(22px*var(--fzc)))}
+.fzc{display:flex;align-items:center;gap:10px}.fzc input{width:calc(180px*var(--fzc))}.fzc b{min-width:3.6em;font-family:var(--math);font-variant-numeric:tabular-nums}
+.fzc button,.ctl button{font-size:calc(16px*var(--fzc));min-height:calc(48px*var(--fzc));min-width:calc(56px*var(--fzc));padding:0 calc(18px*var(--fzc))}
+.main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,60fr) minmax(0,40fr);gap:24px;padding:0 36px}
+.left{min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.left .stage{margin:0;flex:none}
+.left .hint{margin:0;font-size:calc(14px*var(--fzc));color:var(--muted);text-align:center}
+.right{min-height:0;display:flex;flex-direction:column;background:var(--card);border-radius:var(--r-composer);box-shadow:var(--composer-shadow);padding:14px 20px 12px;overflow:hidden}
+.tabs{position:relative;flex:none;display:flex;gap:4px;padding:5px;background:hsla(0,0%,8%,.06);border-radius:calc(14px*var(--fzc))}
+.tabs button{position:relative;z-index:1;flex:1;background:transparent;font-size:calc(19px*var(--fzc));min-height:calc(60px*var(--fzc));border-radius:calc(10px*var(--fzc));color:var(--muted);font-weight:600;white-space:nowrap;padding:0 8px}
+.tabs button.on{color:var(--ink)}.tabs button:hover{background:transparent;color:var(--ink)}
+.tabs .ind{position:absolute;z-index:0;top:5px;bottom:5px;left:0;width:0;border-radius:calc(10px*var(--fzc));background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.06),0 2px 8px rgba(0,0,0,.06)}
+.tabbody{position:relative;flex:1;min-height:0;margin-top:12px}
+.tab{position:absolute;inset:0;display:flex;flex-direction:column}.tab:not(.on){display:none}
+.pager{flex:1;min-height:0;overflow:hidden;column-gap:48px;column-fill:auto;font-size:1em}
+.pager h3{font-size:1.1em;margin:.2em 0 .5em;font-weight:600;break-after:avoid}
+.pager .q{font-size:1em;line-height:1.85;max-width:none}.pager .fnote{font-size:.85em;margin:.4em 0 .6em}
+.pager .step{font-size:1em;break-inside:avoid}.pager .n{width:1.4em;height:1.4em;font-size:.72em;margin-top:.35em}
+.pager .note{font-size:.9em;break-inside:avoid}
+.pgnav{flex:none;display:flex;align-items:center;justify-content:center;gap:14px;padding-top:8px}.pgnav[hidden]{display:none}
+.pgnav button{min-width:calc(52px*var(--fzc));min-height:calc(44px*var(--fzc));font-size:calc(18px*var(--fzc));padding:0}
+.pgnav .dots{display:flex;gap:8px}.pgnav .dots i{width:10px;height:10px;border-radius:50%;background:var(--a2);transition:all .3s var(--ease-overshoot)}.pgnav .dots i.on{background:var(--clay);width:24px;border-radius:5px}
+.seg{flex:none;display:flex;gap:4px;padding:4px;background:hsla(0,0%,8%,.05);border-radius:10px;margin-bottom:10px;align-self:flex-start}
+.seg button{background:transparent;font-size:calc(17px*var(--fzc));min-height:calc(44px*var(--fzc));padding:0 calc(18px*var(--fzc));font-family:var(--math);font-style:italic;color:var(--muted)}.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+#gb{break-inside:avoid;display:flex;flex-direction:column}#gb h4{margin:0 0 6px;font-size:1em;font-weight:600}#gb canvas{display:none;width:100%}#gb canvas.on{display:block}
+.gleg .gn{margin:0 0 .3em;color:var(--muted);break-inside:avoid}.top .tag,.top h1{white-space:nowrap}
+.gleg{font-size:.85em;color:var(--ink2);line-height:1.6}.gleg div{display:flex;align-items:center;gap:.5em;padding:.15em 0;break-inside:avoid}
+.gleg s{flex:none;display:inline-block;width:1.1em;height:.75em;border-radius:2px;text-decoration:none}.gleg s.ln{height:3px}
+.pleg div{display:flex;align-items:center;gap:.6em;padding:.3em 0;break-inside:avoid;font-size:.95em}.pleg s{flex:none;width:.8em;height:.8em;border-radius:3px}.pleg b{margin-left:auto;font-family:var(--math);font-variant-numeric:tabular-nums}
+#pie{margin:4px auto 6px;break-inside:avoid}
+.pager .live .r{font-size:.92em;break-inside:avoid}
+.bot{flex:none;display:flex;align-items:stretch;gap:16px;padding:calc(14px*var(--fzc)) 36px calc(18px*var(--fzc))}
+.ctl{flex:none;display:flex;flex-direction:column;justify-content:center;gap:8px}
+.bot .params{flex:1;margin:0;gap:12px}
+.bot .p{padding:calc(10px*var(--fzc)) 16px}
+.bot .p .k{font-size:calc(14px*var(--fzc))}.bot .p .val{font-size:calc(20px*var(--fzc));margin:0 0 4px}.bot .p .val small{font-size:calc(13px*var(--fzc))}
+.bot input[type=range],.fzc input[type=range]{height:6px}
+input[type=range]::-webkit-slider-thumb{width:calc(28px*var(--fzc));height:calc(28px*var(--fzc))}
+.left .hint.chip{background:var(--clay-light);color:#9E4429;box-shadow:inset 0 0 0 1px rgba(201,100,66,.22);border-radius:999px;padding:calc(6px*var(--fzc)) calc(16px*var(--fzc));font-size:calc(15px*var(--fzc));line-height:1.5;max-width:100%}
+.left .hint.chip.off{background:#EEF1EA;color:#4E5E43;box-shadow:inset 0 0 0 1px rgba(78,94,67,.18)}.left .hint.chip b{font-family:var(--math);font-variant-numeric:tabular-nums}
+.ctl .sw.bt{font-size:calc(16px*var(--fzc));min-height:calc(48px*var(--fzc));padding:0 calc(10px*var(--fzc));border-radius:var(--r-panel);background:hsla(0,0%,8%,.06);justify-content:center;white-space:nowrap}
+.ctl .btns{display:flex;gap:8px}.ctl .btns button{flex:1 0 auto;white-space:nowrap;padding:0 calc(14px*var(--fzc))}button:disabled{opacity:.38;cursor:default;pointer-events:none}
+</style></head><body><div id="app">
+<header class="top"><span class="tag">模型一 · 子弹—木块</span><h1>第 1 题　子弹打木块</h1>
+<div class="tools"><label class="sw"><input type="checkbox" id="clawdOn" checked><i></i>显示小人</label>
+<div class="fzc"><span>字号</span><button id="fzm" aria-label="减小字号">A−</button><input type="range" id="fz" min="50" max="400" step="10" value="100"><button id="fzp" aria-label="增大字号">A＋</button><b id="fzv">100%</b></div></div></header>
+<main class="main">
+<section class="left"><div class="stage" id="scene"><canvas id="c"></canvas><div id="clawd" class="clawd"></div></div><div class="hint chip" id="hint">接触过程实际只有几毫秒，动画已按时间缩放</div></section>
+<section class="right"><nav class="tabs" id="tabs"><i class="ind" id="ind"></i><button data-t="sol" class="on">解题过程</button><button data-t="gr">运动图像</button><button data-t="en">能量饼图</button></nav>
+<div class="tabbody">
+<div class="tab on" id="t-sol"><div class="pager" id="pg-sol"><p class="q">质量为 <span class="f">M</span> 的木块放在光滑水平面上，质量为 <span class="f">m</span> 的子弹以初速度 <span class="f">v</span>₀ 水平打进木块并留在其中，子弹所受阻力为 <span class="f">f</span>。求：(1) 相对静止时的速度；(2) 子弹在木块内运动的时间；(3) 子弹、木块的位移及打入深度；(4) 要使子弹不射出，木块至少多长。</p>
+<p class="fnote"><span class="f">f</span> 是木块对子弹的恒定阻力，木块受到其反作用力（大小也为 <span class="f">f</span>）；地面光滑。</p><h3>解答</h3><div id="ans"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-gr"><div class="seg" id="seg"><button data-g="gv" class="on">v–t</button><button data-g="gx">x–t</button><button data-g="ge">E–t</button></div>
+<div class="pager" id="pg-gr"><div id="gb"><h4 id="gtitle"></h4><canvas id="gv" class="on"></canvas><canvas id="gx"></canvas><canvas id="ge"></canvas></div><div class="gleg" id="gleg"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-en"><div class="pager" id="pg-en"><h3>初动能去向</h3><canvas id="pie"></canvas><div id="pieLeg" class="pleg"></div><h3>实时数据</h3><div id="live" class="live"></div></div><div class="pgnav"></div></div>
+</div></section></main>
+<footer class="bot"><div class="ctl"><div class="btns"><button class="primary" id="play">▶ 开始播放</button><button id="pause">⏸ 暂停</button><button id="rst">↺ 重置</button></div><label class="sw bt"><input type="checkbox" id="bt" checked><i></i>子弹时间</label></div><div class="params" id="params"></div></footer>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+// 画布文字随字号缩放：拦截 ctx.font 中的 px
+(()=>{const P0=CanvasRenderingContext2D.prototype,fd=Object.getOwnPropertyDescriptor(P0,"font");Object.defineProperty(P0,"font",{get(){return fd.get.call(this)},set(v){const k=this._fz||1;fd.set.call(this,k===1?v:String(v).replace(/([\d.]+)px/,(m,n)=>(n*k).toFixed(2)+"px"))}});})();
+// ===== 精确有理数运算（BigInt 分数） =====
+const Bg=BigInt;
+function gcdB(a,b){a=a<0n?-a:a;b=b<0n?-b:b;while(b){[a,b]=[b,a%b];}return a;}
+function R(n,d=1n){n=Bg(n);d=Bg(d);if(d<0n){n=-n;d=-d;}const g=gcdB(n,d)||1n;return{n:n/g,d:d/g};}
+const qa=(a,b)=>R(a.n*b.d+b.n*a.d,a.d*b.d),qs=(a,b)=>R(a.n*b.d-b.n*a.d,a.d*b.d),qm=(a,b)=>R(a.n*b.n,a.d*b.d),qd=(a,b)=>R(a.n*b.d,a.d*b.n),qv=a=>Number(a.n)/Number(a.d);
+function qparse(s){s=String(s).trim();const[i,f=""]=s.split(".");return R(Bg(i+f),10n**Bg(f.length));}
+function sqExtract(N){let out=1n,p=2n,it=0;while(p*p<=N&&it<2e6){while(N%(p*p)===0n){N/=p*p;out*=p;}p+=p===2n?1n:2n;it++;}return[out,N];}
+// √q = k√n
+function qsqrt(q){const[s,n]=sqExtract(q.n*q.d);return{k:R(s,q.d),n};}
+function exactSolve(m,M,v0,f,L){const mM=qa(m,M),v=qd(qm(m,v0),mM),t=qd(qm(qm(m,M),v0),qm(f,mM)),two=R(2),
+s1=qd(qm(m,qs(qm(v0,v0),qm(v,v))),qm(two,f)),s2=qd(qm(M,qm(v,v)),qm(two,f)),d=qs(s1,s2),Q=qm(f,d),E0=qm(R(1,2),qm(m,qm(v0,v0))),
+Eb=qm(R(1,2),qm(m,qm(v,v))),Ek=qm(R(1,2),qm(M,qm(v,v)));
+const r={v,t,tms:qm(t,R(1000)),s1,s2,d,Q,E0,Eb,Ek,rQ:qd(Q,E0),rB:qd(Eb,E0),rK:qd(Ek,E0),thru:qv(d)>qv(L)};
+if(r.thru){const a=qm(f,qa(qd(R(1),m),qd(R(1),M))),disc=qs(qm(v0,v0),qm(qm(two,a),L)),sq=qsqrt(disc);
+const te={r:qd(v0,a),k:qd(R(-sq.k.n,sq.k.d),a),n:sq.n},fm=qd(f,m),fM=qd(f,M);
+r.te=te;r.teMs={r:qm(te.r,R(1000)),k:qm(te.k,R(1000)),n:te.n};r.vb={r:qs(v0,qm(fm,te.r)),k:R(-1n*qm(fm,te.k).n,qm(fm,te.k).d),n:te.n};r.vk={r:qm(fM,te.r),k:qm(fM,te.k),n:te.n};}
+return r;}
+const sv=s=>qv(s.r)+qv(s.k)*Math.sqrt(Number(s.n));
+const isBig=q=>(q.n<0n?-q.n:q.n)>99999n||q.d>99999n;
+function apx(x){const a=Math.abs(x);return a===0?"0":a>=100?x.toFixed(1):a>=1?x.toPrecision(4):x.toPrecision(3);}
+// HTML 渲染
+function fracH(q,num){const neg=q.n<0n,n=neg?-q.n:q.n,nn=num!=null?num:(n===1n&&num===""?"":n);
+if(q.d===1n&&num==null)return(neg?"−":"")+n;return(neg?"−":"")+`<span class="fr"><span>${num!=null?num:n}</span><span>${q.d}</span></span>`;}
+function exH(q,unit){return fracH(q)+(unit?" "+unit:"")+(isBig(q)?` <small class="ap">≈ ${apx(qv(q))}</small>`:"");}
+function surdH(s,unit){if(s.n===1n){const q=qa(s.r,s.k);return exH(q,unit);}
+const kn=s.k.n<0n?-s.k.n:s.k.n,rad=`${kn===1n?"":kn}<span class="rt">√<span>${s.n}</span></span>`;let h="";
+if(s.r.n!==0n)h+=fracH(s.r)+(s.k.n<0n?" − ":" + ");else if(s.k.n<0n)h+="−";
+h+=s.k.d===1n?rad:fracH(R(kn,s.k.d),rad);const big=isBig(s.r)||isBig(s.k)||s.n>99999n;
+return h+(unit?" "+unit:"")+(big?` <small class="ap">≈ ${apx(sv(s))}</small>`:"");}
+
+
+const C={clay:"#C96442",ink:"#1F1E1D",muted:"#7A776D",line:"#E3E0D5",wood:"#B98A5E",wood2:"#9C7048",sage:"#6F7F63",brass:"#C9A24A"};
+const defs=[["m","子弹质量 m","kg",0.005,0.2,0.005,0.02],["M","木块质量 M","kg",0.2,5,0.1,1],["v0","初速度 v₀","m/s",50,600,10,300],["f","子弹所受阻力 f","N",500,20000,100,4000],["L","木块长度","m",0.05,0.5,0.01,0.3]];
+$("params").innerHTML=defs.map(d=>`<div class="p"><div class="k">${d[1].replace(/ ([mMfL]|v₀)$/," <span class=\"f\">$1</span>")}</div><div class="val"><span id="${d[0]}v"></span><small>${d[2]}</small></div><input id="${d[0]}" type="range" min="${d[3]}" max="${d[4]}" step="${d[5]}" value="${d[6]}"></div>`).join("");
+const cv=$("c"),ctx=cv.getContext("2d"),CW=1040,CH=480;let dpr=window.devicePixelRatio||1;
+
+let PX,X,P,S,st,run=false,slow=true,lastT=null,K;
+const fx=(x,n=3)=>(+x).toFixed(n);
+function read(){P={};PX={};defs.forEach(d=>PX[d[0]]=qparse($(d[0]).value));defs.forEach(d=>{P[d[0]]=+$(d[0]).value;$(d[0]+"v").textContent=P[d[0]];});}
+function solve(){const{m,M,v0,f,L}=P,v=m*v0/(m+M),t=m*M*v0/(f*(m+M)),s1=m*(v0*v0-v*v)/(2*f),s2=M*v*v/(2*f),d=s1-s2,E0=.5*m*v0*v0,Q=f*d;S={v,t,s1,s2,d,Q,E0};
+const st=(n,h)=>`<div class="step"><span class="n">${n}</span><div>${h}</div></div>`;
+X=exactSolve(PX.m,PX.M,PX.v0,PX.f,PX.L);const V=(q,u)=>`<span class="v">${exH(q,u)}</span>`,i=t=>`<span class="f">${t}</span>`;
+$("ans").innerHTML=
+st(1,`系统合外力为零，动量守恒：${i("mv")}₀ = (${i("m")}+${i("M")})${i("v")}，得 ${i("v")} = ${V(X.v,"m/s")}`)+
+st(2,`对木块用动量定理：${i("ft")} = ${i("Mv")}（${i("f")} 为子弹所受阻力，木块受其反作用力），得 ${i("t")} = ${V(X.tms,"ms")}`)+
+st(3,`动能定理。子弹：${i("fs")}₁ = ½${i("m")}(${i("v")}₀²−${i("v")}²)，${i("s")}₁ = ${V(X.s1,"m")}；木块：${i("fs")}₂ = ½${i("Mv")}²，${i("s")}₂ = ${V(X.s2,"m")}<br>打入深度 ${i("d")} = ${i("s")}₁−${i("s")}₂ = ${i("mMv")}₀² / [2${i("f")}(${i("m")}+${i("M")})] = ${V(X.d,"m")}`)+
+st(4,`不射出需木块长 ${i("L")} ≥ ${V(X.d,"m")}。损失的机械能 ${i("Q")} = ${i("fd")} = ${V(X.Q,"J")}，占初动能 ${exH(X.rQ)} ≈ ${fx(qv(X.rQ)*100,1)}%`)+
+(X.thru?`<div class="note bad">当前木块长 ${i("L")} = ${exH(PX.L,"m")} 小于 ${i("d")}，子弹会射穿木块，上面 (1)～(4) 的共速结论不再成立。射出时刻 ${i("t")} = ${surdH(X.teMs,"ms")}，子弹 ${i("v")}₁ = ${surdH(X.vb,"m/s")}，木块 ${i("v")}₂ = ${surdH(X.vk,"m/s")}</div>`:`<div class="note ok">当前木块长 ${i("L")} = ${exH(PX.L,"m")} ≥ ${i("d")}，子弹留在木块内，与木块共速。</div>`);}
+function reset(){read();solve();K=620/Math.max(P.L+S.s2*1.4+0.12,0.45);st={xb:-110/K,vb:P.v0,xk:0,vk:0,t:0,inside:false,out:false,pen:0,trail:[]};run=false;if(typeof updBtns==="function")updBtns();}
+function step(dt){const{m,M,f,L}=P,n=300,h=dt/n;
+for(let i=0;i<n;i++){const front=st.xk,back=st.xk+L,inB=st.xb>=front&&st.xb<=back&&!st.out;
+if(inB&&st.vb>st.vk+1e-9){st.inside=true;st.vb-=f/m*h;st.vk+=f/M*h;if(st.vb<st.vk){const v=(m*st.vb+M*st.vk)/(m+M);st.vb=st.vk=v;}}
+else if(inB&&st.inside)st.vb=st.vk;
+st.xb+=st.vb*h;st.xk+=st.vk*h;st.t+=h;if(st.inside&&st.xb>back)st.out=true;if(st.inside&&!st.out)st.pen=st.xb-front;}}
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+
+// ===== 放大镜区域 =====
+function niceR(v){const c=[0.5,1,2,3,5,8,10,15,20,30,50,80,100,150,200,300,500];for(const x of c)if(x>=v)return x;return Math.ceil(v/100)*100;}
+function drawInset(){const top=300,bot=CH-16,L0=40,R0=640;
+ctx.fillStyle="#F6F3EC";rr(24,top-8,CW-48,bot-top+16,14);ctx.fill();ctx.strokeStyle=C.line;ctx.lineWidth=1;ctx.stroke();
+// 先缩放后平移：u=xk·ppm0/432，木块左缘 E=sx0+432·tanh u（平滑趋于固定位置），倍率 ppm=ppmMin+(ppm0−ppmMin)·tanh(u)/u 平滑趋于冻结值，平移量 pan=xk−(E−sx0)/ppm ≥ 0
+const sx0=L0+30,gyI=bot-34,ppm0=(R0-L0-60)/niceR(Math.max(S.s2*1000*1.35,0.3)),ppmMin=ppm0/4,xkm=Math.max(st.xk*1000,0),uu=xkm*ppm0/432,th=uu>1e-9?Math.tanh(uu)/uu:1;
+const ppm=ppmMin+(ppm0-ppmMin)*th,exE=sx0+432*Math.tanh(uu),pan=Math.max(0,xkm-(exE-sx0)/ppm),Rmm=(R0-L0-60)/ppm,W2S=mm=>sx0+(mm-pan)*ppm;
+ctx.fillStyle=C.muted;ctx.font="12px 'Source Serif 4','Noto Serif SC',serif";ctx.fillText((pan>0?"放大镜 · 跟随木块左缘":"放大镜 · 起点附近")+"（约 ×"+(ppm/(K/1000)).toFixed(0)+"）",L0,top+14);
+ctx.fillStyle=C.muted;ctx.font="12px 'Source Serif 4','Noto Serif SC',serif";
+ctx.save();ctx.beginPath();ctx.rect(L0,top+22,R0-L0,bot-top-22);ctx.clip();
+// 木块左端
+const ex=W2S(xkm),bt=top+44;st._ins={ppm,ex,pan};
+const g=ctx.createLinearGradient(0,bt,0,gyI);g.addColorStop(0,"#C99B6E");g.addColorStop(1,"#A87A50");ctx.fillStyle=g;rr(ex,bt,R0-ex+20,gyI-bt,6);ctx.fill();
+ctx.strokeStyle="rgba(255,255,255,.14)";for(let y=bt+10;y<gyI;y+=11){ctx.beginPath();ctx.moveTo(ex,y);ctx.lineTo(R0+20,y+2);ctx.stroke();}
+// 子弹（按放大镜比例；主场景 24px 长 → 24/K 米）与逐渐延伸的弹孔
+const zoom=ppm*1000/K,hyI=(bt+gyI)/2,bl=24/K*1000*ppm,bhh=Math.min(5*zoom,(gyI-bt)*.18),tip=W2S(st.xb*1000),tail=tip-bl,back=ex+P.L*1000*ppm;
+if(st.inside){const hEnd=st.out?back:Math.min(tip,back);if(hEnd>ex){ctx.fillStyle="rgba(60,35,15,.55)";ctx.fillRect(ex,hyI-bhh,Math.min(hEnd,R0+20)-ex,bhh*2);}}
+if(tip>L0&&tail<R0){const nl=Math.min(bl*14/24,bhh*2.8);ctx.fillStyle=C.brass;ctx.beginPath();ctx.moveTo(tip,hyI);ctx.quadraticCurveTo(tip-nl*.43,hyI-bhh,tip-nl,hyI-bhh);ctx.lineTo(tail,hyI-bhh);ctx.lineTo(tail,hyI+bhh);ctx.lineTo(tip-nl,hyI+bhh);ctx.quadraticCurveTo(tip-nl*.43,hyI+bhh,tip,hyI);ctx.fill();
+ctx.fillStyle="#A8842F";ctx.fillRect(tail,hyI-bhh,Math.max(2,bl*3/24),bhh*2);}
+ctx.restore();
+if(tip>R0){const ay=hyI;ctx.fillStyle="rgba(252,251,248,.92)";rr(R0-54,ay-12,60,24,8);ctx.fill();ctx.strokeStyle="rgba(201,100,66,.25)";ctx.lineWidth=1;ctx.stroke();ctx.strokeStyle=C.clay;ctx.fillStyle=C.clay;ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(R0-46,ay);ctx.lineTo(R0-4,ay);ctx.stroke();ctx.beginPath();ctx.moveTo(R0+2,ay);ctx.lineTo(R0-10,ay-7);ctx.lineTo(R0-10,ay+7);ctx.fill();
+const fin=st.inside&&!st.out&&st.vb<=st.vk+1e-6,pmm=fx(Math.min(st.pen,P.L)*1000,1);
+const seg=st.out?[["子弹 → 已射穿木块（",0],["L",1],[" = "+fx(P.L*1000,1)+" mm）",0]]:fin&&!X.thru?[["子弹 → 深度 ",0],["d",1],[" = ",0],["",0,X.d],[" m = "+pmm+" mm",0]]:[["子弹 → 深度 ",0],["d",1],[" = "+pmm+" mm",0]];
+
+const lw=(()=>{ctx.save();ctx.globalAlpha=0;const r=rich(ctx,seg,0,-999,12.5,"left");ctx.restore();return r;})();
+ctx.fillStyle="rgba(252,251,248,.9)";rr(R0-56-lw-10,ay-bhh-34,lw+16,26,6);ctx.fill();ctx.strokeStyle="rgba(201,100,66,.25)";ctx.lineWidth=1;ctx.stroke();rich(ctx,seg,R0-56-lw-2,ay-bhh-16,12.5,"left","#9E4429");}
+// 地面+刻度
+ctx.strokeStyle=C.ink;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(L0,gyI);ctx.lineTo(R0,gyI);ctx.stroke();
+const stepMM=niceStep(Rmm,8),hiMM=pan+(R0-sx0)/ppm,useM=hiMM>=1000,dec=useM?Math.max(0,Math.ceil(-Math.log10(stepMM/1000)-1e-9)):Math.max(0,Math.ceil(-Math.log10(stepMM)-1e-9));
+ctx.lineWidth=1;ctx.fillStyle=C.muted;ctx.textAlign="center";ctx.font="11px 'Source Serif 4',Georgia,serif";
+for(let v=Math.max(0,Math.ceil((pan-(sx0-L0)/ppm)/stepMM))*stepMM;v<=hiMM+1e-9;v+=stepMM){const x=W2S(v);if(x<L0-1)continue;ctx.strokeStyle=C.muted;ctx.beginPath();ctx.moveTo(x,gyI);ctx.lineTo(x,gyI+9);ctx.stroke();if(x<R0-34&&x>L0+8)ctx.fillText((useM?v/1000:v).toFixed(dec),x,gyI+21);}
+ctx.textAlign="left";ctx.fillText(useM?"m":"mm",R0-24,gyI+21);
+// 起点线（随平移移出左侧后显示“← 起点”）
+const sxS=W2S(0);if(sxS>=L0){ctx.setLineDash([4,4]);ctx.strokeStyle=C.ink;ctx.beginPath();ctx.moveTo(sxS,top+30);ctx.lineTo(sxS,gyI);ctx.stroke();ctx.setLineDash([]);
+ctx.fillStyle=C.ink;ctx.font="11px 'Source Serif 4','Noto Serif SC',serif";ctx.fillText("起点",sxS-12,top+32);}
+else{ctx.fillStyle=C.ink;ctx.font="11px 'Source Serif 4','Noto Serif SC',serif";ctx.fillText("← 起点",L0,top+32);}
+// s2 箭头
+if(st.xk>0){const ay=top+36,a0=Math.max(sxS,L0+42);if(ex>a0){ctx.strokeStyle=C.clay;ctx.fillStyle=C.clay;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(a0,ay);ctx.lineTo(ex,ay);ctx.stroke();if(ex-a0>8){ctx.beginPath();ctx.moveTo(ex,ay);ctx.lineTo(ex-8,ay-5);ctx.lineTo(ex-8,ay+5);ctx.fill();}}}
+// 右侧大读数
+const rx=R0+40;ctx.strokeStyle=C.line;ctx.beginPath();ctx.moveTo(R0+16,top+10);ctx.lineTo(R0+16,bot-10);ctx.stroke();
+ctx.fillStyle=C.muted;ctx.font="13px 'Source Serif 4','Noto Serif SC',serif";ctx.fillText("木块位移 s₂",rx,top+28);ctx.fillText("打入深度 d（子弹相对木块）",rx,top+102);
+ctx.fillStyle=C.clay;ctx.font="600 38px 'Source Serif 4',Georgia,serif";ctx.fillText(st.xk>=1?fx(st.xk,3)+" m":fx(st.xk*1000,2)+" mm",rx,top+72);
+ctx.fillStyle=C.ink;ctx.fillText(fx(Math.min(st.pen,P.L)*1000,1)+" mm",rx,top+146);
+}
+function niceTick(m){for(const c of [0.001,0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5,1,2,5,10,20,50])if(c>=m)return c;return 100;}
+function fmtLen(v,stp){return stp<0.01?(v*1000).toFixed(0)+" mm":stp<1?(v*100).toFixed(stp<0.1?1:0).replace(/\.0$/,"")+" cm":v.toFixed(stp<10?0:0)+" m";}
+function draw(){ctx.clearRect(0,0,CW,CH);const cam=st.camX||0,x0=230-cam,gy=250,bh=92;
+// 地面
+ctx.strokeStyle=C.line;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(40,gy);ctx.lineTo(CW-40,gy);ctx.stroke();
+// 地面斜线与刻度画在世界坐标中（随镜头后退）
+ctx.save();ctx.beginPath();ctx.rect(40,gy,CW-80,40);ctx.clip();ctx.strokeStyle="#ECE9DF";ctx.lineWidth=1;const h0=((cam%14)+14)%14;for(let x=50-h0;x<CW-26;x+=14){ctx.beginPath();ctx.moveTo(x,gy+1);ctx.lineTo(x-8,gy+9);ctx.stroke();}
+const tM=niceTick(110/K),i0=Math.floor((40+cam-230)/K/tM);ctx.font="11px 'Source Serif 4','Noto Serif SC',serif";ctx.textAlign="center";
+for(let i=i0;;i++){const xw=i*tM,x=x0+xw*K;if(x>CW-40)break;if(x<40)continue;ctx.strokeStyle="#C9C4B5";ctx.beginPath();ctx.moveTo(x,gy);ctx.lineTo(x,gy+(i%5===0?10:6));ctx.stroke();if(i>=0&&x>150&&x<CW-60){ctx.fillStyle="#A7A294";ctx.fillText(fmtLen(xw,tM),x,gy+24);}}
+ctx.textAlign="left";ctx.restore();
+ctx.fillStyle=C.muted;ctx.font="12px 'Source Serif 4','Noto Serif SC',serif";ctx.fillText("光滑水平面",44,gy+26);
+// 起点参考线
+ctx.setLineDash([3,4]);ctx.strokeStyle="#D6D2C5";ctx.beginPath();ctx.moveTo(x0,gy-bh-30);ctx.lineTo(x0,gy);ctx.stroke();ctx.setLineDash([]);
+// 木块
+const bx=x0+st.xk*K,bw=Math.max(P.L*K,10),by=gy-bh;
+ctx.save();ctx.shadowColor="rgba(80,60,30,.18)";ctx.shadowBlur=14;ctx.shadowOffsetY=6;rr(bx,by,bw,bh,6);
+const g=ctx.createLinearGradient(0,by,0,gy);g.addColorStop(0,"#C99B6E");g.addColorStop(1,"#A87A50");ctx.fillStyle=g;ctx.fill();ctx.restore();
+ctx.save();rr(bx,by,bw,bh,6);ctx.clip();ctx.strokeStyle="rgba(255,255,255,.12)";ctx.lineWidth=1;for(let y=by+10;y<gy;y+=11){ctx.beginPath();ctx.moveTo(bx,y);ctx.bezierCurveTo(bx+bw*.3,y-3,bx+bw*.7,y+3,bx+bw,y);ctx.stroke();}
+const hy=by+bh/2;if(st.inside){ctx.fillStyle="rgba(60,35,15,.55)";ctx.fillRect(bx,hy-2.5,Math.min(st.pen,P.L)*K,5);}ctx.restore();
+ctx.fillStyle="rgba(255,255,255,.92)";ctx.font="600 15px 'Source Serif 4',Georgia,serif";ctx.textAlign="center";ctx.fillText("M",bx+bw/2,by+22);ctx.textAlign="left";
+// 子弹（拖尾）
+st.trail.push(st.xb);if(st.trail.length>14)st.trail.shift();const px=x0+st.xb*K;
+if(!(st.inside&&!st.out&&st.vb<=st.vk+1e-6)||st.out){const tl=x0+st.trail[0]*K;const gr=ctx.createLinearGradient(tl,0,px,0);gr.addColorStop(0,"rgba(201,100,66,0)");gr.addColorStop(1,"rgba(201,100,66,.35)");ctx.fillStyle=gr;ctx.fillRect(tl,hy-2,px-tl-12,4);}
+ctx.fillStyle=C.brass;ctx.beginPath();ctx.moveTo(px+4,hy);ctx.quadraticCurveTo(px-2,hy-5,px-10,hy-5);ctx.lineTo(px-20,hy-5);ctx.lineTo(px-20,hy+5);ctx.lineTo(px-10,hy+5);ctx.quadraticCurveTo(px-2,hy+5,px+4,hy);ctx.fill();
+ctx.fillStyle="#A8842F";ctx.fillRect(px-20,hy-5,3,10);
+// 位移标注
+const ay=gy-bh-22;ctx.strokeStyle=C.clay;ctx.fillStyle=C.clay;ctx.lineWidth=1.5;
+const a0=Math.max(x0,44+(x0<44?54:0));if(st.xk*K>2&&bx>a0){ctx.beginPath();ctx.moveTo(a0,ay);ctx.lineTo(bx,ay);ctx.stroke();ctx.beginPath();ctx.moveTo(bx,ay);ctx.lineTo(bx-6,ay-4);ctx.lineTo(bx-6,ay+4);ctx.fill();}
+ctx.font="12.5px 'Source Serif 4','Noto Serif SC',serif";if(x0<44)ctx.fillText("← 起点",44,ay+4);ctx.fillText("木块位移 s₂ = "+fx(st.xk,4)+" m",a0+4,ay-8);
+drawInset();drawGraphs();drawPie();
+// 左上角仪表
+ctx.fillStyle=C.muted;ctx.font="12px 'Source Serif 4','Noto Serif SC',serif";ctx.fillText("时间",44,40);
+ctx.fillStyle=C.ink;ctx.font="600 20px 'Source Serif 4',Georgia,serif";ctx.fillText(fx(st.t*1000)+" ms",44,64);
+const bars=[["子弹速度",st.vb,C.brass],["木块速度",st.vk,C.wood2]];
+bars.forEach((b,i)=>{const y=40+i*30,x=640;ctx.fillStyle=C.muted;ctx.font="12px 'Source Serif 4','Noto Serif SC',serif";ctx.fillText(b[0],x,y+4);
+ctx.fillStyle="#EFECE3";rr(x+64,y-4,230,8,4);ctx.fill();ctx.fillStyle=b[2];rr(x+64,y-4,Math.max(4,b[1]/P.v0*230),8,4);ctx.fill();
+ctx.fillStyle=C.ink;ctx.font="600 13px 'Source Serif 4',Georgia,serif";ctx.fillText(fx(b[1],2)+" m/s",x+304,y+5);});
+// 状态
+let s=!st.inside?"子弹飞向木块":st.out?"子弹已射穿木块":st.vb>st.vk+1e-6?"子弹在木块中减速，木块加速":"共速，一起匀速运动";
+ctx.fillStyle=C.clay;ctx.font="600 13px 'Source Serif 4','Noto Serif SC',serif";ctx.fillText("● "+s,44,92);
+// 实时
+const{m,M}=P,p=m*st.vb+M*st.vk,Ek=.5*m*st.vb*st.vb+.5*M*st.vk*st.vk,Q=S.E0-Ek;
+const kb=.5*m*st.vb*st.vb/S.E0*100,kk=.5*M*st.vk*st.vk/S.E0*100,kq=Math.max(0,100-kb-kk);
+$("live").innerHTML=`<div class="r"><span>系统总动量</span><b>${fx(p,4)} kg·m/s</b></div>
+<div class="r"><span>初始总动量</span><b>${fx(m*P.v0,4)} kg·m/s</b></div>
+<div class="r"><span>系统总动能</span><b>${fx(Ek,2)} J</b></div>
+<div class="r"><span>已转化为内能</span><b>${fx(Q,2)} J</b></div>
+<div class="r"><span>打入深度</span><b>${fx(Math.min(st.pen,P.L),4)} m${st.out?"（射穿）":""}</b></div>
+`;}
+
+// ===== Clawd 待机（沿用用户提供的造型与 idle 动作） =====
+const smoothK=t=>t*t*(3-2*t);
+function keyK(t,pts){for(let i=1;i<pts.length;i++){if(t<=pts[i][0]){const a=pts[i-1],b=pts[i];return a[1]+(b[1]-a[1])*smoothK((t-a[0])/(b[0]-a[0]));}}return pts[pts.length-1][1];}
+function clawdSVG(frame){const t=(frame%180)/180,y=4*(1-Math.cos(t*Math.PI*2))/2,bl=keyK(t,[[0,1],[.38,1],[.41,.12],[.43,.12],[.47,1],[1,1]]);
+let s='<ellipse cx="60" cy="102" rx="40" ry="3" fill="#3D3929" opacity=".10"/>';
+[31,51,69,89].forEach(x=>{s+='<rect x="'+(x-6)+'" y="'+(70+y)+'" width="12" height="'+Math.max(10,95-(70+y))+'" fill="#D77757"/>';});
+s+='<g transform="translate(0 '+y+')"><rect x="0" y="30" width="20" height="20" fill="#D77757"/><rect x="100" y="30" width="20" height="20" fill="#D77757"/><rect x="20" y="10" width="80" height="60" fill="#D77757"/>';
+s+='<rect x="38" y="'+(31-6*bl)+'" width="10" height="'+(12*bl)+'" fill="#171717"/><rect x="72" y="'+(31-6*bl)+'" width="10" height="'+(12*bl)+'" fill="#171717"/></g>';
+return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -55 160 175" shape-rendering="crispEdges">'+s+'</svg>';}
+let cf=0,cprev=null;
+function clawdTick(now){if(cprev!==null)cf=(cf+Math.min(now-cprev,100)*60/1000)%180;cprev=now;$("clawd").innerHTML=clawdSVG(Math.floor(cf));requestAnimationFrame(clawdTick);}
+function placeClawd(){const k=cv.offsetWidth/CW,el=$("clawd");const W0=120,H0=W0*175/160;el.style.width=W0*k+"px";el.style.height=H0*k+"px";
+// 脚底(viewBox y=95)对齐讲解栏底线
+el.style.top=(118*k-(95+55)/175*H0*k)+"px";el.style.left=((CW/2-W0/2)*k)+"px";}
+
+// 子弹时间关：全程恒定尺度，子弹约 1 s 飞过 110 px 接近段
+const tsOff=()=>(110/K)/P.v0;let chipLast="";
+function chipUpd(){const ts=slow?(st.ts||((110/K)/P.v0/0.9)):tsOff(),N=1/ts,Nr=N>=100?Math.round(N/10)*10:Math.round(N);
+const h=slow?`子弹时间：接触过程已放慢约 <b>${Nr}</b> 倍；退出慢放时画面速度的变化由播放倍率造成，不是物理过程 · 当前播放 <b>×1/${Nr}</b>`:`真实比例播放：屏幕速度与物理速度严格成正比（<b>×1/${Nr}</b>）`;
+if(h!==chipLast){const e=$("hint");e.innerHTML=h;e.classList.toggle("off",!slow);chipLast=h;}}
+function frame(t){if(lastT==null)lastT=t;const dt=Math.min((t-lastT)/1000,.05);lastT=t;
+if(run){const contact=st.inside&&!st.out&&st.vb>st.vk+1e-6;
+// 播放时间尺度：各阶段目标值不变，但实际尺度 st.ts 在对数空间按指数缓动（τ=0.5 s 真实时间），屏幕速度不再跳变
+const tsA=(110/K)/P.v0/(slow?0.9:0.3),tsC=S.t/(slow?2.4:0.6),tsP=(slow?110:260)/(K*Math.max(st.vk,1e-3));
+const co=st.inside&&!st.out&&!contact;if(co)st.hold=(st.hold||0)+dt;
+const tgt=(!st.inside||st.out)?tsA:contact?tsC:(st.hold<0.4?tsC:tsP);
+if(!slow)st.ts=tsOff();else if(!st.ts)st.ts=tgt;else st.ts*=Math.pow(tgt/st.ts,1-Math.exp(-dt/0.5));
+const dS=dt*st.ts;step(dS);
+// 镜头跟随：共速（或射穿）后，镜头速度占木块速度的比例 camA 按 τ=0.6 s 真实时间平滑升到 1，木块在屏幕上平滑停在固定位置
+if(st.inside&&(st.out||!contact)){st.camA=(st.camA||0)+(1-(st.camA||0))*(1-Math.exp(-dt/0.6));st.camX=(st.camX||0)+st.camA*st.vk*K*dS;}}
+draw();chipUpd();requestAnimationFrame(frame);}
+function x0px(){return 230+(st.xk+P.L)*K;}
+const PIE={c:$("pie"),x:$("pie").getContext("2d"),w:300,h:300};let pieD=null;
+function rrx(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+function drawPie(){const{m,M}=P,E0=S.E0,tb=.5*m*st.vb*st.vb/E0,tk=.5*M*st.vk*st.vk/E0,tgt=[tb,tk,Math.max(0,1-tb-tk)];
+if(!pieD||st.t===0)pieD=tgt.slice();else pieD=pieD.map((v,i)=>v+(tgt[i]-v)*.25);const x=PIE.x,w=PIE.w,h=PIE.h;x.clearRect(0,0,w,h);
+const cx=w/2,cy=h/2,R0=Math.min(w,h)/2-4,cols=[C.brass,C.wood2,C.clay],names=["子弹剩余动能","木块动能","内能 <i class=f>Q</i>"];let a=-Math.PI/2;
+pieD.forEach((p,i)=>{if(p<=0)return;const b=a+p*Math.PI*2;x.fillStyle=cols[i];x.beginPath();x.moveTo(cx,cy);x.arc(cx,cy,R0,a,b);x.closePath();x.fill();x.strokeStyle="#FCFBF8";x.lineWidth=2;x.stroke();
+if(p>.08){const mid=(a+b)/2;x.fillStyle="#fff";x.font="600 "+(Math.max(R0*.15,14*(x._fz||1))/(x._fz||1))+"px "+GF;x.textAlign="center";x.fillText((p*100).toFixed(1)+"%",cx+Math.cos(mid)*R0*.58,cy+Math.sin(mid)*R0*.58+R0*.05);}a=b;});
+const done=st.inside&&!st.out&&st.vb<=st.vk+1e-6&&!X.thru,fr=[X.rB,X.rK,X.rQ];
+const html=pieD.map((p,i)=>`<div><s style="background:${cols[i]}"></s>${names[i]}<b>${(p*100).toFixed(p<.01?2:1)}%${done&&fr[i].d<=9999n?" = "+exH(fr[i])+" <i class=f>E</i>₀":""}</b></div>`).join("");
+if(html!==PIE.last){$("pieLeg").innerHTML=html;PIE.last=html;}}
+// ===== 运动图像（解析解，随 st.t 逐步绘出） =====
+const GF="'Source Serif 4','Noto Serif SC',serif",GI="italic 13px 'Source Serif 4',Georgia,serif";
+const GC={b:"#C9A24A",k:"#8A6440",q:"#C96442",tot:"#1F1E1D",d:"rgba(201,100,66,.20)",s2:"rgba(111,127,99,.28)",grid:"rgba(31,30,29,.06)",ax:"rgba(31,30,29,.55)"};
+function mkCanvas(id,w,h){const c=$(id),x=c.getContext("2d");c.width=w*dpr;c.height=h*dpr;x.scale(dpr,dpr);return{c,x,w,h};}
+const mk=id=>({c:$(id),x:$(id).getContext("2d"),w:600,h:400}),GV=mk("gv"),GX=mk("gx"),GE=mk("ge");
+function niceStep(r,n){const raw=r/n,p=Math.pow(10,Math.floor(Math.log10(raw))),q=raw/p;return (q<1.5?1:q<3?2:q<7?5:10)*p;}
+// rich text: segments [text, italic?]
+function rich(x,segs,X,Y,size,align,color){x.save();x.fillStyle=x.strokeStyle=color||"#3D3929";const fnt=(it,sz)=>(it?"italic ":"")+(sz||size)+"px "+(it?"'Source Serif 4',Georgia,serif":GF);
+const fs=size*.82,wq=q=>{if(q.d===1n){x.font=fnt(0);return x.measureText(String(q.n)).width;}x.font=fnt(0,fs);return Math.max(x.measureText(String(q.n<0n?-q.n:q.n)).width,x.measureText(String(q.d)).width)+4+(q.n<0n?8:0);};
+const wsg=s=>{if(s[2])return wq(s[2])+(isBig(s[2])?(x.font=fnt(0,size*.8),x.measureText(" ≈"+apx(qv(s[2]))).width):0);x.font=fnt(s[1]);return x.measureText(s[0]).width;};
+let w=0;segs.forEach(s=>w+=wsg(s));let cx=align==="center"?X-w/2:align==="right"?X-w:X;if(x._lw&&!x._nc)cx=Math.max(2,Math.min(cx,x._lw-w-4));x.textAlign="left";
+segs.forEach(s=>{const q=s[2];if(q){if(q.d===1n){x.font=fnt(0);x.fillText(String(q.n),cx,Y);}else{let ox=cx;if(q.n<0n){x.font=fnt(0);x.fillText("−",cx,Y);ox+=8;}x.font=fnt(0,fs);const n=String(q.n<0n?-q.n:q.n),dd=String(q.d),ww=wq(q)-(q.n<0n?8:0),kz=x._fz||1,by=Y-size*kz*.33;
+x.textAlign="center";x.fillText(n,ox+ww/2,by-2);x.fillText(dd,ox+ww/2,by+fs*kz*.95);x.textAlign="left";x.lineWidth=1;x.beginPath();x.moveTo(ox+1,by+.5);x.lineTo(ox+ww-1,by+.5);x.stroke();}
+let ww2=wq(q);if(isBig(q)){x.font=fnt(0,size*.8);x.save();x.fillStyle="#7A776D";x.fillText(" ≈"+apx(qv(q)),cx+ww2,Y);x.restore();}cx+=wsg(s);}
+else{x.font=fnt(s[1]);x.fillText(s[0],cx,Y);cx+=x.measureText(s[0]).width;}});x.restore();return w;}
+function kin(tau){const{m,M,v0,f}=P,ab=f/m,ak=f/M,tc=G.tc;const at=t=>({vb:v0-ab*t,vk:ak*t,xb:v0*t-ab*t*t/2,xk:ak*t*t/2});
+if(tau<=0)return{vb:v0,vk:0,xb:v0*tau,xk:0};if(tau<=tc)return at(tau);const e=at(tc),u=tau-tc;return{vb:e.vb,vk:e.vk,xb:e.xb+e.vb*u,xk:e.xk+e.vk*u};}
+let G={};
+function gsetup(){const{m,M,v0,f,L}=P,a=f*(1/m+1/M);let tc=S.t,thru=false;
+if(S.d>L){thru=true;tc=(v0-Math.sqrt(Math.max(v0*v0-2*a*L,0)))/a;}
+G={tc,thru,T:tc*1.45,t0:(110/K)/v0,key:JSON.stringify(P)};}
+function frameAxes(g,xmax,ymax,ylab,xt,yfmt){const x=g.x,k=x._fz||1,l=58*k,r=g.w-14*k,t=16*k,b=g.h-40*k;x.clearRect(0,0,g.w,g.h);
+const X=v=>l+v/xmax*(r-l),Y=v=>b-v/ymax*(b-t);const xs=niceStep(xmax,Math.max(2,Math.min(6,(r-l)/(80*k)))),ys=niceStep(ymax,Math.max(2,Math.min(5,(b-t)/(45*k))));
+x.lineWidth=1;x.font="11.5px "+GF;x.fillStyle="#7A776D";
+for(let v=0;v<=ymax*1.0001;v+=ys){x.strokeStyle=GC.grid;x.beginPath();x.moveTo(l,Y(v));x.lineTo(r,Y(v));x.stroke();x.textAlign="right";x.fillText(yfmt(v),l-7*k,Y(v)+4*k);}
+for(let v=0;v<=xmax*1.0001;v+=xs){x.strokeStyle=GC.grid;x.beginPath();x.moveTo(X(v),t);x.lineTo(X(v),b);x.stroke();x.textAlign="center";x.fillText(+(v*1000).toFixed(3)+"",X(v),b+16*k);}
+x.strokeStyle=GC.ax;x.lineWidth=1.2;x.beginPath();x.moveTo(l,t-4);x.lineTo(l,b);x.lineTo(r+4,b);x.stroke();
+rich(x,[["时间 ",0],["t",1],[" / ms",0]],r,b+33*k,12.5,"right","#3D3929");
+x.save();x.translate(14*k,(t+b)/2);x.rotate(-Math.PI/2);x._nc=1;rich(x,ylab,0,4*k,12.5,"center","#3D3929");x._nc=0;x.restore();
+// 共速线
+if(xt!=null){x.setLineDash([3,4]);x.strokeStyle="rgba(201,100,66,.45)";x.beginPath();x.moveTo(X(xt),t);x.lineTo(X(xt),b);x.stroke();x.setLineDash([]);}
+return{X,Y,l,r,t,b};}
+function series(fn,t1,n=160){const a=[];for(let i=0;i<=n;i++){const t=t1*i/n;a.push([t,fn(t)]);}return a;}
+function line(x,A,pts,col,w,dash){if(pts.length<2)return;x.strokeStyle=col;x.lineWidth=w||2.2;x.setLineDash(dash||[]);x.lineJoin="round";x.beginPath();pts.forEach((p,i)=>{const X=A.X(p[0]),Y=A.Y(p[1]);i?x.lineTo(X,Y):x.moveTo(X,Y);});x.stroke();x.setLineDash([]);}
+function fillBetween(x,A,up,lo,col){if(up.length<2)return;x.fillStyle=col;x.beginPath();up.forEach((p,i)=>{i?x.lineTo(A.X(p[0]),A.Y(p[1])):x.moveTo(A.X(p[0]),A.Y(p[1]));});for(let i=lo.length-1;i>=0;i--)x.lineTo(A.X(lo[i][0]),A.Y(lo[i][1]));x.closePath();x.fill();}
+function hatch(x,A,up,lo){x.save();x.beginPath();up.forEach((p,i)=>{i?x.lineTo(A.X(p[0]),A.Y(p[1])):x.moveTo(A.X(p[0]),A.Y(p[1]));});for(let i=lo.length-1;i>=0;i--)x.lineTo(A.X(lo[i][0]),A.Y(lo[i][1]));x.closePath();x.clip();
+x.strokeStyle="rgba(201,162,74,.55)";x.lineWidth=1;for(let k=-400;k<1000;k+=7){x.beginPath();x.moveTo(k,A.b);x.lineTo(k+(A.b-A.t),A.t);x.stroke();}x.restore();}
+const LEG={};function segH(t){return t.map(g=>g[2]?exH(g[2]):g[0]===""?"":g[1]?`<i class="f">${g[0]}</i>`:g[0]).join("");}
+function legend(x,items){const h=items.map(it=>`<div><s class="${it.line?"ln":""}" style="background:${it.hatch?"repeating-linear-gradient(135deg,rgba(201,162,74,.9) 0 1.5px,transparent 1.5px 4px)":it.c}"></s><span>${segH(it.t)}</span></div>`).join("");LEG[x.canvas.id]=h;}
+function drawGraphs(){if(G.key!==JSON.stringify(P))gsetup();const{m,M,v0}=P,tc=G.tc,T=G.T,now=Math.min(Math.max(st.t-G.t0,0),T),tcN=Math.min(now,tc);
+const vb=series(t=>kin(t).vb,now),vk=series(t=>kin(t).vk,now),z=series(()=>0,tcN),vbC=series(t=>kin(t).vb,tcN),vkC=series(t=>kin(t).vk,tcN);
+// (a) v-t
+let x=GV.x,A=frameAxes(GV,T,v0*1.08,[["速度 ",0],["v",1],[" / (m·s⁻¹)",0]],tc,v=>+v.toFixed(0)+"");
+fillBetween(x,A,vkC,z,GC.s2);fillBetween(x,A,vbC,vkC,GC.d);hatch(x,A,vbC,z);
+line(x,A,vb,GC.b,2.4);line(x,A,vk,GC.k,2.4);
+const e=kin(tc);
+if(now>=tc){x.fillStyle="#C96442";x.beginPath();x.arc(A.X(tc),A.Y(e.vk),4.5,0,7);x.fill();x.strokeStyle="#fff";x.lineWidth=1.5;x.stroke();
+const lbl=G.thru?"射出":"共速";rich(x,[[lbl+"  ",0],["v",1],[" = ",0],["",0,G.thru?null:X.v],[G.thru?fx(e.vk,2):"",0],[" m/s，",0],["t",1],[" = ",0],["",0,G.thru?null:X.tms],[G.thru?fx(tc*1000,3):"",0],[" ms",0]],A.X(tc)+8,A.Y(e.vk)-16,12.5,"left","#9E4429");
+if(G.thru)rich(x,[["子弹 ",0],["v",1],[" = "+fx(e.vb,1),0]],A.X(tc)+8,A.Y(e.vb)-6,12,"left","#7A776D");
+// area label for d
+rich(x,[["d",1]],A.X(tc*0.3),A.Y((v0*0.7+kin(tc*0.3).vk)/2)+5,15,"center","#9E4429");}
+rich(x,[["v",1],["₀",0]],A.l+6,A.Y(v0)-6,12.5,"left","#7A776D");
+const s1=e.xb,s2=e.xk;
+legend(x,[{c:GC.b,line:1,t:[["子弹 ",0],["v",1],["₁",0]]},{c:GC.k,line:1,t:[["木块 ",0],["v",1],["₂",0]]},
+{c:GC.d,t:[["两线之间 = 打入深度 ",0],["d",1],[" = ",0],["",0,X.thru?null:X.d],[X.thru?fx(s1-s2,4):"",0],[" m",0]]},
+{c:"",hatch:1,t:[["子弹线下 = ",0],["s",1],["₁ = ",0],["",0,X.thru?null:X.s1],[X.thru?fx(s1,4):"",0],[" m",0]]},
+{c:GC.s2,t:[["木块线下 = ",0],["s",1],["₂ = ",0],["",0,X.thru?null:X.s2],[X.thru?fx(s2,5):"",0],[" m",0]]}],A.r-250,A.t+26);
+// (b) x-t  (mm)
+x=GX.x;const xm=kin(T).xb*1000;A=frameAxes(GX,T,xm*1.08,[["位置 ",0],["x",1],[" / mm",0]],tc,v=>+v.toFixed(0)+"");
+line(x,A,series(t=>kin(t).xb*1000,now),GC.b,2.2);line(x,A,series(t=>kin(t).xk*1000,now),GC.k,2.2);
+if(now>=tc){const tt=now,pb=kin(tt).xb*1000,pk=kin(tt).xk*1000,XA=A.X(tt)-10;x.strokeStyle="#C96442";x.fillStyle="#C96442";x.lineWidth=1.3;
+x.beginPath();x.moveTo(XA,A.Y(pk));x.lineTo(XA,A.Y(pb));x.stroke();[[pk,1],[pb,-1]].forEach(([p,s])=>{x.beginPath();x.moveTo(XA,A.Y(p));x.lineTo(XA-4,A.Y(p)-6*s);x.lineTo(XA+4,A.Y(p)-6*s);x.fill();});
+rich(x,[["d",1],[" = ",0],["",0,X.thru?null:X.d],[X.thru?fx((pb-pk)/1000,4):"",0],[" m",0]],XA-8,(A.Y(pk)+A.Y(pb))/2,12.5,"right","#9E4429");
+}
+xtInset(x,A,now,tc,T);
+legend(x,[{c:GC.b,line:1,t:[["子弹 ",0],["x",1],["₁",0]]},{c:GC.k,line:1,t:[["木块 ",0],["x",1],["₂",0]]}],A.l+12,A.t+16);
+// (c) E-t (J)
+x=GE.x;const E0=S.E0;A=frameAxes(GE,T,E0*1.12,[["能量 ",0],["E",1],[" / J",0]],tc,v=>+v.toFixed(0)+"");
+const Eb=t=>.5*m*kin(t).vb**2,Ek=t=>.5*M*kin(t).vk**2;
+line(x,A,series(()=>E0,T,2),GC.tot,1.4,[6,4]);
+line(x,A,series(t=>E0-Eb(t)-Ek(t),now),GC.q,2.2);line(x,A,series(Eb,now),GC.b,2.2);line(x,A,series(Ek,now),GC.k,2.2);
+legend(x,[{c:GC.tot,line:1,t:[["总能量 ",0],["E",1],["₀ = ",0],["",0,X.E0],[" J",0]]},{c:GC.b,line:1,t:[["子弹动能",0]]},{c:GC.k,line:1,t:[["木块动能",0]]},{c:GC.q,line:1,t:[["内能 ",0],["Q",1]]}],A.r-128,A.Y(E0*0.82));
+}
+// x–t 放大小图：共速后两段，同一比例尺，斜率三角形
+function xtInset(x,A,now,tc,T){if(now<tc+1e-12||G.thru)return;const t1=Math.min(now,T),k=x._fz||1,ih=142*k,ix=A.X(T*.22),iw=A.X(T*.76)-ix,iy=Math.max(A.t+4,A.Y(kin(T).xb*1000*0.68));if(ih>(A.b-iy)-6||iw<200*k)return;
+x.save();x.fillStyle="#FFFFFF";x.strokeStyle="rgba(31,30,29,.14)";x.lineWidth=1;rrx(x,ix,iy,iw,ih,8);x.fill();x.stroke();
+rich(x,[["放大：共速后（两段纵轴同比例）",0]],ix+8*k,iy+15*k,11,"left","#7A776D");
+const v=kin(tc).vk,span=Math.max(v*(T-tc)*1000,1e-6),sh=40*k,ppm=sh/(span*1.25),px0=ix+12*k,pw=iw-24*k,Xi=t=>px0+(t-tc)/(T-tc)*pw;
+[["b",GC.b,"子弹"],["k",GC.k,"木块"]].forEach(([w,col,nm],j)=>{const y0=iy+24*k+j*(sh+12*k)+sh,base=kin(tc)["x"+w]*1000,Yi=xx=>y0-(xx-base)*ppm-sh*.1;
+x.strokeStyle="rgba(31,30,29,.08)";x.beginPath();x.moveTo(px0,y0);x.lineTo(px0+pw,y0);x.stroke();
+x.strokeStyle=col;x.lineWidth=2.2;x.beginPath();x.moveTo(Xi(tc),Yi(base));x.lineTo(Xi(t1),Yi(kin(t1)["x"+w]*1000));x.stroke();
+// 斜率三角形
+const ta=tc+(T-tc)*.15,tb2=tc+(T-tc)*.75;if(t1>=tb2){const ya=Yi(kin(ta)["x"+w]*1000),yb=Yi(kin(tb2)["x"+w]*1000);x.setLineDash([3,3]);x.strokeStyle="rgba(201,100,66,.8)";x.lineWidth=1;x.beginPath();x.moveTo(Xi(ta),ya);x.lineTo(Xi(tb2),ya);x.lineTo(Xi(tb2),yb);x.stroke();x.setLineDash([]);}
+rich(x,[[nm,0]],px0+2,y0-sh+8*k,10.5,"left","#7A776D");});
+if(t1>=tc+(T-tc)*.75)rich(x,[["两线斜率相同 ",0],["v",1],[" = ",0],["",0,X.v],[" m/s",0]],ix+iw/2,iy+ih-9*k,11.5,"center","#9E4429");x.restore();}
+// ===== Claude 风格交互（open-claude-ui 弹簧参数） =====
+function springKF(k,c,m,from,to,dur){const w0=Math.sqrt(k/m),z=c/(2*Math.sqrt(m*k)),wd=w0*Math.sqrt(1-z*z),kf=[],N=30;
+for(let i=0;i<=N;i++){const t=dur*i/N,p=1-Math.exp(-z*w0*t)*(Math.cos(wd*t)+z/Math.sqrt(1-z*z)*Math.sin(wd*t));kf.push(from+(to-from)*p);}kf[N]=to;return kf;}
+const BOUNCY=[600,30,1],SNAPPY=[320,28,1];
+document.querySelectorAll("button").forEach(b=>{let sc=1;
+b.addEventListener("pointerdown",()=>{b.animate([{transform:`scale(${sc})`},{transform:"scale(0.96)"}],{duration:120,easing:"cubic-bezier(.32,.72,0,1)",fill:"forwards"});sc=.96;});
+const up=()=>{if(sc===1)return;b.animate(springKF(...BOUNCY,.96,1,.3).map(v=>({transform:`scale(${v})`})),{duration:300,fill:"forwards"});sc=1;};
+b.addEventListener("pointerup",up);b.addEventListener("pointerleave",up);});
+// 入场上浮（motionMessageFadeUp：opacity 0,y 12 → SPRING_SNAPPY）
+document.querySelectorAll(".left .stage,.p,.right").forEach((el,i)=>{const kf=springKF(...SNAPPY,0,1,.45);el.animate(kf.map(p=>({opacity:Math.min(1,p),transform:`translateY(${12*(1-p)}px)`})),{duration:450,delay:i*30,fill:"backwards"});});
+
+defs.forEach(d=>$(d[0]).oninput=reset);
+function updBtns(){const started=st&&st.t>0;$("play").disabled=run;$("pause").disabled=!(started||run);$("pause").textContent=run?"⏸ 暂停":"▶ 继续";$("rst").disabled=!started&&!run;}
+$("play").onclick=()=>{if(run)return;if(st.t>0)reset();run=true;lastT=null;updBtns();};
+$("pause").onclick=()=>{if(!(st.t>0)&&!run)return;run=!run;lastT=null;updBtns();};
+$("rst").onclick=()=>{reset();updBtns();};
+{const bt=$("bt");try{const v=localStorage.getItem("q1.bt");if(v!==null)bt.checked=v==="1";}catch(e){}slow=bt.checked;bt.onchange=()=>{slow=bt.checked;try{localStorage.setItem("q1.bt",slow?"1":"0")}catch(e){}};}
+// ===== 16:9 舞台布局、清晰度、字号、标签页 =====
+const APP=$("app"),LS=window.localStorage;let FZ=+(LS&&LS.getItem("q1.fz"))||1,SC=1,TAB="sol",GSEL="gv";const PG={};
+const GT={gv:"速度—时间图像",gx:"位移—时间图像",ge:"能量—时间图像"},GN={gv:"面积即位移：两线之间 = 打入深度 <i class=f>d</i>",gx:"共速后两线平行（见放大图）",ge:"总能量守恒：动能减少量 = 内能 <i class=f>Q</i>"};let LEGS="";
+function backing(c,x,lw,lh){const cw=c.offsetWidth,ch=c.offsetHeight,bw=Math.max(1,Math.round(cw*SC*dpr)),bh=Math.max(1,Math.round(ch*SC*dpr));if(c.width!==bw)c.width=bw;if(c.height!==bh)c.height=bh;x.setTransform(bw/lw,0,0,bh/lh,0,0);x._lw=lw;}
+function pager(id){const el=$(id),nav=el.nextElementSibling,W=el.clientWidth,gap=48;el.style.columnWidth=W+"px";
+const n=Math.max(1,Math.round((el.scrollWidth+gap)/(W+gap)));let p=Math.min(PG[id]||0,n-1);PG[id]=p;el.scrollLeft=p*(W+gap);
+nav.hidden=n<2;nav.innerHTML=n<2?"":`<button data-d="-1" ${p?"":"disabled"}>‹</button><span class="dots">${Array.from({length:n},(_,i)=>`<i class="${i===p?"on":""}"></i>`).join("")}</span><button data-d="1" ${p<n-1?"":"disabled"}>›</button>`;
+nav.querySelectorAll("button").forEach(b=>b.onclick=()=>{PG[id]=Math.max(0,Math.min(n-1,p+ +b.dataset.d));el.scrollTo({left:PG[id]*(W+gap),behavior:"smooth"});pager(id);});}
+function layoutTab(){
+if(TAB==="sol")pager("pg-sol");
+if(TAB==="gr"){const el=$("pg-gr"),gb=$("gb"),lg=$("gleg");LEGS=LEG[GSEL]||"";lg.innerHTML=`<p class="gn">${FZ>=1.5?"<b>"+GT[GSEL]+"</b>：":""}${GN[GSEL]}</p>`+LEGS;$("gtitle").innerHTML=GT[GSEL];$("gtitle").style.display=FZ>=1.5?"none":"";
+const W=el.clientWidth,H=el.clientHeight,th=FZ>=1.5?0:$("gtitle").offsetHeight+6;lg.style.breakBefore="auto";gb.style.height="";el.style.columnWidth=W+"px";
+const lh=lg.offsetHeight;let ch=H-th-lh-6;if(ch<H*.55){ch=H-th-8;lg.style.breakBefore="column";gb.style.height=(H-2)+"px";}
+const g={gv:GV,gx:GX,ge:GE}[GSEL];g.c.style.height=ch+"px";g.w=W;g.h=ch;g.x._fz=FZ;backing(g.c,g.x,W,ch);pager("pg-gr");}
+if(TAB==="en"){const el=$("pg-en"),W=el.clientWidth,H=el.clientHeight,sz=Math.max(120,Math.min(W*.8,H*.5));PIE.c.style.width=PIE.c.style.height=sz+"px";PIE.w=PIE.h=sz;PIE.x._fz=FZ;backing(PIE.c,PIE.x,sz,sz);PIE.last="";drawPie();pager("pg-en");}
+if(typeof draw==="function"&&st)draw();}
+function layout(){dpr=window.devicePixelRatio||1;const vw=innerWidth,vh=innerHeight;SC=Math.min(vw/1920,vh/1080);
+APP.style.transform=`translate(${(vw-1920*SC)/2}px,${(vh-1080*SC)/2}px) scale(${SC})`;
+APP.style.setProperty("--fz",FZ);APP.style.setProperty("--fzc",FZ<1?FZ:Math.min(1.6,1+(FZ-1)*.3));$("fz").value=Math.round(Math.min(400,Math.max(50,FZ*100)));$("fzv").textContent=Math.round(FZ*100)+"%";
+const L=document.querySelector(".left"),hh=$("hint").offsetHeight+8,aw=L.clientWidth,ah=L.clientHeight-hh,w=Math.min(aw,ah*CW/CH);
+const sc=$("scene");sc.style.width=w+"px";cv.style.width=w+"px";cv.style.height=w*CH/CW+"px";ctx._fz=Math.min(FZ,1.25);backing(cv,ctx,CW,CH);placeClawd();
+moveInd(false);layoutTab();}
+function moveInd(anim){const b=document.querySelector(`#tabs button[data-t="${TAB}"]`),ind=$("ind"),L0=parseFloat(ind.dataset.l||b.offsetLeft),W0=parseFloat(ind.dataset.w||b.offsetWidth),L1=b.offsetLeft,W1=b.offsetWidth;
+ind.style.left=L1+"px";ind.style.width=W1+"px";ind.dataset.l=L1;ind.dataset.w=W1;
+if(anim&&ind.animate){const kf=springKF(...SNAPPY,0,1,.4);ind.animate(kf.map(p=>({left:L0+(L1-L0)*p+"px",width:W0+(W1-W0)*p+"px"})),{duration:400});}}
+document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{if(TAB===b.dataset.t)return;TAB=b.dataset.t;document.querySelectorAll("#tabs button").forEach(x=>x.classList.toggle("on",x===b));
+document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.id==="t-"+TAB));moveInd(true);layoutTab();
+const t=$("t-"+TAB);if(t.animate){const kf=springKF(...SNAPPY,0,1,.4);t.animate(kf.map(p=>({opacity:Math.min(1,p),transform:`translateY(${10*(1-p)}px) scale(${.98+.02*p})`})),{duration:400});}});
+document.querySelectorAll("#seg button").forEach(b=>b.onclick=()=>{GSEL=b.dataset.g;document.querySelectorAll("#seg button").forEach(x=>x.classList.toggle("on",x===b));["gv","gx","ge"].forEach(i=>$(i).classList.toggle("on",i===GSEL));PG["pg-gr"]=0;layoutTab();
+const c=$(GSEL);if(c.animate){const kf=springKF(...SNAPPY,0,1,.35);c.animate(kf.map(p=>({opacity:Math.min(1,p)})),{duration:350});}});
+function setFZ(v){FZ=Math.max(.3,Math.round(v*100)/100);try{LS.setItem("q1.fz",FZ)}catch(e){}layout();}
+$("fz").oninput=e=>setFZ(e.target.value/100);$("fzm").onclick=()=>setFZ(FZ-.1);$("fzp").onclick=()=>setFZ(FZ+.1);
+const cOn=$("clawdOn");cOn.checked=!(LS&&LS.getItem("q1.clawd")==="0");const applyC=()=>{$("clawd").style.display=cOn.checked?"":"none";try{LS.setItem("q1.clawd",cOn.checked?"1":"0")}catch(e){}};cOn.onchange=applyC;applyC();
+defs.forEach(d=>$(d[0]).oninput=()=>{reset();layoutTab();});
+window.addEventListener("resize",layout);
+(function watchDPR(){const mq=matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);const h=()=>{layout();watchDPR();};mq.addEventListener?mq.addEventListener("change",h,{once:true}):mq.addListener(h);})();
+if(document.fonts)document.fonts.ready.then(layout);
+// 图例在每帧更新后同步
+setInterval(()=>{if(TAB==="gr"){const lg=$("gleg");if(LEGS!==(LEG[GSEL]||""))layoutTab();}},300);
+
+reset();layout();requestAnimationFrame(frame);requestAnimationFrame(clawdTick);
+</script></body></html>

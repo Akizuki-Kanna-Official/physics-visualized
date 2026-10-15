@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,600&display=swap">
+<title>第 1 题 · 子弹打木块</title>
+<style>
+:root{--bg:#F5F4EE;--card:#FCFBF8;--surface:#FFFFFF;--ink:#1F1E1D;--ink2:#3D3929;--muted:#7A776D;--line:#E3E0D5;--clay:#C96442;--clay-hover:#B5573A;--clay-light:#FBF3EF;--clay2:#E8B9A5;--sage:#6F7F63;--wood:#B98A5E;
+--serif:'Tiempos Text','Copernicus','Source Serif 4','Noto Serif SC','Source Han Serif SC','Songti SC',serif;--math:'Source Serif 4','Times New Roman',Georgia,serif;
+/* 取自 open-claude-ui cds-theme.css */
+--a1:hsla(0,0%,8%,.05);--a2:hsla(0,0%,8%,.10);--a3:hsla(0,0%,8%,.20);
+--shadow-sm:0 1px 2px 0 rgba(0,0,0,.05),0 2px 8px 0 rgba(0,0,0,.08);
+--shadow-lg:0 4px 8px 0 rgba(0,0,0,.06),0 12px 28px -2px rgba(0,0,0,.08);
+--panel-shadow:0 0 0 1px var(--a2),0 1px 2px 0 rgba(0,0,0,.03),0 2px 8px 0 rgba(0,0,0,.04);
+--panel-shadow-hover:0 0 0 1px var(--a3),0 4px 16px -2px rgba(0,0,0,.09);
+--composer-shadow:0 4px 20px rgba(0,0,0,.035),inset 0 0 0 1px var(--a2);
+--focus:inset 0 0 0 1px #FCFBF8,0 0 0 1.5px var(--clay),0 0 6px 1px rgba(201,100,66,.25);
+--r-lg:8px;--r-panel:10px;--r-xl:12px;--r-2xl:16px;--r-bubble:18px;--r-composer:20px;
+--ease-expo:cubic-bezier(.16,1,.3,1);--ease-press:cubic-bezier(.32,.72,0,1);--ease-overshoot:cubic-bezier(.34,1.3,.64,1);--fade:28px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.wrap{max-width:1040px;margin:0 auto;padding:56px 28px 80px}
+.tag{display:inline-block;font-size:12.5px;letter-spacing:.06em;color:var(--clay);background:var(--clay-light);box-shadow:inset 0 0 0 1px rgba(201,100,66,.22);border-radius:999px;padding:3px 12px;margin-bottom:16px}
+h1{font-family:var(--serif);font-weight:600;font-size:32px;line-height:1.3;margin:0 0 14px;letter-spacing:-.005em}
+.q{color:var(--ink2);font-size:16.5px;line-height:1.9;max-width:860px;margin:0}
+.stage{position:relative;margin-top:30px;background:var(--card);border-radius:var(--r-composer);box-shadow:var(--composer-shadow);overflow:hidden;transition:box-shadow .2s var(--ease-expo)}
+.stage:hover{box-shadow:0 4px 24px rgba(0,0,0,.06),inset 0 0 0 1px var(--a3)}
+canvas{display:block;width:100%;height:auto}
+.bar{display:flex;gap:8px;align-items:center;padding:12px 16px;border-top:1px solid var(--a2)}
+button{font:inherit;font-size:14.5px;border-radius:var(--r-panel);padding:8px 16px;cursor:pointer;border:0;background:hsla(0,0%,8%,.06);color:var(--ink);transition:background-color .15s,box-shadow .15s;outline:none;will-change:transform;user-select:none}
+button:hover{background:rgba(21,21,21,.10)}
+button:focus-visible{box-shadow:var(--focus)}
+button.primary{background:var(--clay);color:#fff;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+button.primary:hover{background:var(--clay-hover)}
+button.ghost{background:transparent;font-size:13px;padding:4px 10px;color:var(--muted)}button.ghost:hover{background:var(--a1);color:var(--ink)}
+.hint{margin-left:auto;font-size:13.5px;color:var(--muted)}
+.params{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:20px}
+.p{background:var(--card);border-radius:var(--r-xl);padding:12px 14px;box-shadow:var(--panel-shadow);transition:box-shadow .2s var(--ease-expo)}
+.p:hover{box-shadow:var(--panel-shadow-hover)}
+.p .k{font-size:13px;color:var(--muted)}.p .val{font-size:19px;font-weight:600;margin:2px 0 6px;font-variant-numeric:tabular-nums;font-family:var(--math)}.p .val small{font-size:12.5px;color:var(--muted);font-weight:400;margin-left:3px;font-family:var(--serif)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:4px;background:var(--a2);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--clay);border:3px solid #fff;box-shadow:0 0 0 1px var(--clay2),0 1px 3px rgba(0,0,0,.15);cursor:pointer;transition:transform .22s var(--ease-overshoot)}
+input[type=range]:active::-webkit-slider-thumb{transform:scale(1.18)}
+input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:var(--focus)}
+input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--clay);border:3px solid #fff}
+.sec{display:flex;align-items:baseline;gap:10px;margin:36px 2px 12px}.sec h2{font-size:20px;font-weight:600;margin:0}.sec span{font-size:13.5px;color:var(--muted)}
+.graphs{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.gcard{background:var(--card);border-radius:var(--r-2xl);box-shadow:var(--panel-shadow);padding:14px 14px 10px;transition:box-shadow .2s var(--ease-expo)}
+.gcard:hover{box-shadow:var(--panel-shadow-hover)}
+.gcard.wide{grid-column:1/-1}
+.gcard h4{margin:0 4px 6px;font-size:15.5px;font-weight:600;display:flex;align-items:baseline;gap:8px}.gcard h4 em{font-style:normal;font-size:12.5px;color:var(--muted);font-weight:400}
+.cols{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;margin-top:20px;align-items:start}
+.box{background:var(--card);border-radius:var(--r-2xl);padding:18px 22px;box-shadow:var(--panel-shadow);transition:box-shadow .2s var(--ease-expo)}
+.box:hover{box-shadow:var(--panel-shadow-hover)}
+.box h3{font-family:var(--serif);font-size:18px;font-weight:600;margin:0 0 10px;display:flex;align-items:center}
+.box h3 button{margin-left:auto}
+.expand{overflow:hidden}
+.scroll{max-height:340px;overflow:auto;padding-right:6px;--ft:0px;--fb:0px;
+-webkit-mask-image:linear-gradient(to bottom,transparent,rgba(0,0,0,.05) calc(var(--ft)*.15),rgba(0,0,0,.15) calc(var(--ft)*.3),rgba(0,0,0,.30) calc(var(--ft)*.45),rgba(0,0,0,.50) calc(var(--ft)*.6),rgba(0,0,0,.70) calc(var(--ft)*.75),rgba(0,0,0,.85) calc(var(--ft)*.87),#000 var(--ft),#000 calc(100% - var(--fb)),rgba(0,0,0,.85) calc(100% - var(--fb)*.87),rgba(0,0,0,.70) calc(100% - var(--fb)*.75),rgba(0,0,0,.50) calc(100% - var(--fb)*.6),rgba(0,0,0,.30) calc(100% - var(--fb)*.45),rgba(0,0,0,.15) calc(100% - var(--fb)*.3),rgba(0,0,0,.05) calc(100% - var(--fb)*.15),transparent);
+mask-image:linear-gradient(to bottom,transparent,rgba(0,0,0,.05) calc(var(--ft)*.15),rgba(0,0,0,.15) calc(var(--ft)*.3),rgba(0,0,0,.30) calc(var(--ft)*.45),rgba(0,0,0,.50) calc(var(--ft)*.6),rgba(0,0,0,.70) calc(var(--ft)*.75),rgba(0,0,0,.85) calc(var(--ft)*.87),#000 var(--ft),#000 calc(100% - var(--fb)),rgba(0,0,0,.85) calc(100% - var(--fb)*.87),rgba(0,0,0,.70) calc(100% - var(--fb)*.75),rgba(0,0,0,.50) calc(100% - var(--fb)*.6),rgba(0,0,0,.30) calc(100% - var(--fb)*.45),rgba(0,0,0,.15) calc(100% - var(--fb)*.3),rgba(0,0,0,.05) calc(100% - var(--fb)*.15),transparent);scrollbar-width:thin;scrollbar-color:var(--a2) transparent}
+.step{display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--a1);font-size:15.5px;line-height:1.85;color:var(--ink2)}
+.step:first-of-type{border-top:0}
+.n{flex:none;width:22px;height:22px;border-radius:50%;background:var(--clay-light);box-shadow:inset 0 0 0 1px rgba(201,100,66,.2);color:var(--clay);font-size:12px;font-weight:600;display:grid;place-items:center;margin-top:4px}
+.v{color:var(--clay);font-weight:600;font-variant-numeric:tabular-nums}
+.f{font-family:var(--math);font-style:italic}
+.note{margin-top:10px;font-size:14px;border-radius:var(--r-panel);padding:9px 12px}
+.note.ok{background:#EEF1EA;color:#4E5E43;box-shadow:inset 0 0 0 1px rgba(78,94,67,.12)}.note.bad{background:#F8E7E0;color:#9E4429;box-shadow:inset 0 0 0 1px rgba(158,68,41,.15)}
+.live .r{display:flex;justify-content:space-between;padding:8px 0;border-top:1px solid var(--a1);font-size:15px;color:var(--ink2)}
+.live .r:first-of-type{border-top:0}.live .r b{font-variant-numeric:tabular-nums;color:var(--ink);font-weight:600;font-family:var(--math)}
+.meter{height:6px;border-radius:6px;background:var(--a1);margin:4px 0 2px;overflow:hidden;display:flex}
+.meter i{display:block;height:100%}
+.legend{display:flex;gap:14px;font-size:12.5px;color:var(--muted);margin-top:6px}.legend span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;background:var(--c)}
+.clawd{position:absolute;left:34px;top:0;width:96px;height:105px;pointer-events:none}.clawd svg{width:100%;height:100%;display:block}
+@media (max-width:760px){.graphs{grid-template-columns:1fr}.params{grid-template-columns:repeat(2,1fr)}.cols{grid-template-columns:1fr}}
+</style></head><body><div class="wrap">
+<span class="tag">模型一 · 子弹—木块</span>
+<h1>第 1 题　子弹打木块</h1>
+<p class="q">质量为 <span class="f">M</span> 的木块放在光滑水平面上，质量为 <span class="f">m</span> 的子弹以初速度 <span class="f">v</span>₀ 水平打进木块并留在其中，子弹与木块间相互作用力为 <span class="f">f</span>。求：(1) 相对静止时的速度；(2) 子弹在木块内运动的时间；(3) 子弹、木块的位移及打入深度；(4) 要使子弹不射出，木块至少多长。</p>
+<div class="stage"><canvas id="c"></canvas><div id="clawd" class="clawd"></div>
+<div class="bar"><button class="primary" id="play">▶ 播放</button><button id="slow">慢放 开</button><span class="hint">接触过程实际只有几毫秒，动画已按时间缩放</span></div></div>
+<div class="params" id="params"></div>
+<div class="sec"><h2>运动图像</h2><span>随动画逐步绘出 · 时间轴为接触阶段（毫秒）</span></div>
+<div class="graphs">
+<div class="gcard wide"><h4>速度—时间图像 <em>面积即位移：两线之间 = 打入深度 <span class="f">d</span></em></h4><canvas id="gv"></canvas></div>
+<div class="gcard"><h4>位移—时间图像</h4><canvas id="gx"></canvas></div>
+<div class="gcard"><h4>能量—时间图像</h4><canvas id="ge"></canvas></div>
+</div>
+<div class="cols">
+<div class="box"><h3>解答<button class="ghost" id="tog">收起</button></h3><div class="expand" id="exp"><div class="scroll" id="ans"></div></div></div>
+<div class="box live"><h3>实时数据</h3><div id="live"></div></div>
+</div></div>
+<script>
+const $=id=>document.getElementById(id);
+const C={clay:"#C96442",ink:"#1F1E1D",muted:"#7A776D",line:"#E3E0D5",wood:"#B98A5E",wood2:"#9C7048",sage:"#6F7F63",brass:"#C9A24A"};
+const defs=[["m","子弹质量 m","kg",0.005,0.2,0.005,0.02],["M","木块质量 M","kg",0.2,5,0.1,1],["v0","初速度 v₀","m/s",50,600,10,300],["f","作用力 f","N",500,20000,100,4000],["L","木块长度","m",0.05,0.5,0.01,0.3]];
+$("params").innerHTML=defs.map(d=>`<div class="p"><div class="k">${d[1]}</div><div class="val"><span id="${d[0]}v"></span><small>${d[2]}</small></div><input id="${d[0]}" type="range" min="${d[3]}" max="${d[4]}" step="${d[5]}" value="${d[6]}"></div>`).join("");
+const cv=$("c"),ctx=cv.getContext("2d"),CW=1040,CH=480,dpr=window.devicePixelRatio||1;
+cv.width=CW*dpr;cv.height=CH*dpr;ctx.scale(dpr,dpr);
+let P,S,st,run=false,slow=true,lastT=null,K;
+const fx=(x,n=3)=>(+x).toFixed(n);
+function read(){P={};defs.forEach(d=>{P[d[0]]=+$(d[0]).value;$(d[0]+"v").textContent=P[d[0]];});}
+function solve(){const{m,M,v0,f,L}=P,v=m*v0/(m+M),t=m*M*v0/(f*(m+M)),s1=m*(v0*v0-v*v)/(2*f),s2=M*v*v/(2*f),d=s1-s2,E0=.5*m*v0*v0,Q=f*d;S={v,t,s1,s2,d,Q,E0};
+const st=(n,h)=>`<div class="step"><span class="n">${n}</span><div>${h}</div></div>`;
+$("ans").innerHTML=
+st(1,`系统合外力为零，动量守恒：<span class="f">mv</span>₀ = (<span class="f">m</span>+<span class="f">M</span>)<span class="f">v</span>，得 <span class="v">v = ${fx(v)} m/s</span>`)+
+st(2,`对木块用动量定理：<span class="f">ft</span> = <span class="f">Mv</span>，得 <span class="v">t = ${fx(t*1000)} ms</span>`)+
+st(3,`动能定理。子弹：<span class="f">fs</span>₁ = ½<span class="f">m</span>(<span class="f">v</span>₀²−<span class="f">v</span>²)，<span class="v">s₁ = ${fx(s1,4)} m</span>；木块：<span class="f">fs</span>₂ = ½<span class="f">Mv</span>²，<span class="v">s₂ = ${fx(s2,4)} m</span><br>打入深度 <span class="f">d</span> = <span class="f">s</span>₁−<span class="f">s</span>₂ = <span class="f">mMv</span>₀² / [2<span class="f">f</span>(<span class="f">m</span>+<span class="f">M</span>)]，<span class="v">d = ${fx(d,4)} m</span>`)+
+st(4,`不射出需木块长 <span class="v">L ≥ ${fx(d,4)} m</span>。损失的机械能 <span class="f">Q</span> = <span class="f">fd</span> = <span class="v">${fx(Q,1)} J</span>，占初动能 ${fx(Q/E0*100,1)}%`)+
+(d>L?`<div class="note bad">当前木块长 ${L} m 小于 d，子弹会射穿木块，上面 (1)～(4) 的共速结论不再成立。</div>`:`<div class="note ok">当前木块长 ${L} m ≥ d，子弹留在木块内，与木块共速。</div>`);}
+function reset(){read();solve();K=620/Math.max(P.L+S.s2*1.4+0.12,0.45);st={xb:-110/K,vb:P.v0,xk:0,vk:0,t:0,inside:false,out:false,pen:0,trail:[]};run=false;$("play").textContent="▶ 播放";}
+function step(dt){const{m,M,f,L}=P,n=300,h=dt/n;
+for(let i=0;i<n;i++){const front=st.xk,back=st.xk+L,inB=st.xb>=front&&st.xb<=back&&!st.out;
+if(inB&&st.vb>st.vk+1e-9){st.inside=true;st.vb-=f/m*h;st.vk+=f/M*h;if(st.vb<st.vk){const v=(m*st.vb+M*st.vk)/(m+M);st.vb=st.vk=v;}}
+else if(inB&&st.inside)st.vb=st.vk;
+st.xb+=st.vb*h;st.xk+=st.vk*h;st.t+=h;if(st.inside&&st.xb>back)st.out=true;if(st.inside&&!st.out)st.pen=st.xb-front;}}
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+
+// ===== 放大镜区域 =====
+function niceR(v){const c=[0.5,1,2,3,5,8,10,15,20,30,50,80,100,150,200,300,500];for(const x of c)if(x>=v)return x;return Math.ceil(v/100)*100;}
+function drawInset(){const top=300,bot=CH-16,L0=40,R0=640;
+ctx.fillStyle="#F6F3EC";rr(24,top-8,CW-48,bot-top+16,14);ctx.fill();ctx.strokeStyle=C.line;ctx.lineWidth=1;ctx.stroke();
+const Rmm=niceR(Math.max(S.s2*1000*1.35,0.3)),ppm=(R0-L0-60)/Rmm,sx0=L0+30,gyI=bot-34;
+ctx.fillStyle=C.muted;ctx.font="12px 'Source Serif 4','Noto Serif SC',serif";ctx.fillText("放大镜 · 起点附近（约 ×"+(ppm/(K/1000)).toFixed(0)+"）",L0,top+14);
+ctx.save();ctx.beginPath();ctx.rect(L0,top+22,R0-L0,bot-top-22);ctx.clip();
+// 木块左端
+const ex=sx0+st.xk*1000*ppm,bt=top+44;
+const g=ctx.createLinearGradient(0,bt,0,gyI);g.addColorStop(0,"#C99B6E");g.addColorStop(1,"#A87A50");ctx.fillStyle=g;rr(ex,bt,R0-ex+20,gyI-bt,6);ctx.fill();
+ctx.strokeStyle="rgba(255,255,255,.14)";for(let y=bt+10;y<gyI;y+=11){ctx.beginPath();ctx.moveTo(ex,y);ctx.lineTo(R0+20,y+2);ctx.stroke();}
+// 弹孔入口
+if(st.inside){ctx.fillStyle="rgba(60,35,15,.55)";ctx.fillRect(ex,(bt+gyI)/2-3,R0-ex+20,6);}
+ctx.restore();
+// 地面+刻度
+ctx.strokeStyle=C.ink;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(L0,gyI);ctx.lineTo(R0,gyI);ctx.stroke();
+const stepMM=Rmm<=1?0.1:Rmm<=3?0.5:Rmm<=10?1:Rmm<=30?5:10;ctx.lineWidth=1;ctx.fillStyle=C.muted;ctx.textAlign="center";ctx.font="11px 'Source Serif 4',Georgia,serif";
+for(let v=0,i=0;v<=Rmm+1e-9;v+=stepMM,i++){const x=sx0+v*ppm,big=i%5===0||stepMM>=1&&i%1===0&&Rmm<=10;ctx.strokeStyle=C.muted;ctx.beginPath();ctx.moveTo(x,gyI);ctx.lineTo(x,gyI+(big?9:5));ctx.stroke();if(big)ctx.fillText(+v.toFixed(2)+"",x,gyI+21);}
+ctx.textAlign="left";ctx.fillText("mm",R0-24,gyI+21);
+// 起点线
+ctx.setLineDash([4,4]);ctx.strokeStyle=C.ink;ctx.beginPath();ctx.moveTo(sx0,top+30);ctx.lineTo(sx0,gyI);ctx.stroke();ctx.setLineDash([]);
+ctx.fillStyle=C.ink;ctx.font="11px 'Source Serif 4','Noto Serif SC',serif";ctx.fillText("起点",sx0-12,top+32);
+// s2 箭头
+if(st.xk>0){const ay=top+36;ctx.strokeStyle=C.clay;ctx.fillStyle=C.clay;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(sx0,ay);ctx.lineTo(ex,ay);ctx.stroke();if(ex-sx0>8){ctx.beginPath();ctx.moveTo(ex,ay);ctx.lineTo(ex-8,ay-5);ctx.lineTo(ex-8,ay+5);ctx.fill();}}
+// 右侧大读数
+const rx=R0+40;ctx.strokeStyle=C.line;ctx.beginPath();ctx.moveTo(R0+16,top+10);ctx.lineTo(R0+16,bot-10);ctx.stroke();
+ctx.fillStyle=C.muted;ctx.font="13px 'Source Serif 4','Noto Serif SC',serif";ctx.fillText("木块位移 s₂",rx,top+28);ctx.fillText("打入深度 d（子弹相对木块）",rx,top+102);
+ctx.fillStyle=C.clay;ctx.font="600 38px 'Source Serif 4',Georgia,serif";ctx.fillText(fx(st.xk*1000,2)+" mm",rx,top+72);
+ctx.fillStyle=C.ink;ctx.fillText(fx(Math.min(st.pen,P.L)*1000,1)+" mm",rx,top+146);
+}
+function draw(){ctx.clearRect(0,0,CW,CH);const x0=230,gy=250,bh=92;
+// 地面
+ctx.strokeStyle=C.line;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(40,gy);ctx.lineTo(CW-40,gy);ctx.stroke();
+ctx.strokeStyle="#ECE9DF";ctx.lineWidth=1;for(let x=50;x<CW-40;x+=14){ctx.beginPath();ctx.moveTo(x,gy+1);ctx.lineTo(x-8,gy+9);ctx.stroke();}
+ctx.fillStyle=C.muted;ctx.font="12px 'Source Serif 4','Noto Serif SC',serif";ctx.fillText("光滑水平面",44,gy+26);
+// 起点参考线
+ctx.setLineDash([3,4]);ctx.strokeStyle="#D6D2C5";ctx.beginPath();ctx.moveTo(x0,gy-bh-30);ctx.lineTo(x0,gy);ctx.stroke();ctx.setLineDash([]);
+// 木块
+const bx=x0+st.xk*K,bw=Math.max(P.L*K,10),by=gy-bh;
+ctx.save();ctx.shadowColor="rgba(80,60,30,.18)";ctx.shadowBlur=14;ctx.shadowOffsetY=6;rr(bx,by,bw,bh,6);
+const g=ctx.createLinearGradient(0,by,0,gy);g.addColorStop(0,"#C99B6E");g.addColorStop(1,"#A87A50");ctx.fillStyle=g;ctx.fill();ctx.restore();
+ctx.save();rr(bx,by,bw,bh,6);ctx.clip();ctx.strokeStyle="rgba(255,255,255,.12)";ctx.lineWidth=1;for(let y=by+10;y<gy;y+=11){ctx.beginPath();ctx.moveTo(bx,y);ctx.bezierCurveTo(bx+bw*.3,y-3,bx+bw*.7,y+3,bx+bw,y);ctx.stroke();}
+const hy=by+bh/2;if(st.inside){ctx.fillStyle="rgba(60,35,15,.55)";ctx.fillRect(bx,hy-2.5,Math.min(st.pen,P.L)*K,5);}ctx.restore();
+ctx.fillStyle="rgba(255,255,255,.92)";ctx.font="600 15px 'Source Serif 4',Georgia,serif";ctx.textAlign="center";ctx.fillText("M",bx+bw/2,by+22);ctx.textAlign="left";
+// 子弹（拖尾）
+const px=x0+st.xb*K;st.trail.push(px);if(st.trail.length>14)st.trail.shift();
+if(!(st.inside&&!st.out&&st.vb<=st.vk+1e-6)||st.out){const tl=st.trail[0];const gr=ctx.createLinearGradient(tl,0,px,0);gr.addColorStop(0,"rgba(201,100,66,0)");gr.addColorStop(1,"rgba(201,100,66,.35)");ctx.fillStyle=gr;ctx.fillRect(tl,hy-2,px-tl-12,4);}
+ctx.fillStyle=C.brass;ctx.beginPath();ctx.moveTo(px+4,hy);ctx.quadraticCurveTo(px-2,hy-5,px-10,hy-5);ctx.lineTo(px-20,hy-5);ctx.lineTo(px-20,hy+5);ctx.lineTo(px-10,hy+5);ctx.quadraticCurveTo(px-2,hy+5,px+4,hy);ctx.fill();
+ctx.fillStyle="#A8842F";ctx.fillRect(px-20,hy-5,3,10);
+// 位移标注
+const ay=gy-bh-22;ctx.strokeStyle=C.clay;ctx.fillStyle=C.clay;ctx.lineWidth=1.5;
+if(st.xk*K>2){ctx.beginPath();ctx.moveTo(x0,ay);ctx.lineTo(bx,ay);ctx.stroke();ctx.beginPath();ctx.moveTo(bx,ay);ctx.lineTo(bx-6,ay-4);ctx.lineTo(bx-6,ay+4);ctx.fill();}
+ctx.font="12.5px 'Source Serif 4','Noto Serif SC',serif";ctx.fillText("木块位移 s₂ = "+fx(st.xk,4)+" m",x0+4,ay-8);
+drawInset();drawGraphs();
+// 左上角仪表
+ctx.fillStyle=C.muted;ctx.font="12px 'Source Serif 4','Noto Serif SC',serif";ctx.fillText("时间",44,40);
+ctx.fillStyle=C.ink;ctx.font="600 20px 'Source Serif 4',Georgia,serif";ctx.fillText(fx(st.t*1000)+" ms",44,64);
+const bars=[["子弹速度",st.vb,C.brass],["木块速度",st.vk,C.wood2]];
+bars.forEach((b,i)=>{const y=40+i*30,x=640;ctx.fillStyle=C.muted;ctx.font="12px 'Source Serif 4','Noto Serif SC',serif";ctx.fillText(b[0],x,y+4);
+ctx.fillStyle="#EFECE3";rr(x+64,y-4,230,8,4);ctx.fill();ctx.fillStyle=b[2];rr(x+64,y-4,Math.max(4,b[1]/P.v0*230),8,4);ctx.fill();
+ctx.fillStyle=C.ink;ctx.font="600 13px 'Source Serif 4',Georgia,serif";ctx.fillText(fx(b[1],2)+" m/s",x+304,y+5);});
+// 状态
+let s=!st.inside?"子弹飞向木块":st.out?"子弹已射穿木块":st.vb>st.vk+1e-6?"子弹在木块中减速，木块加速":"共速，一起匀速运动";
+ctx.fillStyle=C.clay;ctx.font="600 13px 'Source Serif 4','Noto Serif SC',serif";ctx.fillText("● "+s,44,92);
+// 实时
+const{m,M}=P,p=m*st.vb+M*st.vk,Ek=.5*m*st.vb*st.vb+.5*M*st.vk*st.vk,Q=S.E0-Ek;
+const kb=.5*m*st.vb*st.vb/S.E0*100,kk=.5*M*st.vk*st.vk/S.E0*100,kq=Math.max(0,100-kb-kk);
+$("live").innerHTML=`<div class="r"><span>系统总动量</span><b>${fx(p,4)} kg·m/s</b></div>
+<div class="r"><span>初始总动量</span><b>${fx(m*P.v0,4)} kg·m/s</b></div>
+<div class="r"><span>系统总动能</span><b>${fx(Ek,2)} J</b></div>
+<div class="r"><span>已转化为内能</span><b>${fx(Q,2)} J</b></div>
+<div class="r"><span>打入深度</span><b>${fx(Math.min(st.pen,P.L),4)} m${st.out?"（射穿）":""}</b></div>
+<div style="margin-top:10px;font-size:12px;color:#7A776D">初动能去向</div>
+<div class="meter"><i style="width:${kb}%;background:${C.brass}"></i><i style="width:${kk}%;background:${C.wood2}"></i><i style="width:${kq}%;background:${C.clay}"></i></div>
+<div class="legend"><span style="--c:${C.brass}">子弹动能</span><span style="--c:${C.wood2}">木块动能</span><span style="--c:${C.clay}">内能 Q</span></div>`;}
+
+// ===== Clawd 待机（沿用用户提供的造型与 idle 动作） =====
+const smoothK=t=>t*t*(3-2*t);
+function keyK(t,pts){for(let i=1;i<pts.length;i++){if(t<=pts[i][0]){const a=pts[i-1],b=pts[i];return a[1]+(b[1]-a[1])*smoothK((t-a[0])/(b[0]-a[0]));}}return pts[pts.length-1][1];}
+function clawdSVG(frame){const t=(frame%180)/180,y=4*(1-Math.cos(t*Math.PI*2))/2,bl=keyK(t,[[0,1],[.38,1],[.41,.12],[.43,.12],[.47,1],[1,1]]);
+let s='<ellipse cx="60" cy="102" rx="40" ry="3" fill="#3D3929" opacity=".10"/>';
+[31,51,69,89].forEach(x=>{s+='<rect x="'+(x-6)+'" y="'+(70+y)+'" width="12" height="'+Math.max(10,95-(70+y))+'" fill="#D77757"/>';});
+s+='<g transform="translate(0 '+y+')"><rect x="0" y="30" width="20" height="20" fill="#D77757"/><rect x="100" y="30" width="20" height="20" fill="#D77757"/><rect x="20" y="10" width="80" height="60" fill="#D77757"/>';
+s+='<rect x="38" y="'+(31-6*bl)+'" width="10" height="'+(12*bl)+'" fill="#171717"/><rect x="72" y="'+(31-6*bl)+'" width="10" height="'+(12*bl)+'" fill="#171717"/></g>';
+return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -55 160 175" shape-rendering="crispEdges">'+s+'</svg>';}
+let cf=0,cprev=null;
+function clawdTick(now){if(cprev!==null)cf=(cf+Math.min(now-cprev,100)*60/1000)%180;cprev=now;$("clawd").innerHTML=clawdSVG(Math.floor(cf));requestAnimationFrame(clawdTick);}
+function placeClawd(){const r=cv.getBoundingClientRect(),k=r.width/CW,el=$("clawd");const W0=120,H0=W0*175/160;el.style.width=W0*k+"px";el.style.height=H0*k+"px";
+// 脚底(viewBox y=95)对齐讲解栏底线
+el.style.top=(118*k-(95+55)/175*H0*k)+"px";el.style.left=((CW/2-W0/2)*k)+"px";}
+window.addEventListener("resize",placeClawd);
+function frame(t){if(lastT==null)lastT=t;const dt=Math.min((t-lastT)/1000,.05);lastT=t;
+if(run){const contact=st.inside&&!st.out&&st.vb>st.vk+1e-6;
+const ts=contact?S.t/(slow?2.4:0.6):(110/K)/P.v0/(slow?0.9:0.3);
+if(!st.inside||contact||st.out)step(dt*ts);else step(dt*(slow?110:260)/(K*Math.max(st.vk,1e-3)));
+if(x0px()>CW-60||230+st.xb*K>CW+30){run=false;$("play").textContent="↺ 重放";}}
+draw();requestAnimationFrame(frame);}
+function x0px(){return 230+(st.xk+P.L)*K;}
+// ===== 运动图像（解析解，随 st.t 逐步绘出） =====
+const GF="'Source Serif 4','Noto Serif SC',serif",GI="italic 13px 'Source Serif 4',Georgia,serif";
+const GC={b:"#C9A24A",k:"#8A6440",q:"#C96442",tot:"#1F1E1D",d:"rgba(201,100,66,.20)",s2:"rgba(111,127,99,.28)",grid:"rgba(31,30,29,.06)",ax:"rgba(31,30,29,.55)"};
+function mkCanvas(id,w,h){const c=$(id),x=c.getContext("2d");c.width=w*dpr;c.height=h*dpr;x.scale(dpr,dpr);return{c,x,w,h};}
+const GV=mkCanvas("gv",956,300),GX=mkCanvas("gx",462,270),GE=mkCanvas("ge",462,270);
+function niceStep(r,n){const raw=r/n,p=Math.pow(10,Math.floor(Math.log10(raw))),q=raw/p;return (q<1.5?1:q<3?2:q<7?5:10)*p;}
+// rich text: segments [text, italic?]
+function rich(x,segs,X,Y,size,align,color){x.save();x.fillStyle=color||C.ink2||"#3D3929";let w=0;const fnt=it=>(it?"italic ":"")+size+"px "+(it?"'Source Serif 4',Georgia,serif":GF);
+segs.forEach(s=>{x.font=fnt(s[1]);w+=x.measureText(s[0]).width;});let cx=align==="center"?X-w/2:align==="right"?X-w:X;
+segs.forEach(s=>{x.font=fnt(s[1]);x.textAlign="left";x.fillText(s[0],cx,Y);cx+=x.measureText(s[0]).width;});x.restore();return w;}
+function kin(tau){const{m,M,v0,f}=P,ab=f/m,ak=f/M,tc=G.tc;const at=t=>({vb:v0-ab*t,vk:ak*t,xb:v0*t-ab*t*t/2,xk:ak*t*t/2});
+if(tau<=0)return{vb:v0,vk:0,xb:v0*tau,xk:0};if(tau<=tc)return at(tau);const e=at(tc),u=tau-tc;return{vb:e.vb,vk:e.vk,xb:e.xb+e.vb*u,xk:e.xk+e.vk*u};}
+let G={};
+function gsetup(){const{m,M,v0,f,L}=P,a=f*(1/m+1/M);let tc=S.t,thru=false;
+if(S.d>L){thru=true;tc=(v0-Math.sqrt(Math.max(v0*v0-2*a*L,0)))/a;}
+G={tc,thru,T:tc*1.45,t0:(110/K)/v0,key:JSON.stringify(P)};}
+function frameAxes(g,xmax,ymax,ylab,xt,yfmt){const x=g.x,l=58,r=g.w-14,t=16,b=g.h-40;x.clearRect(0,0,g.w,g.h);
+const X=v=>l+v/xmax*(r-l),Y=v=>b-v/ymax*(b-t);const xs=niceStep(xmax,6),ys=niceStep(ymax,5);
+x.lineWidth=1;x.font="11.5px "+GF;x.fillStyle="#7A776D";
+for(let v=0;v<=ymax*1.0001;v+=ys){x.strokeStyle=GC.grid;x.beginPath();x.moveTo(l,Y(v));x.lineTo(r,Y(v));x.stroke();x.textAlign="right";x.fillText(yfmt(v),l-7,Y(v)+4);}
+for(let v=0;v<=xmax*1.0001;v+=xs){x.strokeStyle=GC.grid;x.beginPath();x.moveTo(X(v),t);x.lineTo(X(v),b);x.stroke();x.textAlign="center";x.fillText(+(v*1000).toFixed(3)+"",X(v),b+16);}
+x.strokeStyle=GC.ax;x.lineWidth=1.2;x.beginPath();x.moveTo(l,t-4);x.lineTo(l,b);x.lineTo(r+4,b);x.stroke();
+rich(x,[["时间 ",0],["t",1],[" / ms",0]],r,b+33,12.5,"right","#3D3929");
+x.save();x.translate(14,(t+b)/2);x.rotate(-Math.PI/2);rich(x,ylab,0,4,12.5,"center","#3D3929");x.restore();
+// 共速线
+if(xt!=null){x.setLineDash([3,4]);x.strokeStyle="rgba(201,100,66,.45)";x.beginPath();x.moveTo(X(xt),t);x.lineTo(X(xt),b);x.stroke();x.setLineDash([]);}
+return{X,Y,l,r,t,b};}
+function series(fn,t1,n=160){const a=[];for(let i=0;i<=n;i++){const t=t1*i/n;a.push([t,fn(t)]);}return a;}
+function line(x,A,pts,col,w,dash){if(pts.length<2)return;x.strokeStyle=col;x.lineWidth=w||2.2;x.setLineDash(dash||[]);x.lineJoin="round";x.beginPath();pts.forEach((p,i)=>{const X=A.X(p[0]),Y=A.Y(p[1]);i?x.lineTo(X,Y):x.moveTo(X,Y);});x.stroke();x.setLineDash([]);}
+function fillBetween(x,A,up,lo,col){if(up.length<2)return;x.fillStyle=col;x.beginPath();up.forEach((p,i)=>{i?x.lineTo(A.X(p[0]),A.Y(p[1])):x.moveTo(A.X(p[0]),A.Y(p[1]));});for(let i=lo.length-1;i>=0;i--)x.lineTo(A.X(lo[i][0]),A.Y(lo[i][1]));x.closePath();x.fill();}
+function hatch(x,A,up,lo){x.save();x.beginPath();up.forEach((p,i)=>{i?x.lineTo(A.X(p[0]),A.Y(p[1])):x.moveTo(A.X(p[0]),A.Y(p[1]));});for(let i=lo.length-1;i>=0;i--)x.lineTo(A.X(lo[i][0]),A.Y(lo[i][1]));x.closePath();x.clip();
+x.strokeStyle="rgba(201,162,74,.55)";x.lineWidth=1;for(let k=-400;k<1000;k+=7){x.beginPath();x.moveTo(k,A.b);x.lineTo(k+(A.b-A.t),A.t);x.stroke();}x.restore();}
+function legend(x,items,X0,Y0){let y=Y0;items.forEach(it=>{x.fillStyle=it.c;if(it.hatch){x.strokeStyle="rgba(201,162,74,.9)";x.lineWidth=1;x.strokeRect(X0,y-9,14,10);for(let k=0;k<14;k+=4){x.beginPath();x.moveTo(X0+k,y+1);x.lineTo(X0+k+4,y-9);x.stroke();}}
+else if(it.line){x.fillRect(X0,y-5,14,2.4);}else{x.fillRect(X0,y-9,14,10);}rich(x,it.t,X0+20,y,12.5,"left","#3D3929");y+=19;});}
+function drawGraphs(){if(G.key!==JSON.stringify(P))gsetup();const{m,M,v0}=P,tc=G.tc,T=G.T,now=Math.min(Math.max(st.t-G.t0,0),T),tcN=Math.min(now,tc);
+const vb=series(t=>kin(t).vb,now),vk=series(t=>kin(t).vk,now),z=series(()=>0,tcN),vbC=series(t=>kin(t).vb,tcN),vkC=series(t=>kin(t).vk,tcN);
+// (a) v-t
+let x=GV.x,A=frameAxes(GV,T,v0*1.08,[["速度 ",0],["v",1],[" / (m·s⁻¹)",0]],tc,v=>+v.toFixed(0)+"");
+fillBetween(x,A,vkC,z,GC.s2);fillBetween(x,A,vbC,vkC,GC.d);hatch(x,A,vbC,z);
+line(x,A,vb,GC.b,2.4);line(x,A,vk,GC.k,2.4);
+const e=kin(tc);
+if(now>=tc){x.fillStyle="#C96442";x.beginPath();x.arc(A.X(tc),A.Y(e.vk),4.5,0,7);x.fill();x.strokeStyle="#fff";x.lineWidth=1.5;x.stroke();
+const lbl=G.thru?"射出":"共速";rich(x,[[lbl+"  ",0],["v",1],[" = "+fx(e.vk,2)+" m/s，",0],["t",1],[" = "+fx(tc*1000,3)+" ms",0]],A.X(tc)+8,A.Y(e.vk)-12,12.5,"left","#9E4429");
+if(G.thru)rich(x,[["子弹 ",0],["v",1],[" = "+fx(e.vb,1),0]],A.X(tc)+8,A.Y(e.vb)-6,12,"left","#7A776D");
+// area label for d
+rich(x,[["d",1]],A.X(tc*0.3),A.Y((v0*0.7+kin(tc*0.3).vk)/2)+5,15,"center","#9E4429");}
+rich(x,[["v",1],["₀",0]],A.l+6,A.Y(v0)-6,12.5,"left","#7A776D");
+const s1=e.xb,s2=e.xk;
+legend(x,[{c:GC.b,line:1,t:[["子弹 ",0],["v",1],["₁",0]]},{c:GC.k,line:1,t:[["木块 ",0],["v",1],["₂",0]]},
+{c:GC.d,t:[["两线之间 = 打入深度 ",0],["d",1],[" = "+fx((s1-s2)*1000,1)+" mm",0]]},
+{c:"",hatch:1,t:[["子弹线下 = ",0],["s",1],["₁ = "+fx(s1*1000,1)+" mm",0]]},
+{c:GC.s2,t:[["木块线下 = ",0],["s",1],["₂ = "+fx(s2*1000,2)+" mm",0]]}],A.r-250,A.t+22);
+// (b) x-t  (mm)
+x=GX.x;const xm=kin(T).xb*1000;A=frameAxes(GX,T,xm*1.08,[["位置 ",0],["x",1],[" / mm",0]],tc,v=>+v.toFixed(0)+"");
+line(x,A,series(t=>kin(t).xb*1000,now),GC.b,2.2);line(x,A,series(t=>kin(t).xk*1000,now),GC.k,2.2);
+if(now>=tc){const tt=now,pb=kin(tt).xb*1000,pk=kin(tt).xk*1000,X=A.X(tt)-10;x.strokeStyle="#C96442";x.fillStyle="#C96442";x.lineWidth=1.3;
+x.beginPath();x.moveTo(X,A.Y(pk));x.lineTo(X,A.Y(pb));x.stroke();[[pk,1],[pb,-1]].forEach(([p,s])=>{x.beginPath();x.moveTo(X,A.Y(p));x.lineTo(X-4,A.Y(p)-6*s);x.lineTo(X+4,A.Y(p)-6*s);x.fill();});
+rich(x,[["d",1],[" = "+fx((pb-pk),1)+" mm",0]],X-8,(A.Y(pk)+A.Y(pb))/2,12.5,"right","#9E4429");
+if(!G.thru)rich(x,[["共速后两线平行",0]],A.X(tc)+6,A.Y(xm*0.12),11.5,"left","#7A776D");}
+legend(x,[{c:GC.b,line:1,t:[["子弹 ",0],["x",1],["₁",0]]},{c:GC.k,line:1,t:[["木块 ",0],["x",1],["₂",0]]}],A.l+12,A.t+16);
+// (c) E-t (J)
+x=GE.x;const E0=S.E0;A=frameAxes(GE,T,E0*1.12,[["能量 ",0],["E",1],[" / J",0]],tc,v=>+v.toFixed(0)+"");
+const Eb=t=>.5*m*kin(t).vb**2,Ek=t=>.5*M*kin(t).vk**2;
+line(x,A,series(()=>E0,T,2),GC.tot,1.4,[6,4]);
+line(x,A,series(t=>E0-Eb(t)-Ek(t),now),GC.q,2.2);line(x,A,series(Eb,now),GC.b,2.2);line(x,A,series(Ek,now),GC.k,2.2);
+legend(x,[{c:GC.tot,line:1,t:[["总能量 ",0],["E",1],["₀ = "+fx(E0,0)+" J",0]]},{c:GC.b,line:1,t:[["子弹动能",0]]},{c:GC.k,line:1,t:[["木块动能",0]]},{c:GC.q,line:1,t:[["内能 ",0],["Q",1]]}],A.r-128,A.Y(E0*0.82));
+}
+// ===== Claude 风格交互（open-claude-ui 弹簧参数） =====
+function springKF(k,c,m,from,to,dur){const w0=Math.sqrt(k/m),z=c/(2*Math.sqrt(m*k)),wd=w0*Math.sqrt(1-z*z),kf=[],N=30;
+for(let i=0;i<=N;i++){const t=dur*i/N,p=1-Math.exp(-z*w0*t)*(Math.cos(wd*t)+z/Math.sqrt(1-z*z)*Math.sin(wd*t));kf.push(from+(to-from)*p);}kf[N]=to;return kf;}
+const BOUNCY=[600,30,1],SNAPPY=[320,28,1];
+document.querySelectorAll("button").forEach(b=>{let sc=1;
+b.addEventListener("pointerdown",()=>{b.animate([{transform:`scale(${sc})`},{transform:"scale(0.96)"}],{duration:120,easing:"cubic-bezier(.32,.72,0,1)",fill:"forwards"});sc=.96;});
+const up=()=>{if(sc===1)return;b.animate(springKF(...BOUNCY,.96,1,.3).map(v=>({transform:`scale(${v})`})),{duration:300,fill:"forwards"});sc=1;};
+b.addEventListener("pointerup",up);b.addEventListener("pointerleave",up);});
+// 卡片展开（SPRING_SNAPPY 320/28，≈0.35s）
+let open=true;$("tog").onclick=()=>{const el=$("exp"),h=el.scrollHeight;open=!open;$("tog").textContent=open?"收起":"展开";
+const kf=springKF(...SNAPPY,open?0:1,open?1:0,.4);el.animate(kf.map(p=>({height:Math.max(0,p*h)+"px",opacity:Math.min(1,Math.max(0,p))})),{duration:400,fill:"forwards"}).onfinish=e=>{el.style.height=open?"":"0px";el.getAnimations().forEach(a=>a.cancel());el.style.opacity=open?"":"0";};};
+// 滚动边缘渐隐（28px，7-stop 非线性）
+function fadeUpd(){const e=$("ans");e.style.setProperty("--ft",e.scrollTop>1?"28px":"0px");e.style.setProperty("--fb",e.scrollTop+e.clientHeight<e.scrollHeight-1?"28px":"0px");}
+$("ans").addEventListener("scroll",fadeUpd);new MutationObserver(fadeUpd).observe($("ans"),{childList:true});window.addEventListener("resize",fadeUpd);
+// 入场上浮（motionMessageFadeUp：opacity 0,y 12 → SPRING_SNAPPY）
+document.querySelectorAll(".stage,.p,.gcard,.box").forEach((el,i)=>{const kf=springKF(...SNAPPY,0,1,.45);el.animate(kf.map(p=>({opacity:Math.min(1,p),transform:`translateY(${12*(1-p)}px)`})),{duration:450,delay:i*30,fill:"backwards"});});
+
+defs.forEach(d=>$(d[0]).oninput=reset);
+$("play").onclick=()=>{if(!run&&st.t>0)reset();run=!run;$("play").textContent=run?"❚❚ 暂停":"▶ 继续";};
+$("slow").onclick=()=>{slow=!slow;$("slow").textContent="慢放 "+(slow?"开":"关");};
+reset();placeClawd();requestAnimationFrame(frame);requestAnimationFrame(clawdTick);
+</script></body></html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第 1 题 · 子弹打木块</title>
+<style>
+:root{--bg:#F5F4EE;--card:#FCFBF8;--ink:#1F1E1D;--ink2:#3D3929;--muted:#7A776D;--line:#E3E0D5;--clay:#C96442;--clay2:#E8B9A5;--sage:#6F7F63;--wood:#B98A5E}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1040px;margin:0 auto;padding:44px 28px 60px}
+.tag{display:inline-block;font-size:12px;letter-spacing:.08em;color:var(--clay);border:1px solid var(--clay2);border-radius:999px;padding:3px 12px;margin-bottom:14px}
+h1{font-family:"Songti SC","Noto Serif CJK SC","Source Han Serif SC",Georgia,serif;font-weight:600;font-size:30px;margin:0 0 12px;letter-spacing:.01em}
+.q{color:var(--ink2);font-size:15px;line-height:1.85;max-width:860px;margin:0}
+.stage{position:relative;margin-top:26px;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 1px 2px rgba(60,50,30,.04),0 8px 28px rgba(60,50,30,.06);overflow:hidden}
+canvas{display:block;width:100%;height:auto}
+.bar{display:flex;gap:10px;align-items:center;padding:14px 20px;border-top:1px solid var(--line)}
+button{font:inherit;font-size:14px;border-radius:10px;padding:9px 18px;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);transition:.15s}
+button:hover{border-color:#cfcabb}
+button.primary{background:var(--clay);border-color:var(--clay);color:#fff}
+button.primary:hover{background:#b5573a}
+.hint{margin-left:auto;font-size:13px;color:var(--muted)}
+.params{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:18px}
+.p{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.p .k{font-size:12px;color:var(--muted)}.p .val{font-size:18px;font-weight:600;margin:2px 0 6px;font-variant-numeric:tabular-nums}.p .val small{font-size:12px;color:var(--muted);font-weight:400;margin-left:3px}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:4px;background:var(--line);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--clay);border:3px solid #fff;box-shadow:0 0 0 1px var(--clay2);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--clay);border:3px solid #fff}
+.cols{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;margin-top:18px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px}
+.box h3{font-family:"Songti SC","Noto Serif CJK SC",Georgia,serif;font-size:18px;font-weight:600;margin:0 0 12px}
+.step{display:flex;gap:12px;padding:9px 0;border-top:1px dashed var(--line);font-size:14.5px;line-height:1.75;color:var(--ink2)}
+.step:first-of-type{border-top:0}
+.n{flex:none;width:22px;height:22px;border-radius:50%;background:#F3E6DF;color:var(--clay);font-size:12px;font-weight:600;display:grid;place-items:center;margin-top:3px}
+.v{color:var(--clay);font-weight:600;font-variant-numeric:tabular-nums}
+.f{font-family:"Times New Roman",Georgia,serif;font-style:italic}
+.note{margin-top:10px;font-size:13.5px;border-radius:10px;padding:9px 12px}
+.note.ok{background:#EEF1EA;color:#4E5E43}.note.bad{background:#F8E7E0;color:#9E4429}
+.live .r{display:flex;justify-content:space-between;padding:8px 0;border-top:1px dashed var(--line);font-size:14px;color:var(--ink2)}
+.live .r:first-of-type{border-top:0}.live .r b{font-variant-numeric:tabular-nums;color:var(--ink);font-weight:600}
+.meter{height:6px;border-radius:6px;background:var(--line);margin:4px 0 2px;overflow:hidden;display:flex}
+.meter i{display:block;height:100%}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:6px}.legend span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;background:var(--c)}
+.bubble{position:absolute;left:190px;bottom:96px;max-width:600px;background:#fff;border:1.5px solid #1F1E1D;border-radius:14px;padding:12px 16px 12px;font-size:14px;line-height:1.7;color:#1F1E1D;box-shadow:4px 4px 0 #1F1E1D;transition:opacity .2s, transform .2s;opacity:0;transform:translateY(6px);pointer-events:none}
+.bubble.show{opacity:1;transform:none;pointer-events:auto}
+.bubble:before{content:"";position:absolute;left:-10px;bottom:18px;width:16px;height:16px;background:#fff;border-left:1.5px solid #1F1E1D;border-bottom:1.5px solid #1F1E1D;transform:rotate(45deg)}
+.bubble .who{font-size:12px;color:#C96442;font-weight:700;letter-spacing:.06em;margin-bottom:2px}
+.bubble .go{margin-top:8px;font-size:13px;padding:5px 12px;border-radius:8px}
+</style></head><body><div class="wrap">
+<span class="tag">模型一 · 子弹—木块</span>
+<h1>第 1 题　子弹打木块</h1>
+<p class="q">质量为 <span class="f">M</span> 的木块放在光滑水平面上，质量为 <span class="f">m</span> 的子弹以初速度 <span class="f">v</span>₀ 水平打进木块并留在其中，子弹与木块间相互作用力为 <span class="f">f</span>。求：(1) 相对静止时的速度；(2) 子弹在木块内运动的时间；(3) 子弹、木块的位移及打入深度；(4) 要使子弹不射出，木块至少多长。</p>
+<div class="stage"><canvas id="c"></canvas><div class="bubble" id="bub"><div class="who">CLAWD</div><div id="bubt"></div><button class="go primary" id="bgo">继续 ▸</button></div>
+<div class="bar"><button class="primary" id="play">▶ 播放</button><button id="slow">慢放 开</button><span class="hint">接触过程实际只有几毫秒，动画已按时间缩放</span></div></div>
+<div class="params" id="params"></div>
+<div class="cols">
+<div class="box"><h3>解答</h3><div id="ans"></div></div>
+<div class="box live"><h3>实时数据</h3><div id="live"></div></div>
+</div></div>
+<script>
+const $=id=>document.getElementById(id);
+const C={clay:"#C96442",ink:"#1F1E1D",muted:"#7A776D",line:"#E3E0D5",wood:"#B98A5E",wood2:"#9C7048",sage:"#6F7F63",brass:"#C9A24A"};
+const defs=[["m","子弹质量 m","kg",0.005,0.2,0.005,0.02],["M","木块质量 M","kg",0.2,5,0.1,1],["v0","初速度 v₀","m/s",50,600,10,300],["f","作用力 f","N",500,20000,100,4000],["L","木块长度","m",0.05,0.5,0.01,0.3]];
+$("params").innerHTML=defs.map(d=>`<div class="p"><div class="k">${d[1]}</div><div class="val"><span id="${d[0]}v"></span><small>${d[2]}</small></div><input id="${d[0]}" type="range" min="${d[3]}" max="${d[4]}" step="${d[5]}" value="${d[6]}"></div>`).join("");
+const cv=$("c"),ctx=cv.getContext("2d"),CW=1040,CH=450,dpr=window.devicePixelRatio||1;
+cv.width=CW*dpr;cv.height=CH*dpr;ctx.scale(dpr,dpr);
+let P,S,st,run=false,slow=true,lastT=null,K;
+const fx=(x,n=3)=>(+x).toFixed(n);
+function read(){P={};defs.forEach(d=>{P[d[0]]=+$(d[0]).value;$(d[0]+"v").textContent=P[d[0]];});}
+function solve(){const{m,M,v0,f,L}=P,v=m*v0/(m+M),t=m*M*v0/(f*(m+M)),s1=m*(v0*v0-v*v)/(2*f),s2=M*v*v/(2*f),d=s1-s2,E0=.5*m*v0*v0,Q=f*d;S={v,t,s1,s2,d,Q,E0};
+const st=(n,h)=>`<div class="step"><span class="n">${n}</span><div>${h}</div></div>`;
+$("ans").innerHTML=
+st(1,`系统合外力为零，动量守恒：<span class="f">mv</span>₀ = (<span class="f">m</span>+<span class="f">M</span>)<span class="f">v</span>，得 <span class="v">v = ${fx(v)} m/s</span>`)+
+st(2,`对木块用动量定理：<span class="f">ft</span> = <span class="f">Mv</span>，得 <span class="v">t = ${fx(t*1000)} ms</span>`)+
+st(3,`动能定理。子弹：<span class="f">fs</span>₁ = ½<span class="f">m</span>(<span class="f">v</span>₀²−<span class="f">v</span>²)，<span class="v">s₁ = ${fx(s1,4)} m</span>；木块：<span class="f">fs</span>₂ = ½<span class="f">Mv</span>²，<span class="v">s₂ = ${fx(s2,4)} m</span><br>打入深度 <span class="f">d</span> = <span class="f">s</span>₁−<span class="f">s</span>₂ = <span class="f">mMv</span>₀² / [2<span class="f">f</span>(<span class="f">m</span>+<span class="f">M</span>)]，<span class="v">d = ${fx(d,4)} m</span>`)+
+st(4,`不射出需木块长 <span class="v">L ≥ ${fx(d,4)} m</span>。损失的机械能 <span class="f">Q</span> = <span class="f">fd</span> = <span class="v">${fx(Q,1)} J</span>，占初动能 ${fx(Q/E0*100,1)}%`)+
+(d>L?`<div class="note bad">当前木块长 ${L} m 小于 d，子弹会射穿木块，上面 (1)～(4) 的共速结论不再成立。</div>`:`<div class="note ok">当前木块长 ${L} m ≥ d，子弹留在木块内，与木块共速。</div>`);}
+function reset(){read();solve();K=620/Math.max(P.L+S.s2*1.4+0.12,0.45);st={xb:-110/K,vb:P.v0,xk:0,vk:0,t:0,inside:false,out:false,pen:0,trail:[]};run=false;$("play").textContent="▶ 播放";seen={};if(typeof say==='function')say('idle',false);}
+function step(dt){const{m,M,f,L}=P,n=300,h=dt/n;
+for(let i=0;i<n;i++){const front=st.xk,back=st.xk+L,inB=st.xb>=front&&st.xb<=back&&!st.out;
+if(inB&&st.vb>st.vk+1e-9){st.inside=true;st.vb-=f/m*h;st.vk+=f/M*h;if(st.vb<st.vk){const v=(m*st.vb+M*st.vk)/(m+M);st.vb=st.vk=v;}}
+else if(inB&&st.inside)st.vb=st.vk;
+st.xb+=st.vb*h;st.xk+=st.vk*h;st.t+=h;if(st.inside&&st.xb>back)st.out=true;if(st.inside&&!st.out)st.pen=st.xb-front;}}
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+function draw(){ctx.clearRect(0,0,CW,CH);const x0=230,gy=250,bh=92;
+// 地面
+ctx.strokeStyle=C.line;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(40,gy);ctx.lineTo(CW-40,gy);ctx.stroke();
+ctx.strokeStyle="#ECE9DF";ctx.lineWidth=1;for(let x=50;x<CW-40;x+=14){ctx.beginPath();ctx.moveTo(x,gy+1);ctx.lineTo(x-8,gy+9);ctx.stroke();}
+ctx.fillStyle=C.muted;ctx.font="12px -apple-system,PingFang SC,sans-serif";ctx.fillText("光滑水平面",44,gy+26);
+ctx.fillStyle='#F6F3EC';ctx.fillRect(0,300,CW,CH-300);ctx.strokeStyle=C.line;ctx.beginPath();ctx.moveTo(0,300);ctx.lineTo(CW,300);ctx.stroke();
+// 起点参考线
+ctx.setLineDash([3,4]);ctx.strokeStyle="#D6D2C5";ctx.beginPath();ctx.moveTo(x0,gy-bh-30);ctx.lineTo(x0,gy);ctx.stroke();ctx.setLineDash([]);
+// 木块
+const bx=x0+st.xk*K,bw=Math.max(P.L*K,10),by=gy-bh;
+ctx.save();ctx.shadowColor="rgba(80,60,30,.18)";ctx.shadowBlur=14;ctx.shadowOffsetY=6;rr(bx,by,bw,bh,6);
+const g=ctx.createLinearGradient(0,by,0,gy);g.addColorStop(0,"#C99B6E");g.addColorStop(1,"#A87A50");ctx.fillStyle=g;ctx.fill();ctx.restore();
+ctx.save();rr(bx,by,bw,bh,6);ctx.clip();ctx.strokeStyle="rgba(255,255,255,.12)";ctx.lineWidth=1;for(let y=by+10;y<gy;y+=11){ctx.beginPath();ctx.moveTo(bx,y);ctx.bezierCurveTo(bx+bw*.3,y-3,bx+bw*.7,y+3,bx+bw,y);ctx.stroke();}
+const hy=by+bh/2;if(st.inside){ctx.fillStyle="rgba(60,35,15,.55)";ctx.fillRect(bx,hy-2.5,Math.min(st.pen,P.L)*K,5);}ctx.restore();
+ctx.fillStyle="rgba(255,255,255,.92)";ctx.font="600 15px Georgia,serif";ctx.textAlign="center";ctx.fillText("M",bx+bw/2,by+22);ctx.textAlign="left";
+// 子弹（拖尾）
+const px=x0+st.xb*K;st.trail.push(px);if(st.trail.length>14)st.trail.shift();
+if(!(st.inside&&!st.out&&st.vb<=st.vk+1e-6)||st.out){const tl=st.trail[0];const gr=ctx.createLinearGradient(tl,0,px,0);gr.addColorStop(0,"rgba(201,100,66,0)");gr.addColorStop(1,"rgba(201,100,66,.35)");ctx.fillStyle=gr;ctx.fillRect(tl,hy-2,px-tl-12,4);}
+ctx.fillStyle=C.brass;ctx.beginPath();ctx.moveTo(px+4,hy);ctx.quadraticCurveTo(px-2,hy-5,px-10,hy-5);ctx.lineTo(px-20,hy-5);ctx.lineTo(px-20,hy+5);ctx.lineTo(px-10,hy+5);ctx.quadraticCurveTo(px-2,hy+5,px+4,hy);ctx.fill();
+ctx.fillStyle="#A8842F";ctx.fillRect(px-20,hy-5,3,10);
+// 位移标注
+const ay=gy-bh-22;ctx.strokeStyle=C.clay;ctx.fillStyle=C.clay;ctx.lineWidth=1.5;
+if(st.xk*K>2){ctx.beginPath();ctx.moveTo(x0,ay);ctx.lineTo(bx,ay);ctx.stroke();ctx.beginPath();ctx.moveTo(bx,ay);ctx.lineTo(bx-6,ay-4);ctx.lineTo(bx-6,ay+4);ctx.fill();}
+ctx.font="12.5px -apple-system,PingFang SC,sans-serif";ctx.fillText("木块位移 s₂ = "+fx(st.xk,4)+" m",x0+4,ay-8);
+// 左上角仪表
+ctx.fillStyle=C.muted;ctx.font="12px -apple-system,PingFang SC,sans-serif";ctx.fillText("时间",44,40);
+ctx.fillStyle=C.ink;ctx.font="600 20px Georgia,serif";ctx.fillText(fx(st.t*1000)+" ms",44,64);
+const bars=[["子弹速度",st.vb,C.brass],["木块速度",st.vk,C.wood2]];
+bars.forEach((b,i)=>{const y=40+i*30,x=640;ctx.fillStyle=C.muted;ctx.font="12px -apple-system,PingFang SC,sans-serif";ctx.fillText(b[0],x,y+4);
+ctx.fillStyle="#EFECE3";rr(x+64,y-4,230,8,4);ctx.fill();ctx.fillStyle=b[2];rr(x+64,y-4,Math.max(4,b[1]/P.v0*230),8,4);ctx.fill();
+ctx.fillStyle=C.ink;ctx.font="600 13px Georgia,serif";ctx.fillText(fx(b[1],2)+" m/s",x+304,y+5);});
+// 状态
+let s=!st.inside?"子弹飞向木块":st.out?"子弹已射穿木块":st.vb>st.vk+1e-6?"子弹在木块中减速，木块加速":"共速，一起匀速运动";
+ctx.fillStyle=C.clay;ctx.font="600 13px -apple-system,PingFang SC,sans-serif";ctx.fillText("● "+s,44,92);
+cl.tick+=1/60;drawClawd(110,428,7,$("bub").classList.contains("show"));
+// 实时
+const{m,M}=P,p=m*st.vb+M*st.vk,Ek=.5*m*st.vb*st.vb+.5*M*st.vk*st.vk,Q=S.E0-Ek;
+const kb=.5*m*st.vb*st.vb/S.E0*100,kk=.5*M*st.vk*st.vk/S.E0*100,kq=Math.max(0,100-kb-kk);
+$("live").innerHTML=`<div class="r"><span>系统总动量</span><b>${fx(p,4)} kg·m/s</b></div>
+<div class="r"><span>初始总动量</span><b>${fx(m*P.v0,4)} kg·m/s</b></div>
+<div class="r"><span>系统总动能</span><b>${fx(Ek,2)} J</b></div>
+<div class="r"><span>已转化为内能</span><b>${fx(Q,2)} J</b></div>
+<div class="r"><span>打入深度</span><b>${fx(Math.min(st.pen,P.L),4)} m${st.out?"（射穿）":""}</b></div>
+<div style="margin-top:10px;font-size:12px;color:#7A776D">初动能去向</div>
+<div class="meter"><i style="width:${kb}%;background:${C.brass}"></i><i style="width:${kk}%;background:${C.wood2}"></i><i style="width:${kq}%;background:${C.clay}"></i></div>
+<div class="legend"><span style="--c:${C.brass}">子弹动能</span><span style="--c:${C.wood2}">木块动能</span><span style="--c:${C.clay}">内能 Q</span></div>`;}
+
+// ===== Clawd =====
+const CL=["..XXXXXXXXXX..","..XXXXXXXXXX..","..XXEXXXXEXX..","XXXXEXXXXEXXXX","XXXXXXXXXXXXXX","..XXXXXXXXXX..","..XXXXXXXXXX..","...X.X..X.X...","...X.X..X.X..."];
+let cl={stage:"",tick:0,blink:0};
+function drawClawd(cx,by,px,talk){const t=cl.tick,bob=Math.round(Math.sin(t*4)*1)*px*(talk?1:0.5);
+const w=CL[0].length*px,ox=Math.round(cx-w/2),oy=Math.round(by-CL.length*px+bob);
+ctx.fillStyle="rgba(60,40,20,.12)";ctx.beginPath();ctx.ellipse(cx,by+3,w*.42,4,0,0,Math.PI*2);ctx.fill();
+const blink=(t%3.2)<0.12;
+CL.forEach((row,r)=>{[...row].forEach((c,k)=>{if(c===".")return;let yy=oy+r*px;
+if(r>=7){const leg=Math.floor(k/4)%2;if(talk&&((leg===0)^(Math.floor(t*6)%2===0))&&r===8)return;yy=oy+r*px-bob;}
+if(c==="E"){ctx.fillStyle=blink&&r===2?"#D97757":"#1F1E1D";}else ctx.fillStyle="#D97757";
+ctx.fillRect(ox+k*px,yy,px,px);});});}
+const LINES={
+idle:"嗨，我是 Clawd！先看题：子弹 m 以 v₀ 射向静止的木块 M，水平面光滑。点「继续」开始，我在每个关键阶段停下来讲解。",
+fly:"子弹还没碰到木块，两者之间没有相互作用。此时系统总动量 = m·v₀，全部在子弹身上。",
+contact:"打进去了！子弹受到向后的阻力 f，减速；木块受到向前的反作用力 f，加速。这对内力等大反向，合外力为零，所以系统动量守恒。但摩擦生热，机械能不守恒。",
+co:"共速了！v = mv₀/(m+M)。此后相对静止，不再生热。损失的机械能 Q = f·d，d 是子弹相对木块的位移，也就是打入深度。",
+out:"射穿了！木块长度小于临界深度 d，子弹还没来得及和木块共速就钻出来了。之后两者各自匀速，动量仍守恒，生热 Q = f·L。",
+};
+function say(k,pause=true){cl.stage=k;$("bubt").textContent=LINES[k];$("bub").classList.add("show");if(pause&&run){run=false;$("play").textContent="▶ 继续";}}
+function hush(){$("bub").classList.remove("show");}
+$("bgo").onclick=()=>{hush();if(!run){if(st.t>0&&!canGo())reset();run=true;$("play").textContent="❚❚ 暂停";}};
+function canGo(){return !(x0px()>CW-60||230+st.xb*K>CW+30);}
+let seen={};
+function checkStage(){if(!run)return;const contact=st.inside&&!st.out&&st.vb>st.vk+1e-6;
+if(!st.inside&&!seen.fly){seen.fly=1;say("fly",false);setTimeout(()=>{if(cl.stage==="fly")hush();},2600);}
+if(contact&&!seen.contact){seen.contact=1;say("contact");}
+if(st.out&&!seen.out){seen.out=1;say("out");}
+if(st.inside&&!st.out&&!contact&&!seen.co){seen.co=1;say("co");}}
+
+function frame(t){if(lastT==null)lastT=t;const dt=Math.min((t-lastT)/1000,.05);lastT=t;
+if(run){const contact=st.inside&&!st.out&&st.vb>st.vk+1e-6;
+const ts=contact?S.t/(slow?2.4:0.6):(110/K)/P.v0/(slow?0.9:0.3);
+if(!st.inside||contact||st.out)step(dt*ts);else step(dt*(slow?110:260)/(K*Math.max(st.vk,1e-3)));
+if(x0px()>CW-60||230+st.xb*K>CW+30){run=false;$("play").textContent="↺ 重放";}}
+checkStage();draw();requestAnimationFrame(frame);}
+function x0px(){return 230+(st.xk+P.L)*K;}
+defs.forEach(d=>$(d[0]).oninput=reset);
+$("play").onclick=()=>{hush();if(!run&&st.t>0)reset();run=!run;$("play").textContent=run?"❚❚ 暂停":"▶ 继续";};
+$("slow").onclick=()=>{slow=!slow;$("slow").textContent="慢放 "+(slow?"开":"关");};
+reset();say('idle',false);requestAnimationFrame(frame);
+</script></body></html>
