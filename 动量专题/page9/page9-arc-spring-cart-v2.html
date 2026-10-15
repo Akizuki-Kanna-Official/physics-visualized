@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,600&display=swap">
+<title>第 9 页 · 圆弧 + 摩擦 + 弹簧小车</title>
+<link rel="stylesheet" href="../../common/cw.css">
+</head><body><div id="app">
+<header class="top"><span class="tag">模型三 · 簧类（第 9 页）</span><h1>第 1 题　圆弧小车上的物块压缩弹簧</h1>
+<div class="tools"><label class="sw"><input type="checkbox" id="clawdOn" checked><i></i>显示小人</label>
+<div class="fzc"><span>字号</span><button id="fzm" aria-label="减小字号">A−</button><input type="range" id="fz" min="50" max="400" step="10" value="100"><button id="fzp" aria-label="增大字号">A＋</button><b id="fzv">100%</b></div></div></header>
+<main class="main">
+<section class="left"><div class="stage" id="scene"><canvas id="c"></canvas><div id="clawd" class="clawd"></div></div><div class="hint chip" id="hint">动画按时间缩放播放</div></section>
+<section class="right"><nav class="tabs" id="tabs"><i class="ind" id="ind"></i><button data-t="sol" class="on">解题过程</button><button data-t="gr">运动图像</button><button data-t="en">能量饼图</button></nav>
+<div class="tabbody">
+<div class="tab on" id="t-sol"><div class="pager" id="pg-sol"><p class="q">如图所示，一光滑的 1/4 圆弧固定在小车的左侧，圆弧半径 <span class="f">R</span> = 0.8 m，小车的右侧固定连有轻弹簧的挡板，弹簧处于原长状态，自由端恰在 C 点，总质量为 <span class="f">M</span> = 3 kg，小车置于光滑的水平地面上，左侧靠墙。一物块从圆弧顶端上的 A 点由静止滑下，经过 B 点时无能量损失，物块只与弹簧碰撞一次，最后物块停在车上的 B 点。已知物块的质量 <span class="f">m</span> = 1 kg，物块与小车间的动摩擦因数为 μ = 0.1，BC 长度为 <span class="f">L</span> = 2 m，<span class="f">g</span> 取 10 m/s²。求在运动过程中 (1) 弹簧最大压缩量；(2) 弹簧弹性势能的最大值。<br>附加：该过程损失机械能多少？B 的最大速度为？该过程弹簧对 B 的冲量？</p>
+<p class="fnote">全部为<b>题目给的</b>数值；物块所受摩擦力 <span class="f">f</span> = μ<span class="f">mg</span>（BC 段与弹簧所在段都有摩擦）。</p><h3>解答</h3><div id="ans"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-gr"><div class="seg" id="seg"><button data-g="gv" class="on">v–t</button><button data-g="gx">x–t</button><button data-g="ge">E–t</button></div>
+<div class="pager" id="pg-gr"><div id="gb"><h4 id="gtitle"></h4><canvas id="gv" class="on"></canvas><canvas id="gx"></canvas><canvas id="ge"></canvas></div><div class="gleg" id="gleg"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-en"><div class="pager" id="pg-en"><h3>物块初始重力势能 <i class=f>mgR</i> 的去向</h3><canvas id="pie"></canvas><div id="pieLeg" class="pleg"></div><h3>实时数据</h3><div id="live" class="live"></div></div><div class="pgnav"></div></div>
+</div></section></main>
+<footer class="bot"><div class="ctl"><div class="btns"><button class="primary" id="play">▶ 开始播放</button><button id="pause">⏸ 暂停</button><button id="rst">↺ 重置</button></div><label class="sw bt"><input type="checkbox" id="bt" checked><i></i>子弹时间</label></div><div class="params" id="params"></div></footer>
+</div>
+<script src="../../common/exact.js"></script><script src="../../common/canvas.js"></script><script src="../../common/graph.js"></script><script src="../../common/pie.js"></script><script src="../../common/clawd.js"></script><script src="../../common/scene.js"></script><script src="../../common/ui.js"></script><script src="../../common/draw.js"></script>
+<script>
+const KEY="p9";
+const defs=[["M","小车总质量 M","kg",1,10,0.1,3,"g"],["m","物块质量 m","kg",0.2,5,0.1,1,"g"],["R","圆弧半径 R","m",0.2,2,0.05,0.8,"g"],["mu","动摩擦因数 μ","",0.02,0.5,0.01,0.1,"g"],["L","BC 长度 L","m",0.5,4,0.1,2,"g"],["l0","弹簧原长","m",0.8,3,0.1,1.4,"a"]];
+const g=10,DECK=0.2,TH=0.1,WR=0.07,SZ=0.16,WD=0.12;
+const M={title:"第 9 页 · 圆弧 + 摩擦 + 弹簧小车（左侧靠墙）",
+extraTags(){return{g:["重力加速度 <i class=f>g</i> = 10 m/s²","“物块只与弹簧碰撞一次，最后停在 B 点”"],a:["劲度系数 <i class=f>k</i> = 2<i class=f>E</i><sub>p</sub>/<i class=f>x</i>² = "+exH(X.k,"N/m")+"（由题目答案推出，见解答）"]};},
+exact(Q){const half=R(1,2),G=R(g),vB2=qm(qm(R(2),G),Q.R),vB=qroot(vB2),mM=qa(Q.m,Q.M),r=qd(Q.m,mM),v=smq(vB,r),f=qm(qm(Q.mu,Q.m),G),
+E0=qm(qm(Q.m,G),Q.R),Eend=qm(half,qm(mM,qm(qsq(r),vB2))),Qt=qs(E0,Eend),x=qs(qd(Qt,qm(R(2),f)),Q.L),Ep=qs(qd(Qt,R(2)),R(0)),k=qd(qm(R(2),Ep),qsq(x)),
+mr=qd(qm(Q.m,Q.M),mM),c1=qd(f,k),u=smq(qroot(qd(k,mr)),qs(x,c1)),dv=smq(u,r),ok=qv(x)>0;
+// 弹簧对物块的冲量（物块压缩、恢复两段的解析式，k 由答案推出）
+let I=null;if(ok){const kv=qv(k),fv=qv(f),mrv=qv(mr),w=Math.sqrt(kv/mrv),uC=Math.sqrt(2*(qv(E0)*qv(qd(Q.M,mM))-fv*qv(Q.L))/mrv),A1=Math.hypot(fv/kv,uC/w),t1=(Math.PI/2-Math.asin(fv/kv/A1))/w,A2=qv(x)-fv/kv,t2=Math.acos(-(fv/kv)/A2)/w,uo=A2*w*Math.sin(w*t2);I={v:mrv*uC-fv*t1+mrv*uo+fv*t2,t1,t2,uC,uo};}
+return{vmax:sval(v)+sval(dv),vB,v,x,Ep,k,f,E0,Qt,dE:Qt,c1,dv,vmaxR:v,ok,I,mr,
+rC:qd(qm(half,qm(Q.M,qm(qsq(r),vB2))),E0),rm:qd(qm(half,qm(Q.m,qm(qsq(r),vB2))),E0),rQ:qd(Qt,E0)};},
+init(P){return{t:0,ph:0,phi:Math.PI/2,om:0,xc:0,vc:0,s:-1,vb:0,Q:0,ep:0,vcmax:0};},
+h(s){return s.ph===0?5e-4:1e-4;},fast(){return false;},
+step(s,h,P){const{m,M:Mc,R:Rr,mu,L,l0}=P;s.t+=h;
+if(s.ph===0){// 小车靠墙不动：物块沿固定圆弧下滑，RK4 积分 φ'' = −(g/R) sin φ（φ 从竖直向下量起）
+const f=(p,o)=>[o,-g/Rr*Math.sin(p)],[a1,b1]=f(s.phi,s.om),[a2,b2]=f(s.phi+a1*h/2,s.om+b1*h/2),[a3,b3]=f(s.phi+a2*h/2,s.om+b2*h/2),[a4,b4]=f(s.phi+a3*h,s.om+b3*h);
+s.phi+=h/6*(a1+2*a2+2*a3+a4);s.om+=h/6*(b1+2*b2+2*b3+b4);if(s.phi<=0){s.ph=1;s.s=0;s.vb=sval(X.vB);s.phi=0;}return;}
+// 车面上：物块位置 s（相对 B），速度 vb；小车 xc、vc。滑动摩擦 + 弹簧（s > L 时压缩 c = s − L）
+const f=mu*m*g,kk=X.ok?qv(X.k):6,c=Math.max(0,s.s-L),Fs=kk*c,u=s.vb-s.vc;
+if(s.ph===3){s.xc+=s.vc*h;s.vb=s.vc;return;}
+let fb;if(Math.abs(u)<1e-12){if(Fs<=f){s.vb=s.vc=(m*s.vb+Mc*s.vc)/(m+Mc);s.ph=c>0?2:3;}fb=c>0?f:0;}else fb=-f*Math.sign(u);
+let ab=(-Fs+fb)/m,ac=(Fs-fb)/Mc;if(s.xc<=0&&s.vc<=0&&ac<0){ac=0;s.vc=0;}
+let tau=h;const du=ab-ac;if(u!==0&&du!==0){const tc=-u/du;if(tc>0&&tc<h)tau=tc;}
+s.s+=(s.vb-s.vc)*tau+.5*(ab-ac)*tau*tau;s.xc+=s.vc*tau+.5*ac*tau*tau;s.Q+=Math.abs(fb)>0?f*Math.abs(u*tau+.5*du*tau*tau):0;s.vb+=ab*tau;s.vc+=ac*tau;
+if(tau<h){// 相对速度过零：判断是否相对静止
+const c2=Math.max(0,s.s-L);if(kk*c2<=f){const v=(m*s.vb+Mc*s.vc)/(m+Mc);s.vb=s.vc=v;s.ph=3;s.tend=s.t-h+tau;s.xc+=v*(h-tau);}else{s.vb=s.vc;s.cmax=Math.max(s.cmax||0,c2);s.vcomm=s.vc;}}
+if(!s.vleave&&s.cmax&&s.s<=L&&s.vb<s.vc)s.vleave=s.vc;if(s.s<0){s.s=0;}s.ep=.5*kk*Math.max(0,s.s-L)**2;s.vcmax=Math.max(s.vcmax,s.vc);},
+tsBase(){return 1;},tsSlow(){return 1;},
+tPre(P){return 12;},events(s,E){if(s.ph>=1&&!E.tB)E.tB=s.t;if(s.tend&&!E.te)E.te=s.tend;},tg(E){return E.te?E.te*1.12:10;},
+check(s){return{cmax:s.cmax,vcmax:s.vcmax,vleave:s.vleave,stopAtB:s.s,tend:s.tend,Q:s.Q};},
+bx(s,P){if(s.ph===0)return s.xc+P.R-P.R*Math.sin(s.phi);return s.xc+P.R+s.s;},
+by(s,P){return s.ph===0?DECK+P.R-P.R*Math.cos(s.phi):DECK;},
+rec(s,P){const vbx=s.ph===0?P.R*s.om*Math.cos(s.phi)*-1:s.vb;return{v:{b:s.ph===0?-P.R*s.om*Math.cos(s.phi):s.vb,c:s.vc},x:{s:s.ph===0?0:s.s,c:Math.max(0,s.s-P.L)},E:{k:.5*P.m*(s.ph===0?(P.R*s.om)**2:s.vb**2),c:.5*P.M*s.vc**2,p:P.m*g*(M.by(s,P)-DECK),e:s.ep,Q:s.Q}};},
+G:{gv:{title:"速度—时间图像（水平速度）",note:"下滑时小车被墙挡住不动；物块滑上 BC 后小车离墙；弹簧压缩最短时第一次共速，最后停在 B 点时再次共速",f:"v",ylab:[["速度 ",0],["v",1],[" / (m·s⁻¹)",0]],s:[{k:"b",c:"#8A6440",t:[["物块（水平分速度）",0]]},{k:"c",c:C.slate,t:[["小车",0]]}],mark:E=>E.te,
+extra(x,A,now){const hs=H.filter(h=>h.t<=now);let mx=null;hs.forEach(h=>{if(!mx||h.v.c>mx.v.c)mx=h;});if(mx&&mx.v.c>0.01){x.fillStyle=C.slate;x.beginPath();x.arc(A.X(mx.t),A.Y(mx.v.c),4,0,7);x.fill();rich(x,[["小车最大速度 ",0],["",0,null],[fx(mx.v.c,3)+" m/s",0]],A.X(mx.t)+6,A.Y(mx.v.c)-8,12,"left","#475070");}}},
+gx:{title:"物块相对 B 的位置",note:"实线：物块到 B 的距离（BC 段 + 压缩量）；虚线：弹簧压缩量",f:"x",ylab:[["位置 ",0],["s",1],[" / m",0]],s:[{k:"s",c:"#8A6440",t:[["物块到 B 的距离",0]]},{k:"c",c:C.clay,dash:[5,4],t:[["弹簧压缩量",0]]}],mark:E=>E.te},
+ge:{title:"能量—时间图像",note:"重力势能 → 动能 → 弹性势能与摩擦生热；最终 6 J 全部变为内能",f:"E",ylab:[["能量 ",0],["E",1],[" / J",0]],s:[{k:"p",c:C.sage,t:[["物块重力势能",0]]},{k:"k",c:"#8A6440",t:[["物块动能",0]]},{k:"c",c:C.slate,t:[["小车动能",0]]},{k:"e",c:C.plum,t:[["弹性势能",0]]},{k:"Q",c:C.clay,t:[["摩擦生热",0]]}],mark:E=>E.te}},
+view(P){const Lc=P.R+P.L+P.l0+WD,K=Math.min(200,640/(Lc+0.3));return{K,ox:160,gy:300};},
+onReset(P){const Lc=P.R+P.L+P.l0+WD,K=Math.min(200,640/(Lc+0.3));M.camAnchor=160+K*Lc/2;},
+camFocus(s,P){return s.xc+(P.R+P.L+P.l0+WD)/2;},track(s,P){return[M.camFocus(s,P)];},
+world(v,s,P){const{R:Rr,L,l0}=P,Lc=Rr+L+l0+WD,xc=s.xc;
+if(v.main)wWall(v,0,0,DECK+Rr+0.25,-1);
+wCart(v,xc,Lc,DECK,TH,WR,"");
+// 圆弧（实心靠墙部分）
+ctx.fillStyle="#D8D3C5";ctx.beginPath();ctx.moveTo(v.X(xc),v.Y(DECK+Rr));for(let a=Math.PI/2;a>=0;a-=0.05)ctx.lineTo(v.X(xc+Rr-Rr*Math.sin(a)),v.Y(DECK+Rr-Rr*Math.cos(a)));ctx.lineTo(v.X(xc+Rr),v.Y(DECK));ctx.lineTo(v.X(xc),v.Y(DECK));ctx.closePath();ctx.fill();
+ctx.strokeStyle=C.ink;ctx.lineWidth=1.4;ctx.beginPath();for(let a=Math.PI/2;a>=0;a-=0.02){const X0=v.X(xc+Rr-Rr*Math.sin(a)),Y0=v.Y(DECK+Rr-Rr*Math.cos(a));a===Math.PI/2?ctx.moveTo(X0,Y0):ctx.lineTo(X0,Y0);}ctx.lineTo(v.X(xc+Rr),v.Y(DECK));ctx.stroke();
+// 挡板 D 与弹簧
+const xD=xc+Rr+L+l0;wBlock(v,xD,DECK,WD,0.45,"",STEEL,2);const c=Math.max(0,s.s-L);wSpring(v,xc+Rr+L+c,xD,DECK+SZ/2,9,0.04);
+// 标注 A B C D
+if(v.main){ctx.fillStyle=C.ink;ctx.font="italic 600 14px 'Source Serif 4',serif";[["A",xc+0.02,DECK+Rr+0.06],["B",xc+Rr-0.03,DECK-TH-0.12],["C",xc+Rr+L-0.03,DECK-TH-0.12],["D",xD+0.02,DECK+0.5]].forEach(a=>ctx.fillText(a[0],v.X(a[1]),v.Y(a[2])));
+ctx.strokeStyle="rgba(201,100,66,.5)";ctx.setLineDash([3,3]);[xc+Rr,xc+Rr+L].forEach(x=>{ctx.beginPath();ctx.moveTo(v.X(x),v.Y(DECK));ctx.lineTo(v.X(x),v.Y(DECK+0.35));ctx.stroke();});ctx.setLineDash([]);}
+// 物块（在圆弧上随切线转动）
+const bx=M.bx(s,P),by=M.by(s,P),ang=s.ph===0?s.phi:0;ctx.save();ctx.translate(v.X(bx),v.Y(by));ctx.rotate(ang);wBlock({K:v.K,X:x=>x*v.K-SZ/2*v.K,Y:y=>-y*v.K},0,0,SZ,SZ,"m");ctx.restore();
+if(v.main){ctx.fillStyle=C.clay;ctx.font="12px "+GF;if(s.ph>=1)ctx.fillText("物块距 B："+fx(s.s,3)+" m"+(c>0?"，压缩量 "+fx(c,3)+" m":""),v.X(xc+Rr),v.Y(DECK+0.62));}},
+status(s,P){if(s.ph===0)return"物块沿光滑圆弧下滑：小车被墙挡住不动，物块机械能守恒";if(s.ph===3)return"物块停在 B 点，与小车一起匀速运动";const c=s.s-P.L,u=s.vb-s.vc;if(c<=0)return u>0?"物块在 BC 段向右滑动，小车离开墙向右加速":"物块离开弹簧，相对小车向左滑回";return u>0?"压缩弹簧：物块减速，小车加速":u<0?"弹簧伸长，把物块相对小车推回":"弹簧压缩最短，二者共速";},
+bars(s,P){const vb=s.ph===0?-P.R*s.om*Math.cos(s.phi):s.vb;return[["物块（水平）",vb,"#8A6440",sval(X.vB)],["小车",s.vc,C.slate,sval(X.vB)]];},
+pie(s,P,X){const E=qv(X.E0),r=M.rec(s,P).E;return{tgt:[r.p/E,r.k/E,r.c/E,r.e/E,r.Q/E],cols:[C.sage,"#8A6440",C.slate,C.plum,C.clay],names:["重力势能","物块动能","小车动能","弹性势能","摩擦生热"],done:s.ph===3,fr:[R(0),X.rm,X.rC,R(0),X.rQ]};},
+live(s,P){const vb=s.ph===0?-P.R*s.om*Math.cos(s.phi):s.vb;return[["水平总动量",fx(P.m*vb+P.M*s.vc,4)+" kg·m/s"],["小车速度",fx(s.vc,4)+" m/s"],["小车最大速度（严格，kx′=μmg 时）",fx(s.vcmax,4)+" m/s"],["物块离开弹簧时小车速度",s.vleave?fx(s.vleave,4)+" m/s":"—"],["弹性势能",fx(s.ep,4)+" J"],["摩擦生热",fx(s.Q,4)+" J"]];},
+sol(X,P){const i=t=>`<span class="f">${t}</span>`,V=(q,u)=>`<span class="v">${exH(q,u)}</span>`,VS=(q,u)=>`<span class="v">${surdH(q,u)}</span>`,st=(n,h)=>`<div class="step"><span class="n">${n}</span><div>${h}</div></div>`;
+if(!X.ok)return `<div class="warn">当前参数下算出的压缩量 ≤ 0：物块到不了弹簧，与题设不符，请恢复题目数值。</div>`;
+const I=X.I;return st(1,`<b>下滑</b>：物块对圆弧的压力有水平向左的分量，小车被墙挡住不动，圆弧光滑，物块机械能守恒：${i("mgR")} = ½${i("mv")}<sub>B</sub>² ⇒ ${i("v")}<sub>B</sub> = ${VS(X.vB,"m/s")}`)+
+st(2,`<b>滑上车面后</b>：小车离开墙，物块与小车系统水平方向合外力为零，动量守恒。弹簧压缩最短时、最后停在 B 点时二者都共速：${i("mv")}<sub>B</sub> = (${i("m")}+${i("M")})${i("v")} ⇒ ${i("v")} = ${VS(X.v,"m/s")}`)+
+st(3,`<b>(1)</b> 从 B 出发到最后回到 B，物块相对小车走过 2(${i("L")}+${i("x")})，摩擦力 ${i("f")} = μ${i("mg")} = ${exH(X.f,"N")}，生热 ${i("Q")} = ${i("f")}·2(${i("L")}+${i("x")})：<br>μ${i("mg")}·2(${i("L")}+${i("x")}) = ½${i("mv")}<sub>B</sub>² − ½(${i("m")}+${i("M")})${i("v")}² = ${exH(X.Qt,"J")} ⇒ ${i("x")} = ${V(X.x,"m")}`)+
+st(4,`<b>(2)</b> 压缩最短时（共速）：${i("E")}<sub>p</sub> = ½${i("mv")}<sub>B</sub>² − ½(${i("m")}+${i("M")})${i("v")}² − μ${i("mg")}(${i("L")}+${i("x")}) = ${V(X.Ep,"J")}`)+
+`<div class="ansbox">答案：(1) ${exH(X.x,"m")}；(2) ${exH(X.Ep,"J")}（与课件 1 m、3 J 一致）</div>`+
+st(5,`<b>附加：损失的机械能</b>　从 A 释放到停在 B：Δ${i("E")} = ${i("mgR")} − ½(${i("M")}+${i("m")})${i("v")}² = ${V(X.dE,"J")}，全部转化为内能（= μ${i("mg")}·2(${i("L")}+${i("x")})）`)+
+`<div class="warn">附加问“B 的最大速度”“该过程弹簧对 B 的冲量”与第 10 页（物体 B 靠墙、弹簧连接）的问题完全相同，疑似从第 10 页复制。本题 B 是车上的一个点。下面按最可能的意思分别解答：“小车的最大速度”“弹簧对物块的冲量”。</div>`+
+st(6,`<b>小车的最大速度（严格最大值，依赖 <i class=f>k</i>）</b>：压缩阶段弹簧和摩擦力都推小车向右，小车一直加速到共速 ${surdH(X.v,"m/s")}；伸长阶段弹簧仍向右推小车，摩擦力（物块相对小车向左滑）向左，<b>当 ${i("kx")}′ = μ${i("mg")} 时小车加速度为零、速度最大</b>，不是在物块离开弹簧（C 点）时。<br>弹簧劲度系数由 (1)(2) 的答案推出：${i("k")} = 2${i("E")}<sub>p</sub>/${i("x")}² = ${V(X.k,"N/m")}，此时 ${i("x")}′ = μ${i("mg")}/${i("k")} = ${exH(X.c1,"m")}。<br>以相对运动处理（折合质量 μ<sub>r</sub> = ${i("mM")}/(${i("m")}+${i("M")}) = ${exH(X.mr,"kg")}）：从最大压缩到 ${i("x")}′，½μ<sub>r</sub>${i("u")}² = ½${i("k")}(${i("x")} − ${i("x")}′)²，${i("u")} = (${i("x")}−${i("x")}′)√(${i("k")}/μ<sub>r</sub>)；小车速度 = 质心速度 + ${i("m")}${i("u")}/(${i("m")}+${i("M")})<br>⇒ ${i("v")}<sub>车 max</sub> = ${surdH(X.v,"")} + ${surdH(X.dv,"m/s")} <span class="v">≈ ${fx(sval(X.v)+sval(X.dv),4)} m/s</span>`)+
+`<div class="warn"><b>采用的解释</b>：“最大速度”按<b>严格最大值</b>理解，即小车所受合力为零（弹簧伸长阶段 <i class=f>kx</i>′ = μ<i class=f>mg</i>）的时刻。这个值<b>依赖劲度系数 <i class=f>k</i></b>，题目没有直接给 <i class=f>k</i>；本页按理想轻弹簧 <i class=f>E</i><sub>p</sub> = ½<i class=f>kx</i>² 由 (1)(2) 的答案推出 <i class=f>k</i> = 6 N/m。若不承认这一推导，严格最大值无法由题给数据确定。<br>另一种常见理解是“物块离开弹簧（回到 C）时小车的速度”：相对路程 <i class=f>L</i>+2<i class=f>x</i> = 4 m，生热 4 J，<i class=f>v</i>₁+3<i class=f>v</i>₂ = 4，<i class=f>v</i>₁²+3<i class=f>v</i>₂² = 8 ⇒ <i class=f>v</i>₂ = 1+√3/3 ≈ 1.577 m/s（不依赖 <i class=f>k</i>）。但此刻弹簧已不推小车、摩擦力已让小车减速一段，它<b>不是</b>小车的最大速度；参考文档给出的 1+√3/3 属于这种理解。仿真实时数据同时显示两个值，图像中的标记点是严格最大值。</div>`+
+st(7,`<b>弹簧对物块的冲量</b>（${i("k")} 由答案推出）：压缩段 ${i("t")}₁ ≈ ${fx(I.t1,4)} s、恢复段 ${i("t")}₂ ≈ ${fx(I.t2,4)} s，由相对运动的动量定理 ∫${i("kx")}d${i("t")} = μ<sub>r</sub>Δ${i("u")} ± ${i("f")}${i("t")}：<br>${i("I")} = (μ<sub>r</sub>${i("u")}<sub>C</sub> − ${i("f")}${i("t")}₁) + (μ<sub>r</sub>|${i("u")}<sub>出</sub>| + ${i("f")}${i("t")}₂) = √6 + √3 + [arccos(−1/5) − π/2 + arcsin(1/7)]/(2√2) <span class="v">≈ ${fx(I.v,3)} N·s</span>，方向向左（弹簧对小车的冲量大小相同、向右）。该值含反三角函数，高中阶段不要求；若题目指第 10 页的情形，请看第 10 页。`);}};
+
+</script>
+<script src="../../common/engine.js"></script>
+<script>engineStart();</script>
+</body></html>
