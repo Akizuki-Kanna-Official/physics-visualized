@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,600&display=swap">
+<title>第 8 页 · 子弹打 A，A、B 由弹簧相连</title>
+<link rel="stylesheet" href="../../common/cw.css">
+</head><body><div id="app">
+<header class="top"><span class="tag">模型三 · 簧类—小球（第 8 页）</span><h1>例题　子弹打木块 + 弹簧连接体</h1>
+<div class="tools"><label class="sw"><input type="checkbox" id="clawdOn" checked><i></i>显示小人</label>
+<div class="fzc"><span>字号</span><button id="fzm" aria-label="减小字号">A−</button><input type="range" id="fz" min="50" max="400" step="10" value="100"><button id="fzp" aria-label="增大字号">A＋</button><b id="fzv">100%</b></div></div></header>
+<main class="main">
+<section class="left"><div class="stage" id="scene"><canvas id="c"></canvas><div id="clawd" class="clawd"></div></div><div class="hint chip" id="hint">动画按时间缩放播放</div></section>
+<section class="right"><nav class="tabs" id="tabs"><i class="ind" id="ind"></i><button data-t="sol" class="on">解题过程</button><button data-t="gr">运动图像</button><button data-t="en">能量饼图</button></nav>
+<div class="tabbody">
+<div class="tab on" id="t-sol"><div class="pager" id="pg-sol"><p class="q">“簧类—小球”模型（课件例题，见图：子弹以 <span class="f">v</span>₀ 射向 A，A、B 用轻弹簧相连，静止在光滑水平面上）。<br>(1) 系统动量守恒吗？机械能守恒吗？<br>(2) 什么时候弹簧弹性势能最大？如何算？<br>B 的最大速度是多少？<br>归纳：弹簧压缩最短或弹簧拉伸最长时，弹簧连接的两物体速度相等，此时弹簧弹性势能最大。</p>
+<p class="fnote">题目只给示意图，页面采用<b>示例数值</b>；子弹所受阻力 <span class="f">f</span> 为 A 对子弹的阻力。</p><h3>解答</h3><div id="ans"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-gr"><div class="seg" id="seg"><button data-g="gv" class="on">v–t</button><button data-g="gx">x–t</button><button data-g="ge">E–t</button></div>
+<div class="pager" id="pg-gr"><div id="gb"><h4 id="gtitle"></h4><canvas id="gv" class="on"></canvas><canvas id="gx"></canvas><canvas id="ge"></canvas></div><div class="gleg" id="gleg"></div></div><div class="pgnav"></div></div>
+<div class="tab" id="t-en"><div class="pager" id="pg-en"><h3>射入后机械能分配（随振动变化）</h3><canvas id="pie"></canvas><div id="pieLeg" class="pleg"></div><h3>实时数据</h3><div id="live" class="live"></div></div><div class="pgnav"></div></div>
+</div></section></main>
+<footer class="bot"><div class="ctl"><div class="btns"><button class="primary" id="play">▶ 开始播放</button><button id="pause">⏸ 暂停</button><button id="rst">↺ 重置</button></div><label class="sw bt"><input type="checkbox" id="bt" checked><i></i>子弹时间</label></div><div class="params" id="params"></div></footer>
+</div>
+<script src="../../common/exact.js"></script><script src="../../common/canvas.js"></script><script src="../../common/graph.js"></script><script src="../../common/pie.js"></script><script src="../../common/clawd.js"></script><script src="../../common/scene.js"></script><script src="../../common/ui.js"></script><script src="../../common/draw.js"></script>
+<script>
+const KEY="p8";
+const defs=[["m0","子弹质量 m₀","kg",0.01,0.5,0.01,0.1,"e"],["v0","子弹速度 v₀","m/s",5,200,1,40,"e"],["mA","A 的质量 mA","kg",0.1,5,0.1,0.9,"e"],["mB","B 的质量 mB","kg",0.1,10,0.1,3,"e"],["k","劲度系数 k","N/m",5,500,1,48,"a"],["l0","弹簧原长","m",0.4,2,0.1,1,"a"]];
+const W=0.25,HH=0.22,DP=0.05;
+const M={title:"第 8 页 · 子弹打木块 + 弹簧连接体",
+exact(Q){const half=R(1,2),m1=qa(Q.m0,Q.mA),vA=qd(qm(Q.m0,Q.v0),m1),mt=qa(m1,Q.mB),vc=qd(qm(m1,vA),mt),E1=qm(half,qm(m1,qsq(vA))),Ep=qs(E1,qm(half,qm(mt,qsq(vc)))),vB=qd(qm(R(2),qm(m1,vA)),mt),vA2=qd(qm(qs(m1,Q.mB),vA),mt),E0=qm(half,qm(Q.m0,qsq(Q.v0))),Qp=qs(E0,E1),
+xm=qroot(qd(qm(R(2),Ep),Q.k)),f=qd(Qp,R(DP*100,100));return{vA,vc,Ep,vB,vA2,E0,E1,Qp,xm,f,m1,rEp:qd(Ep,E1),rB:qd(qm(half,qm(Q.mB,qsq(vc))),E1),rA:qd(qm(half,qm(m1,qsq(vc))),E1),tooShort:sval(qroot(qd(qm(R(2),Ep),Q.k)))>=qv(Q.l0)*0.9};},
+init(P){return{t:0,ph:0,xb:-0.4,vb:P.v0,xA:0,vA:0,xB:W+P.l0,vB:0,pen:0,Qp:0};},
+h(s){if(s.ph===0)return Math.max(2e-6,Math.min(2e-3,(s.xA-s.xb)/s.vb/4));return s.ph===1?2e-6:2e-3;},fast(s){return s.ph===1;},
+step(s,h,P){const{m0,mA,mB,k,l0}=P;s.t+=h;
+if(s.ph<=1){if(s.ph===0&&s.xb>=s.xA)s.ph=1;const f=s.ph===1?qv(X.f):0,Fs=k*(s.xB-s.xA-W-l0);s.vb-=f/m0*h;s.vA+=(f+Fs)/mA*h;s.vB-=Fs/mB*h;s.xb+=s.vb*h;s.xA+=s.vA*h;s.xB+=s.vB*h;s.pen=Math.max(0,s.xb-s.xA);
+if(s.ph===1&&s.vb<=s.vA){const m1=m0+mA;s.vA=(m0*s.vb+mA*s.vA);s.vA/=m1;s.ph=2;s.Qp=qv(X.Qp);s.tc=s.t;}return;}
+// 两物体 + 弹簧：RK4
+const m1=m0+mA,acc=(xA,xB)=>{const F=k*(xB-xA-W-l0);return[F/m1,-F/mB];};
+const d=(y)=>{const[a1,a2]=acc(y[0],y[2]);return[y[1],a1,y[3],a2];},y=[s.xA,s.vA,s.xB,s.vB],k1=d(y),k2=d(y.map((v,i)=>v+k1[i]*h/2)),k3=d(y.map((v,i)=>v+k2[i]*h/2)),k4=d(y.map((v,i)=>v+k3[i]*h));
+const n=y.map((v,i)=>v+h/6*(k1[i]+2*k2[i]+2*k3[i]+k4[i]));const vBo=s.vB;[s.xA,s.vA,s.xB,s.vB]=n;s.xb=s.xA+s.pen;s.vb=s.vA;
+const c=s.xA+W+l0-s.xB;if(c>(s.cmax||0))s.cmax=c;if(s.vB>(s.vBmax||0))s.vBmax=s.vB;},
+check(s){return{cmax:s.cmax,vBmax:s.vBmax};},
+tsBase(){return 0.5;},tsSlow(){return 0.0012;},
+tPre(P){const m1=P.m0+P.mA,w=Math.sqrt(P.k*(m1+P.mB)/(m1*P.mB));return 0.02+2*Math.PI/w*2.2;},events(s,E){if(s.tc&&!E.tc)E.tc=s.tc;},
+tg(E,P){const m1=P.m0+P.mA,w=Math.sqrt(P.k*(m1+P.mB)/(m1*P.mB));return (E.tc||0)+2*Math.PI/w*2;},
+rec(s,P){const m1=P.m0+P.mA,c=s.xA+W+P.l0-s.xB;return{v:{A:s.vA,B:s.vB,cm:(m1*s.vA+P.mB*s.vB)/(m1+P.mB)},x:{c},E:{A:.5*(s.ph>=2?m1:P.mA)*s.vA**2,B:.5*P.mB*s.vB**2,p:.5*P.k*c*c}};},
+G:{gv:{title:"速度—时间图像",note:"弹簧压缩最短（或伸长最长）时两物体速度相等；弹簧恢复原长时 B 的速度最大",f:"v",ylab:[["速度 ",0],["v",1],[" / (m·s⁻¹)",0]],s:[{k:"A",c:"#8A6440",t:[["A（含子弹）",0]]},{k:"B",c:C.slate,t:[["B",0]]},{k:"cm",c:"#999",dash:[5,4],w:1.4,t:[["质心速度",0]]}],
+leg:X=>[{c:"#8A6440",line:1,t:[["A（含子弹）：",0],["",0,X.vA],[" ↔ ",0],["",0,X.vA2],[" m/s",0]]},{c:C.slate,line:1,t:[["B：0 ↔ ",0],["",0,X.vB],[" m/s（最大）",0]]},{c:"#999",line:1,t:[["质心速度 = 共同速度 ",0],["",0,X.vc],[" m/s",0]]}]},
+gx:{title:"弹簧形变量—时间图像",note:"正值为压缩，负值为伸长；压缩量最大时弹性势能最大",f:"x",ylab:[["压缩量 ",0],["x",1],[" / m",0]],s:[{k:"c",c:C.clay,t:[["弹簧压缩量",0]]}]},
+ge:{title:"能量—时间图像（射入之后）",note:"射入后系统机械能守恒：两物体动能与弹性势能相互转化",f:"E",ylab:[["能量 ",0],["E",1],[" / J",0]],s:[{k:"A",c:"#8A6440",t:[["A 动能",0]]},{k:"B",c:C.slate,t:[["B 动能",0]]},{k:"p",c:C.clay,t:[["弹性势能",0]]}],
+leg:X=>[{c:"#8A6440",line:1,t:[["A（含子弹）动能",0]]},{c:C.slate,line:1,t:[["B 动能",0]]},{c:C.clay,line:1,t:[["弹性势能（最大 ",0],["",0,X.Ep],[" J）",0]]}]}},
+view(P){const K=Math.min(260,600/(P.l0+2*W+1));return{K,ox:260,gy:262};},
+camFocus(s,P){const m1=P.m0+P.mA;return (m1*(s.xA+W/2)+P.mB*(s.xB+W/2))/(m1+P.mB);},camAnchor:null,
+onReset(P){const K=Math.min(260,600/(P.l0+2*W+1)),m1=P.m0+P.mA;M.camAnchor=260+K*((m1*W/2+P.mB*(W+P.l0+W/2))/(m1+P.mB));},
+track(s,P){return[M.camFocus(s,P)];},
+world(v,s,P){wSpring(v,s.xA+W,s.xB,HH/2,10,0.04);wBlock(v,s.xA,0,W,HH,"A");wBlock(v,s.xB,0,W,HH,"B",STEEL);
+if(s.pen>0){ctx.fillStyle="rgba(60,35,15,.55)";const hh=Math.max(1.5,2*v.K/K);ctx.fillRect(v.X(s.xA),v.Y(HH/2)-hh,s.pen*v.K,hh*2);}
+if(s.ph<2||v.z)if(!offscreen(v,s.xb,HH/2,"子弹"))wBullet(v,s.xb,HH/2,0.04);
+if(v.main){const c=s.xA+W+P.l0-s.xB;ctx.fillStyle=C.clay;ctx.font="12px "+GF;ctx.fillText((c>=0?"压缩量 ":"伸长量 ")+fx(Math.abs(c),3)+" m",v.X(s.xA+W),v.Y(HH)-34);
+if(s.ph===0)wArrow(v,s.xb-0.1,HH/2+0.12,1,40,C.clay,"v₀");
+const cm=M.camFocus(s,P);ctx.fillStyle="#999";ctx.beginPath();ctx.moveTo(v.X(cm),v.Y(-0.02));ctx.lineTo(v.X(cm)-5,v.Y(-0.02)+8);ctx.lineTo(v.X(cm)+5,v.Y(-0.02)+8);ctx.fill();ctx.font="11px "+GF;ctx.fillText("质心",v.X(cm)-11,v.Y(-0.02)+42);}},
+mag(s,P){return{x:s.xA+W/2,y:HH/2,z:2.6,r:[24,300,420,166],title:"放大镜 · 跟随 A"};},
+status(s,P){if(s.ph===0)return"子弹飞向 A";if(s.ph===1)return"子弹射入 A（时间极短，弹簧几乎未形变）";const c=s.xA+W+P.l0-s.xB,dv=s.vA-s.vB;return c>1e-4?(dv>0?"弹簧被压缩：A 减速、B 加速":"弹簧恢复：B 继续加速、A 继续减速"):c<-1e-4?(dv<0?"弹簧被拉长：B 减速、A 加速":"弹簧收缩回原长"):"弹簧处于原长";},
+bars(s,P){return[["子弹",s.ph<2?s.vb:s.vA,C.brass,P.v0],["A",s.vA,"#8A6440",qv(X.vA)*1.1],["B",s.vB,C.slate,qv(X.vA)*1.1]];},
+pie(s,P,X){const E=qv(X.E1),m1=P.m0+P.mA,c=s.xA+W+P.l0-s.xB;const a=s.ph<2?[0,0,0]:[.5*m1*s.vA**2/E,.5*P.mB*s.vB**2/E,.5*P.k*c*c/E];return{tgt:a,cols:["#8A6440",C.slate,C.clay],names:["A（含子弹）动能","B 动能","弹性势能"],done:false,fr:null};},
+live(s,P){const m1=P.m0+P.mA,c=s.xA+W+P.l0-s.xB;return[["系统总动量",fx((s.ph<2?P.m0*s.vb+P.mA*s.vA:m1*s.vA)+P.mB*s.vB,4)+" kg·m/s"],["初始总动量",fx(P.m0*P.v0,4)+" kg·m/s"],["射入产生的内能",fx(s.Qp,3)+" J"],["动能 + 弹性势能",fx((s.ph<2?.5*P.mA*s.vA**2:.5*m1*s.vA**2)+.5*P.mB*s.vB**2+.5*P.k*c*c,4)+" J"],["已出现的最大压缩量",fx(s.cmax||0,4)+" m"],["已出现的 B 最大速度",fx(s.vBmax||0,4)+" m/s"]];},
+sol(X,P){const i=t=>`<span class="f">${t}</span>`,V=(q,u)=>`<span class="v">${exH(q,u)}</span>`,st=(n,h)=>`<div class="step"><span class="n">${n}</span><div>${h}</div></div>`,m=k=>i("m")+"<sub>"+k+"</sub>";
+return `<div class="warn">原课件此页只有示意图和问题，没有给出质量、速度等数值，也没有选择题选项；页面上孤立的答案“C”无法对应任何选项，这里不采用。下面用<b>示例数值</b>演示并给出一般表达式。</div>`+
+st(1,`<b>过程一：子弹射入 A</b>（时间极短，弹簧来不及形变，B 不参与）。子弹与 A 动量守恒：${m("0")}${i("v")}₀ = (${m("0")}+${m("A")})${i("v")}<sub>A</sub> ⇒ ${i("v")}<sub>A</sub> = ${V(X.vA,"m/s")}；机械能损失 ${V(X.Qp,"J")}（转化为内能）`)+
+st(2,`<b>(1) 守恒判断</b>：子弹、A、B 与弹簧组成的系统合外力为零，<b>全过程动量守恒</b>；射入过程有摩擦生热，<b>机械能不守恒</b>；射入之后只有弹簧弹力做功，A、B 与弹簧系统<b>机械能守恒</b>。`)+
+st(3,`<b>(2) 弹性势能何时最大</b>：弹簧压缩最短（或拉伸最长）时 A、B 速度相等，此时弹性势能最大。<br>(${m("0")}+${m("A")})${i("v")}<sub>A</sub> = (${m("0")}+${m("A")}+${m("B")})${i("v")}<sub>共</sub> ⇒ ${i("v")}<sub>共</sub> = ${V(X.vc,"m/s")}<br>${i("E")}<sub>p max</sub> = ½(${m("0")}+${m("A")})${i("v")}<sub>A</sub>² − ½(${m("0")}+${m("A")}+${m("B")})${i("v")}<sub>共</sub>² = ${V(X.Ep,"J")}`)+
+st(4,`<b>B 的最大速度</b>：弹簧恢复原长时 B 速度最大。动量守恒 + 机械能守恒（相当于弹性碰撞）：<br>${i("v")}<sub>B max</sub> = 2(${m("0")}+${m("A")})${i("v")}<sub>A</sub>/(${m("0")}+${m("A")}+${m("B")}) = ${V(X.vB,"m/s")}，此时 A 的速度 ${V(X.vA2,"m/s")}${qv(X.vA2)<0?"（向左）":""}`)+
+`<div class="ansbox">答案：${i("E")}<sub>p max</sub> = ${exH(X.Ep,"J")}（共速时）；${i("v")}<sub>B max</sub> = ${exH(X.vB,"m/s")}</div>`+
+`<div class="fnote">动画补设：劲度系数 ${i("k")}、弹簧原长、打入深度 5 cm 不影响上述答案；${i("k")} 只决定最大压缩量 ${i("x")} = √(2${i("E")}<sub>p</sub>/${i("k")}) = ${surdH(X.xm,"m")} 和振动快慢。弹簧与 A、B 都连接，射入后两物体<b>永远往复振动</b>，质心以 ${exH(X.vc,"m/s")} 匀速前进。</div>`+(X.tooShort?`<div class="warn">最大压缩量接近弹簧原长，请增大 ${i("k")} 或原长。</div>`:"");}};
+
+</script>
+<script src="../../common/engine.js"></script>
+<script>engineStart();</script>
+</body></html>
