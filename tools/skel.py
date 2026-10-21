@@ -11,7 +11,7 @@ def page(title,tag,h1,q,note,graphs,pie_title,script,hint="动画按时间缩放
 <link rel="stylesheet" href="../../common/cw.css">
 </head><body><div id="app">
 <header class="top"><span class="tag">{tag}</span><h1>{h1}</h1>
-<div class="tools"><label class="sw"><input type="checkbox" id="clawdOn" checked><i></i>显示小人</label>
+<div class="tools"><label class="sw"><input type="checkbox" id="clawdOn"><i></i>显示小人</label>
 <div class="fzc"><span>字号</span><button id="fzm" aria-label="减小字号">A−</button><input type="range" id="fz" min="50" max="400" step="10" value="100"><button id="fzp" aria-label="增大字号">A＋</button><b id="fzv">100%</b></div></div></header>
 <main class="main">
 <section class="left"><div class="stage" id="scene"><canvas id="c"></canvas><div id="clawd" class="clawd"></div></div><div class="hint chip" id="hint">{hint}</div></section>
