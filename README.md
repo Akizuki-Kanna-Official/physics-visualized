@@ -30,7 +30,30 @@
 
 ## 如何打开
 
-无需安装、无需构建：直接用浏览器（Chrome / Edge / Firefox / Safari）双击打开对应 `.html` 即可。也可以下载 Release 里的 zip，解压后离线使用。
+用浏览器（Chrome / Edge / Firefox / Safari）打开页面即可，无需安装、无需联网。
+
+### 群聊 / 临时分享：单文件包
+
+Release 里的 `physics-visualized-1.1.0-standalone.zip` 中，第 2–16 页各是一个独立的 `.html`。`common/*.js`、`common/cw.css` 和本专题用到的字体子集都写在文件里面。把其中一页发到群里，对方下载后双击就能看到动画。
+
+同目录的 `index.html` 是目录页，和这些页面放在一起使用。每个 `page*.html` 自己就能打开。
+
+重新生成：
+
+```bash
+pip install -r tools/requirements-pack.txt
+python3 tools/pack.py
+```
+
+输出在 `dist/standalone/`（构建产物，不入库）。`python3 tools/pack.py --smoke` 会再用无头 Chrome 抽查第 2、9、16 页是否能播起来。打包依赖 `fonttools` 和 `brotli`，只在导出时需要。
+
+西文字体 Source Serif 4 带有 OFL 保留字体名 Source。单文件里的子集改名为 **CW Latin**，许可全文在每个 html 源码的 `font-license` 一段。开发源码里的页面继续使用 `common/fonts/` 里的原字体名。
+
+### 克隆仓库看源码、改题
+
+源码布局是 `动量专题/pageN/*.html` 与旁边的 `common/`。从仓库里打开页面时，浏览器读取 `../../common/` 下的脚本、样式和字体。改题、对答案、对照 `history/` 都用这套文件。
+
+仓库：<https://github.com/Akizuki-Kanna-Official/physics-visualized> 。想跟踪后续页面，可以在 GitHub 上 Star 这个仓库。
 
 页面操作：开始 / 暂停 / 重置三按钮、「子弹时间」开关（瞬间过程放慢）、参数滑块与数值输入框、解题过程 / 运动图像 / 能量饼图标签页、字号调节（50%–400%，适合投屏）。
 
@@ -56,17 +79,19 @@
 | `python3 tools/runtest.py 页面.html [秒数]` | 无头连续运行测试：按钮逻辑、物体是否在画面内、帧间速度突变 |
 | `python3 tools/shot.py 页面.html 输出.png 帧数 [tab=sol\|gr\|en] [fz=1] [w=1920] [h=1080]` | 预推进 N 帧后无头截图 |
 | `tools/skel.py` | 页面骨架生成器（新页面 v0 的模板） |
+| `pip install -r tools/requirements-pack.txt` 然后 `python3 tools/pack.py` | 把第 2–16 页导出为 `dist/standalone/` 下的离线单文件。`--smoke` 抽查播放 |
 
 完整制作流程见 [`WORKFLOW.md`](WORKFLOW.md)，进度记录见 [`PROGRESS.md`](PROGRESS.md)，版本变化见 [`CHANGELOG.md`](CHANGELOG.md)。
 
 ## 目录结构
 
 ```
-动量专题/pageN/      第 N 页的页面（当前版本）及 history/ 旧版本
+动量专题/pageN/      第 N 页的页面（当前版本）及 history/ 旧版本。开发时的源码
 common/              通用模块：cw.css 样式，exact.js 精确数，engine/scene/draw 绘图与仿真，
                      graph.js 运动图像，pie.js 能量饼图，ui.js 交互，clawd.js 小人
 common/fonts/        本地字体（woff2 分片 + fonts.css + OFL.txt）
-tools/               校验、测试、截图脚本
+tools/               校验、测试、截图，以及 pack.py（单文件导出）
+dist/standalone/     pack.py 生成的单文件页面（不入库，见 Release 的 zip）
 WORKFLOW.md  PROGRESS.md  CHANGELOG.md
 LICENSE  LICENSE-CONTENT
 ```
@@ -79,4 +104,5 @@ LICENSE  LICENSE-CONTENT
 
 ## 相关
 
-宣传视频在单独的仓库中维护，不包含在本仓库内。
+- 源码与 Star：<https://github.com/Akizuki-Kanna-Official/physics-visualized>
+- 宣传视频在单独的仓库中维护，不包含在本仓库内。

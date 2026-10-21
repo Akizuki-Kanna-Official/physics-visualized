@@ -4,6 +4,15 @@
 版本号对应用户备份 `history/q1-bullet-block-N.html`（时间为文件修改时间，北京时间 2026-10-15）。各条目均根据相邻版本的 `diff -u` 写出。
 当前 `q1-bullet-block.html` 与 V10 完全相同（MD5 `87b56e61…`），所以没有单独列为新版本。
 
+## [1.1.0] – 2026-10-21
+单文件分发：第 2–16 页可以各自离线打开，不必带上整个仓库。
+### Added
+- `tools/pack.py`：把每一页的 `common/*.js`、`common/cw.css` 内联进 HTML，并把本专题用到的 Noto Serif SC / Source Serif 4 字形子集嵌成 data URL，写出 `dist/standalone/`。
+- 打包依赖 `tools/requirements-pack.txt`（fonttools、brotli）。`python3 tools/pack.py --smoke` 用无头 Chrome 抽查第 2、9、16 页能播放、字体已加载、Clawd 仍默认关闭。
+- Release 附带单文件 zip，方便群聊里只传一页。
+### Changed
+- 单文件里的 Source Serif 4 子集改名为 CW Latin（SIL OFL 保留字体名 Source，修改版另起族名）。开发源码 `common/fonts/` 与页面里的字体名保持不变。每个单文件源码内附 OFL 全文。
+
 ## [1.0.0] – 2026-10-21
 首个公开发布版本：动量守恒四大模型 动起来讲（第 2–16 页）。
 ### Added
