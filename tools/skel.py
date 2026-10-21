@@ -1,5 +1,5 @@
 """页面骨架（与第 2 页 V10 相同的 DOM 结构），生成 第 N 页 HTML 的 v0。之后的版本直接在 HTML 上修改。"""
-FONTS='<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,600&display=swap">'
+FONTS='<link rel="stylesheet" href="../../common/fonts/fonts.css">'
 def page(title,tag,h1,q,note,graphs,pie_title,script,hint="动画按时间缩放播放"):
     segs=''.join(f'<button data-g="{g}"{" class=\"on\"" if i==0 else ""}>{lab}</button>' for i,(g,lab) in enumerate(graphs))
     cvs=''.join(f'<canvas id="{g}"{" class=\"on\"" if i==0 else ""}></canvas>' for i,(g,lab) in enumerate(graphs))
