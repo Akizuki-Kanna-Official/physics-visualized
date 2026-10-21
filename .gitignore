@@ -1,0 +1,3 @@
+# tools/pack.py 的生成目录（单文件 HTML 随 Release 的 zip 分发，不入库）。
+# 字体、截图等媒体继续由 git 跟踪，不要写进本文件。
+/dist/
