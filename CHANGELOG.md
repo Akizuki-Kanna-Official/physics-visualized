@@ -4,6 +4,16 @@
 版本号对应用户备份 `history/q1-bullet-block-N.html`（时间为文件修改时间，北京时间 2026-10-15）。各条目均根据相邻版本的 `diff -u` 写出。
 当前 `q1-bullet-block.html` 与 V10 完全相同（MD5 `87b56e61…`），所以没有单独列为新版本。
 
+## [1.0.0] – 2026-10-21
+首个公开发布版本：动量守恒四大模型 动起来讲（第 2–16 页）。
+### Added
+- 中文 README（页面说明、打开方式、URL 参数、工具、目录结构）。
+- 许可：代码 MIT（`LICENSE`），文档与媒体 CC BY 4.0（`LICENSE-CONTENT`），字体 SIL OFL 1.1（`common/fonts/OFL.txt`）。
+- URL 参数 `#clawdOn` / `#clawdOff`。
+### Changed
+- 字体本地化：Noto Serif SC（400/500/600/700）与 Source Serif 4（400/600，含斜体）改为 `common/fonts/` 本地 woff2，所有页面不再请求 Google Fonts，国内与离线可正常显示。
+- Clawd 小人默认关闭，仅 `#clawdOn` 或手动打开开关时显示。
+
 ## [第 15 页 v1] – 2026-10-15 17:43
 ### Fixed
 - 初始时刻物块高度未初始化，能量饼图图例显示“NaN%”。
